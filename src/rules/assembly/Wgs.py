@@ -42,10 +42,7 @@ rule wgsExecution:
     output: "assembly/wgs/9-terminator/assembly.ctg.fasta"
     run: 
         specFile = SpecFile("assembly/wgs.cnf",CONFIG["maxMem"],threads)
-        print("runCA -d assembly/wgs/ -p assembly -s {specFile} {inputFiles}".format(specFile=specFile.fileName, inputFiles=" ".join(input)))
-        if not os.path.exists("assembly/wgs/9-terminator"):
-            os.mkdir("assembly/wgs/9-terminator")
-        open(output[0], "a").close()
+        shell("runCA -d assembly/wgs/ -p assembly -s {specFile} {inputFiles}".format(specFile=specFile.fileName, inputFiles=" ".join(input)))
         
         
 ruleorder: fastqToCaPaired > fastqToCaSingle
@@ -54,7 +51,7 @@ rule fastqToCaPaired:
     input: lambda wildcards: CONFIG["options"]["wgs"]["input"][wildcards.sample]
     output: "assembly/{sample}.frg"
     run:
-        print("fastqToCA -insertSize {insSize} {insDev} -libraryname {sample} -technology {tech} {direction} -mates {input[0]},{input[1]} "
+        shell("fastqToCA -insertsize {insSize} {insDev} -libraryname {sample} -technology {tech} {direction} -mates {input[0]},{input[1]} "
                   "> {output[0]}".format(
                                          insSize=CONFIG["libraries"][wildcards.sample]["insertSize"],
                                          insDev=CONFIG["libraries"][wildcards.sample]["insertSizeStdev"],
@@ -63,24 +60,22 @@ rule fastqToCaPaired:
                                          direction=getOrientation(CONFIG["libraries"][wildcards.sample]["type"]),
                                          input=input,
                                          output=output))
-        open(output[0], 'a').close()
 
 rule fastqToCaSingle:
     input: "preprocessing/{sample}_1.fastq"
     output: "assembly/{sample}.frg"
     run:
-        print("fastqToCA -technology {tech} -reads {input[0]} > {output[0]}"
+        shell("fastqToCA -technology {tech} -reads {input[0]} > {output[0]}"
                   "".format(
                             tech=getTech(CONFIG["libraries"][wildcards.sample]["platform"], CONFIG["libraries"][wildcards.sample]["readlen"]),
                             input=input,
                             output=output
                             ))
-        open(output[0], 'a').close()
       
 rule wgsCleanup:
     input: "assembly/wgs/9-terminator/assembly.ctg.fasta"
     output: "assembly/wgs.contigs.fasta"
-    shell: "mv {input[0]} {output[0]}"
+    shell: "mv {input[0]} {output[0]}; rm -r assembly/wgs"
 
 #################
 ##  Functions  ##

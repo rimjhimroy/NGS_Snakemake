@@ -5,11 +5,13 @@
 in the directory of the reference genome
 TODO: implement BWA
 TODO: implement Tophat for RNA
+TODO test bowtieSingle
 
 {
     "mapping":{
         "reads":{
-            "sampleName":[/path/to/forward,/path/to/reversed]
+            "sampleName":[/path/to/forward.fastq,/path/to/reversed.fastq]
+            "anotherSample":[/path/to/singleEndReads.fastq]
         },
         "referenceGenome":"/path/to/reference"
     }

@@ -1,6 +1,22 @@
 """
 @author: jetse
 @version: 0.1
+
+The minimum JSON for executing the Haplotyping:
+{
+    "options":{
+        "mpileup":{
+            "reads":["/path/to/file.bam"]
+        },
+        "vcfUtils":{
+            "path":"/path/to/vcfUtils.pl"
+            "optionalOpts":""
+        }
+    },
+    "mapping":{
+        "referenceGenome":"/path/to/referenceGenome.fasta"
+    }
+}
 """
 rule samtoolsMpileup:
     input: 

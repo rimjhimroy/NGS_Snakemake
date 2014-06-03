@@ -14,7 +14,7 @@ for sample in CONFIG["libraries"]:
         except FileExistsError:
             pass
 
-#TODO: relative paths, __file__ is path to snakemake...       
+#TODO: relative paths, __file__ is path to snakemake, sys.argv[2] isn't best method either...       
 include: os.path.dirname(sys.argv[2])+"/../../rules/fastqProcessing/Trimming.py"
  
 include: os.path.dirname(sys.argv[2])+"/../../rules/fastqProcessing/ContaminationFiltering.py"
