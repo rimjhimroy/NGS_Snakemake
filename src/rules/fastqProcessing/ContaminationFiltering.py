@@ -22,7 +22,7 @@ Required programs:
 
 Expects a global variable CONFIG (e.g. parsed from json) of at least the following structure for paired end data:
 {
-    "libraries"{
+    "libraries":{
         "testLibrary":{
             "insertSize":500
         }
@@ -81,7 +81,3 @@ rule filterSingle:
                                                    output=output))
 #         FileControl.fastqControl(output[0])
         
-rule bowtieIndex:
-    input: inFile = "{ref}.fasta"
-    output: outFile = "{ref}.fasta.1.bt2"
-    shell: "bowtie2-build {input.inFile} {input.inFile}"
