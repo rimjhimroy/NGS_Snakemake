@@ -1,0 +1,59 @@
+"""
+@author: Jetse
+@version: 0.1
+ 
+Trimming of fastq files with FastqMcf. For usage, include this in your workflow.
+
+Required programs:
+* ea-utils
+
+Expects a global variable CONFIG (e.g. parsed from json) of at least the following structure:
+{
+    "illuminaAdapters": "/path/to/adapters",
+    "options":{
+        "fastqMcf":{
+            "dupLen": "60",
+            "optionalOptions": ""
+        },
+    }
+}
+
+Expects the input files in the working directory. For paired end data the files have to end with _1.fastq (forward reads) and 
+_2.fastq (reversed reads).
+"""
+
+###############
+##  Imports  ##
+###############
+from qualityControl.files import FastqFile
+
+#################
+##  Fastq-mcf  ##
+#################
+ruleorder: fastqMcfPaired > fastqMcfSingle
+
+rule fastqMcfPaired:
+    input: 
+        forward = "preprocessing/{sample}_1.fastq",
+        reversed = "preprocessing/{sample}_2.fastq"
+    output: 
+        forward = "preprocessing/mcf.{sample}_1.fastq",
+        reversed = "preprocessing/mcf.{sample}_2.fastq"
+    run: 
+        shell("fastq-mcf {optionalParams} -D  {dups} -o {output.forward} -o {output.reversed} {adapterFile} {input.forward} {input.reversed}".format(optionalParams=CONFIG["options"]["fastqMcf"]["optionalOptions"],
+                                                                                                                                                    dups=CONFIG["options"]["fastqMcf"]["dupLen"],
+                                                                                                                                                    adapterFile=CONFIG["illuminaAdapters"],
+                                                                                                                                                    input=input,
+                                                                                                                                                    output=output))
+        FastqFile.FastqFile(output.forward, output.reversed).isValid(dna=True)
+        
+rule fastqMcfSingle:
+    input:"preprocessing/{sample}.fastq",
+    output: "preprocessing/mcf.{sample}.fastq"
+    run: 
+        shell("fastq-mcf {optionalParams} -D  {dups} -o {output[0]} {adapterFile} {input[0]}".format(optionalParams=CONFIG["options"]["fastqMcf"]["optionalOptions"],
+                                                                                                        dups=CONFIG["options"]["fastqMcf"]["dupLen"],
+                                                                                                        adapterFile=CONFIG["illuminaAdapters"],
+                                                                                                        input=input,
+                                                                                                        output=output))
+        FastqFile.FastqFile(output[0]).isValid(dna=True)

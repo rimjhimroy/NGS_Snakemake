@@ -30,7 +30,7 @@ Data requirements:
 ###############
 ##  Imports  ##
 ###############
-from qualityControl import FileControl
+from qualityControl.files import FastqFile
 
 #############
 ##  Quake  ##
@@ -54,7 +54,7 @@ rule quakePaired:
                         threads=threads))
         os.rename(wildcards.sample + "_1.cor.fastq", output.forward)
         os.rename(wildcards.sample + "_2.cor.fastq", output.reversed)
-        FileControl.fastqControl(output.forward, output.reversed)
+        FastqFile.FastqFile(output.forward, output.reversed).isValid(dna=True)
 
 #Put paired end data file names into a file with a whitespace inbetween.
 rule fastqNamesFile:
@@ -77,4 +77,4 @@ rule quakeSingle:
                         kmerSize=CONFIG["kmerSize"],
                         threads=threads))
         os.rename(wildcards.sample + ".cor.fastq", output[0])
-        FileControl.fastqControl(output[0])
+        FastqFile.FastqFile(output[0]).isValid(dna=True)

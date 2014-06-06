@@ -37,7 +37,7 @@ For unpaired data, the libraries section is not needed in this module.
 ###############
 ##  Imports  ##
 ###############
-# from qualityControl import FileControl
+from qualityControl.files import FastqFile
 
 ###############################
 ##  Contamination filtering  ##
@@ -64,7 +64,7 @@ rule filterPaired:
                                                                            maxInsert=insertSize*2))
         os.rename(output.forward + "_tmp_unmapppedPhix.1.fastq", output.forward)
         os.rename(output.forward + "_tmp_unmapppedPhix.2.fastq", output.reversed)
-#         FileControl.fastqControl(output.forward, output.reversed)
+        FastqFile.FastqFile(output.forward, output.reversed).isValid(dna=True)
             
 rule filterSingle:
     input:
@@ -79,5 +79,5 @@ rule filterSingle:
               "-U {input.fastq} -S /dev/null".format(threads=threads,
                                                    input=input,
                                                    output=output))
-#         FileControl.fastqControl(output[0])
+        FastqFile.FastqFile(output[0]).isValid(dna=True)
         

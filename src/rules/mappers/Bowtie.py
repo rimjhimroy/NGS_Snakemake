@@ -3,8 +3,6 @@
 @author: Jetse
 @attention: When the bowtie index is not present, the program needs writing permissions 
 in the directory of the reference genome
-TODO: implement BWA
-TODO: implement Tophat for RNA
 TODO test bowtieSingle
 
 {
@@ -40,12 +38,4 @@ rule bowtieSingle:
     output: "mapped/{sample}.sam"
     threads: 999
     shell: "bowtie2 -p {threads} -x {input.reference} -U {input.reads} -S {output[0]}"
-    
-###########
-##  BWA  ##
-###########
 
-
-##############
-##  Tophat  ##
-##############

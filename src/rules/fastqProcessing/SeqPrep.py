@@ -20,6 +20,8 @@ Expects the input files in the working directory. The input files have to end wi
 (forward reads) and "_2" (reversed reads) 
 
 """
+from qualityControl.files import FastqFile
+
 #################################
 ##  Merging overlapping reads  ##
 #################################
@@ -43,6 +45,6 @@ rule seqprep:
         shell("gunzip " + output.merged + ".gz")
         shell("gunzip " + output.forwardSingle + ".gz")
         shell("gunzip " + output.reversedSingle + ".gz")
-        FileControl.fastqControl(output.merged)
-        FileControl.fastqControl(output.forwardSingle)
-        FileControl.fastqControl(output.reversedSingle)
+        FastqFile.FastqFile(output.merged).isValid(dna=True)
+        FastqFile.FastqFile(output.forwardSingle).isValid(dna=True)
+        FastqFile.FastqFile(output.reversedSingle).isValid(dna=True)

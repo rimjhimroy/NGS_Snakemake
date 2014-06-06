@@ -1,0 +1,89 @@
+"""
+@author: Jetse
+@version: 0.1
+ 
+Trimming of fastq files. For usage, include this in your workflow.
+
+Required programs:
+* trimmomatic
+
+Expects a global variable CONFIG (e.g. parsed from json) of at least the following structure:
+{
+    "illuminaAdapters": "/path/to/adapters",
+    "options":{
+        "trimmomatic":{
+            "jar": "/home/jaco001/programs/trimmomatic-0.32.jar",
+            "seedMisMatches": 2,
+            "palindromeClipTreshold": 30,
+            "simpleClipThreshhold": 10,
+            "LeadMinTrimQual": 3,
+            "TrailMinTrimQual": 3,
+            "windowSize": 4,
+            "avgMinQual": 15,
+            "minReadLen": 36,
+            "phred" : "-phred33"
+        }
+    }
+}
+Expects the input files in the working directory. For paired end data the files have to end with _1.fastq (forward reads) and 
+_2.fastq (reversed reads).
+
+"""
+###############
+##  Imports  ##
+###############
+from qualityControl.files import FastqFile
+
+###################
+##  Trimmomatic  ##
+###################
+ruleorder: trimmomaticPaired > trimmomaticSingle
+
+rule trimmomaticPaired:
+    input:
+        forward = "preprocessing/{sample}_1.fastq",
+        reversed = "preprocessing/{sample}_2.fastq"
+    output:
+        forward = "preprocessing/trim.{sample}_1.fastq",
+        reversed = "preprocessing/trim.{sample}_2.fastq",
+        forwardUnpaired = "preprocessing/trim.{sample}_unpaired_1.fastq",
+        reversedUnpaired = "preprocessing/trim.{sample}_unpaired_2.fastq"
+    threads: 999
+    run: 
+        TrimOpts = collections.namedtuple("TrimOpts", CONFIG["options"]["trimmomatic"].keys())
+        trimOpts = TrimOpts(**CONFIG["options"]["trimmomatic"])
+        shell("java -jar {trimOpts.jar} PE {trimOpts.phred} -threads {threads} "
+            "{input.forward} {input.reversed} {output.forward} {output.forwardUnpaired} {output.reversed} {output.reversedUnpaired}  "
+            "ILLUMINACLIP:{adapterFile}:{trimOpts.seedMisMatches}:{trimOpts.palindromeClipTreshold}:{trimOpts.simpleClipThreshhold} "
+            "LEADING:{trimOpts.LeadMinTrimQual} "
+            "TRAILING:{trimOpts.TrailMinTrimQual} "
+            "SLIDINGWINDOW:{trimOpts.windowSize}:{trimOpts.avgMinQual} "
+            "MINLEN:{trimOpts.minReadLen}"
+            "".format(
+                    input=input,
+                    output=output,
+                    adapterFile=CONFIG["illuminaAdapters"],
+                    threads=threads,
+                    trimOpts=trimOpts))
+        FastqFile.FastqFile(output.forward, output.reversed).isValid(dna=True)
+        
+rule trimmomaticSingle:
+    input: "preprocessing/{sample}.fastq"
+    output: "preprocessing/trim.{sample}.fastq"
+    threads: 999
+    run:
+        TrimOpts = collections.namedtuple("TrimOpts", CONFIG["options"]["trimmomatic"].keys())
+        trimOpts = TrimOpts(**CONFIG["options"]["trimmomatic"])
+        shell("java -jar {trimOpts.jar} SE {trimOpts.phred} -threads {threads} "
+            "{input[0]} {output[0]} "
+            "ILLUMINACLIP:{adapterFile}:{trimOpts.seedMisMatches}:{trimOpts.palindromeClipTreshold}:{trimOpts.simpleClipThreshhold} "
+            "LEADING:{trimOpts.LeadMinTrimQual} "
+            "TRAILING:{trimOpts.TrailMinTrimQual} "
+            "SLIDINGWINDOW:{trimOpts.windowSize}:{trimOpts.avgMinQual} "
+            "MINLEN:{trimOpts.minReadLen}".format(
+                    input=input,
+                    output=output,
+                    adapterFile=CONFIG["illuminaAdapters"],
+                    threads=threads,
+                    trimOpts=trimOpts))
+        FastqFile.FastqFile(output[0]).isValid(dna=True)

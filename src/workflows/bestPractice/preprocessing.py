@@ -15,13 +15,11 @@ for sample in CONFIG["libraries"]:
             pass
 
 #TODO: relative paths, __file__ is path to snakemake, sys.argv[2] isn't best method either...       
-include: os.path.dirname(sys.argv[2])+"/../../rules/fastqProcessing/Trimming.py"
- 
+include: os.path.dirname(sys.argv[2])+"/../../rules/fastqProcessing/Trimmomatic.py"
+include: os.path.dirname(sys.argv[2])+"/../../rules/fastqProcessing/SeqPrep.py"
+include: os.path.dirname(sys.argv[2])+"/../../rules/fastqProcessing/Quake.py"
+include: os.path.dirname(sys.argv[2])+"/../../rules/fastqProcessing/FastqMcf.py"
 include: os.path.dirname(sys.argv[2])+"/../../rules/fastqProcessing/ContaminationFiltering.py"
-
-include: os.path.dirname(sys.argv[2])+"/../../rules/fastqProcessing/Merging.py"
-
-include: os.path.dirname(sys.argv[2])+"/../../rules/fastqProcessing/KmerCorrection.py"
 
 #Assembly, preprocessing is wrong name :P
 include: os.path.dirname(sys.argv[2])+"/../../rules/assembly/Wgs.py"
