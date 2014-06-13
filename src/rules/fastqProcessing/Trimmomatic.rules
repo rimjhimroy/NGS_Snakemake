@@ -33,6 +33,7 @@ _2.fastq (reversed reads).
 ##  Imports  ##
 ###############
 from qualityControl.files import FastqFile
+import collections
 
 ###################
 ##  Trimmomatic  ##

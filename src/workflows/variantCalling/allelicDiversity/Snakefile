@@ -1,0 +1,33 @@
+"""
+@author: Jetse
+
+"""
+import json, os, sys
+ 
+with open("config.json") as f:
+    CONFIG = json.load(f)
+
+if "outputDir" in CONFIG:
+    workdir: CONFIG["outputDir"]
+
+ruleDir = os.path.dirname(inspect.getframeinfo(inspect.currentframe()).filename) + "/../../rules/"
+
+# Mapper:
+include: ruleDir + "mappers/Bowtie.rules"
+
+#Bam processing
+include: ruleDir + "mappers/Samtools.rules"
+include: ruleDir + "mappers/PicardTools.rules"
+
+#SNP calling
+include: ruleDir + "variantCalling/SnpCallers.rules"
+
+#Phasing
+include: ruleDir + "variantCalling/Haplotyper.rules"
+
+#Analysis
+include: ruleDir + "variantCalling/analysis/AllelicDiversity.rules"
+
+rule all:
+# input: "variantCalling/phased.snps.samtoolsMpileupSnps.vcf"
+    input: "variantCalling/all.phased.samtoolsMpileupSnps.allelicDiversity.csv"

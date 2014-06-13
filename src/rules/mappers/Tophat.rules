@@ -6,7 +6,9 @@
 ###############
 ##  Imports  ##
 ###############
+import inspect, os
 
+include: os.path.dirname(inspect.getframeinfo(inspect.currentframe()).filename) + "/Bowtie.rules"
 ##############
 ##  Tophat  ##
 ##############

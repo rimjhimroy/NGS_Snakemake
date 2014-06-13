@@ -1,0 +1,14 @@
+"""
+
+"""
+import json, os, inspect
+
+ruleDir = os.path.dirname(inspect.getframeinfo(inspect.currentframe()).filename) + "/../../../../rules/"
+
+with open("config.json") as f:
+    CONFIG = json.load(f)
+
+include: ruleDir + "/assembly/Allpaths.rules"
+
+rule all:
+    input: "assembly/allpaths.contigs.fasta"

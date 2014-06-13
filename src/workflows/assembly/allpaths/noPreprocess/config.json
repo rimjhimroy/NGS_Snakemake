@@ -1,0 +1,18 @@
+{
+    "libraries":{
+        "libName":{
+            "reads" : ["/path/to/reads_1.fastq","/path/to/reads_2.fastq"],
+            "type" : "pe",
+            "insertSize" : 180,
+        }
+    },
+    "allpaths":{
+        "input":{
+            "fragData":["../preprocessing/trim.fragData_1.fastq"]
+        },
+        "preparation":{
+            "optionalOpts": ""
+        },
+        "optionalOpts": "FF_MAX_STRETCH=5"
+    }
+}

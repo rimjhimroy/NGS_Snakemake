@@ -1,0 +1,40 @@
+"""
+@version:0.1
+@author: Jetse
+
+The Samtools module contains all rules for manipulating bam files with samtools.
+
+A configuration file like the following is expected in a global CONFIG variable:
+{
+    "mapping":{
+        "referenceGenome":"/path/to/referenceGenome.fasta
+    }
+}
+"""
+
+rule samToBam:
+    input: "mapped/{sample}.sam"
+    output: "mapped/{sample}.bam"
+    shell: "samtools view -bS {input[0]} > {output[0]}"
+     
+rule indexBam:
+    input: "mapped/sorted.{sample}.bam"
+    output: "mapped/{sample}.bam.idx"
+    shell: "samtools index {input[0]}"
+     
+rule sortBam:
+    input: "mapped/{sample}.bam"
+    output: "mapped/sorted.{sample}.bam"
+    shell: "samtools sort -o {input[0]} {output[0]} > {output[0]}"
+        
+rule addMdTag:
+    input: 
+        bam="mapped/{sample}.bam",
+        reference=CONFIG["mapping"]["referenceGenome"]
+    output: "mapped/md.{sample}.bam"
+    shell: "samtools calmd {input.bam} {input.reference} > {output[0]}"
+    
+rule faidX:
+    input: "{prefix}.fasta"
+    output: "{prefix}.fasta.fai"
+    shell: "samtools faidx {input[0]}"

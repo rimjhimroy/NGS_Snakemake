@@ -1,0 +1,130 @@
+"""
+@author: Jetse
+@version: 0.1
+@attention: Not tested yet...
+
+ALLPATHS-LG is a short read assembler and it works on both small and large (mammalian size) genomes. 
+To use it, you should first generate ~100 base Illumina reads from two libraries: 
+one with ~180 bp insert size (fragment data), and one with a ~3000 bp insert size (jumping library), both at about 45x coverage. 
+Sequence from longer fragments will enable longer-range continuity.
+{
+    "libraries":{
+        "libName":{
+            "reads" : ["/path/to/reads_1.fastq","/path/to/reads_2.fastq"],
+            "type" : "pe",
+            "insertSize" : 180,
+        }
+    },
+    "allpaths":{
+        "input":{
+            "fragData":["../preprocessing/trim.fragData_1.fastq"]
+        },
+        "preparation":{
+            "optionalOpts": ""
+        },
+        "optionalOpts": "FF_MAX_STRETCH=5"
+    }
+}
+
+"""
+    
+################
+##  Allpaths  ##
+################
+rule prepareAllpaths:
+    input: 
+        reads = sum(list(CONFIG["allpaths"]["input"].values()),[]),
+        libsCsv = "assembly/assembly/libs.csv",
+        groupsCsv = "assembly/assembly/groups.csv"
+    output: "assembly/assembly/jump_reads_orig.fastb"
+    params:
+        optionalOpts = CONFIG["allpaths"]["preparation"]["optionalOpts"]
+    shell: "PrepareAllPathsInputs.pl {params.optionalOpts} DATA_DIR=assembly/ IN_GROUPS_CSV={input.groupsCsv} IN_LIBS_CSV={input.libsCsv} PLOIDY=2 OVERWRITE=1"  
+ 
+rule allpaths:
+    input: rules.prepareAllpaths.output
+    output: 
+        contigs = "assembly/assembly/assembly/ASSEMBLIES/assembly/final.contigs.fasta",
+        scaffolds = "assembly/assembly/assembly/ASSEMBLIES/assembly/final.assembly.fasta"
+    threads: 999
+    shell: "RunAllPathsLG PRE=assembly/ REFERENCE_NAME=assembly DATA_SUBDIR=assembly RUN=assembly SUBDIR=assembly OVERWRITE=TRUE THREADS={threads}"
+  
+rule allpathsCleanup:
+    input: rules.allpaths.output
+    output: 
+        contigs = "assembly/allpaths.contigs.fasta",
+        scaffolds = "assembly/allpaths.scaffolds.fasta"
+    shell: "mv {input.contigs} {output.contigs};"
+        "mv {input.scaffolds} {output.scaffolds};"
+        "rm -r assembly/assembly"
+
+rule inLibsCsv:
+    params: libs = CONFIG["allpaths"]["input"]
+    output: "assembly/assembly/libs.csv"
+    run:
+        createInLibsCsv(params, output[0])
+        
+rule inGroupsCsv:
+    params: CONFIG["libraries"]
+    output: "assembly/assembly/groups.csv"
+    run: 
+        createInGroupsCsv(params, output[0])
+
+#################
+##  Functions  ##
+#################
+def createInLibsCsv(libraries, outputFile):
+    """
+    The method createInLibsCsv creates a csv file with all libraries as allpaths wants its input.
+    """
+    with open(outputFile, "w") as csvWriter:
+        csvWriter.write("library_name, project_name, organism_name, type, paired, frag_size, frag_stddev, insert_size, insert_stddev, read_orientation, genomic_start, genomic_end\n")
+        print(libraries)
+        for lib in libraries:
+            csvWriter.write(lib + ", ")
+            csvWriter.write("assembly, ")
+            csvWriter.write("assembly, ")
+            if CONFIG["libraries"][lib]["type"] == "mp":
+                csvWriter.write("jumping, ")
+                csvWriter.write("1, ")
+                csvWriter.write(", , ")
+                csvWriter.write(str(int(CONFIG["libraries"][lib]["insertSize"])) + ", ")
+                csvWriter.write(str(int(int(CONFIG["libraries"][lib]["insertSize"])*0.2)) + ", ")
+                csvWriter.write("outward, ")
+            elif CONFIG["libraries"][lib]["type"] == "pe":
+                csvWriter.write("fragment, ")
+                csvWriter.write("1, ")
+                csvWriter.write(str(int(CONFIG["libraries"][lib]["insertSize"])) + ", ")
+                csvWriter.write(str(int(int(CONFIG["libraries"][lib]["insertSize"])*0.2)) + ", ")
+                csvWriter.write(", , ")
+                csvWriter.write("inward, ")
+            elif CONFIG["libraries"][lib]["type"] == "u":
+                csvWriter.write("long, ")
+                csvWriter.write("0, ")
+                csvWriter.write(", , , , , ")
+            csvWriter.write("0, 0\n")
+
+def createInGroupsCsv(libraries, outputFile):
+    """
+    The method createInGroupsCsv creates a csv file with all paths to the libraries in it. When the reads are mated, the last "1" is replaced by a ? for the allpaths regex input.
+    """
+    with open(outputFile, "w") as csvWriter:
+        i = 0
+        csvWriter.write("group_name, library_name, file_name\n")
+        for lib in libraries:
+            if len(CONFIG["libraries"][lib]["reads"])==2:
+                csvWriter.write(str(i) + ", " + lib + ", " + rreplace(CONFIG["allpaths"]["input"][lib][0], "1", "?",1) + "\n")
+            else:
+                csvWriter.write(str(i) + ", " + lib + ", " + CONFIG["allpaths"]["input"][lib][0] + "\n")
+            i += 1
+
+def rreplace(s, old, new, occurrence):
+    """
+    The method rreplace replaces the last occurence(s) of a given string with a new value.
+    :param s: The string to replace the last value in
+    :param old: The substring to replace
+    :param new: The new value for the substring
+    :param occurence: The numer of times to replace the substring, beginning from the end.
+    """
+    li = s.rsplit(old, occurrence)
+    return new.join(li)

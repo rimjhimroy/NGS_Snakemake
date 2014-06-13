@@ -26,7 +26,7 @@ class FastqFile:
         print("Correct! File contains {} reads".format(forwardRecords))
         if self.reversedReads != None:
             print("Checking: " + self.reversedReads)
-            reversedRecords = self.self.reversedReads(self.reversedReads, dna)
+            reversedRecords = self._contentControl(self.reversedReads, dna)
             print("Correct! File contains {} reads".format(reversedRecords))
             if forwardRecords != reversedRecords:
                 raise QualityControlExceptions.FileFormatException("Forward file has not the same number of sequences as the reversed file when comparing " + self.forwardReads + " with " + self.reversedReads)
@@ -37,7 +37,7 @@ class FastqFile:
         try:
             for record in SeqIO.parse(open(fastqFile), "fastq"):
                 lcs = Counter(record.seq.upper())
-                if dna==True and sum([lcs["A"],lcs["T"],lcs["C"],lcs["G"],lcs["N"]])!=len(record.seq):
+                if dna == True and sum([lcs["A"],lcs["T"],lcs["C"],lcs["G"],lcs["N"]])!=len(record.seq):
                     raise QualityControlExceptions.FileFormatException("Illegal character found in " + fastqFile + " with sequence id: " + record.id)
                 if max(record.letter_annotations["phred_quality"]) > 72 or min(record.letter_annotations["phred_quality"]) < 0:
                     raise QualityControlExceptions.FileFormatException("Invalid quality score in " + fastqFile + " with sequence id: " + record.id)
@@ -53,13 +53,6 @@ class FastqFile:
         self.forwardInfo = self.getFastqInfo(self.forwardReads)
         if self.reversedReads != None:
             self.reversedInfo = self.getFastqInfo(self.reversedReads)
-            
-# logging.debug(os.path.basename(fastqFile) + ":")
-# logging.debug("Total bp: " + self.fastqInfo[index][0])
-# logging.debug("Total reads: " + self.fastqInfo[index][1])
-# logging.debug("Avg read length: " + self.fastqInfo[index][2])
-# logging.debug("percentage good quality: " + self.fastqInfo[index][3])
-
             
     def getFastqInfo(self, fastqFile):
         """

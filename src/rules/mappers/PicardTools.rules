@@ -1,0 +1,25 @@
+"""
+
+Required JSON:
+{
+    "options":{
+        "picardTools":{
+            "path":"/path/to/picardtools"
+        }
+    }
+}
+"""
+rule addHeaderline:
+    input: "mapped/{sample}.bam"
+    params: 
+        path=CONFIG["options"]["picardTools"]["path"]
+    output: "mapped/headered.{sample}.bam"
+    shell: "java -jar {params.path}/AddOrReplaceReadGroups.jar I={input[0]} VALIDATION_STRINGENCY=SILENT O={output[0]} LB={wildcards.sample} PL=illumina PU=lane SM={wildcards.sample}"
+    
+rule removeDuplicates:
+    input: "mapped/{sample}.bam"
+    output: "mapped/noDup.{sample}.bam"  
+    params: 
+        path=CONFIG["options"]["picardTools"]["path"]
+    shell: "java -jar {params.path}/MarkDuplicates.jar INPUT={input[0]} VALIDATION_STRINGENCY=SILENT OUTPUT={output[0]} REMOVE_DUPLICATES=true METRICS_FILE=/dev/null"
+ 

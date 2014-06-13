@@ -16,6 +16,14 @@ TODO test bowtieSingle
 }
 """
 ################
+##  Indexing  ##
+################
+rule bowtieIndex:
+    input: inFile = "{ref}.fasta"
+    output: outFile = "{ref}.fasta.1.bt2"
+    shell: "bowtie2-build {input.inFile} {input.inFile}"
+    
+################
 ##  Bowtie 2  ##
 ################
 ruleorder: bowtiePaired > bowtieSingle

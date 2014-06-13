@@ -1,0 +1,33 @@
+"""
+
+"""
+
+import json, os, inspect
+ 
+with open("config.json") as f:
+    CONFIG = json.load(f)
+
+## Create a symlink so the data is perfectly fit for all rules. All reads contain the name of their library. 
+## All forward reads are {library name}_1.fastq and all reversed reads are {library name}_2.fastq
+for sample in CONFIG["libraries"]:
+    for i in range(len(CONFIG["libraries"][sample]["reads"])):
+        try:
+            if os.path.exists("preprocessing") == False:
+                os.mkdir("preprocessing")
+            os.symlink(CONFIG["libraries"][sample]["reads"][i], "preprocessing/"+ sample +"_" + str(i+1) + ".fastq")
+        except FileExistsError:
+            pass
+
+ruleDir = os.path.dirname(inspect.getframeinfo(inspect.currentframe()).filename) + "/../../../../rules/"
+
+#Preprocessing     
+include: ruleDir + "fastqProcessing/Trimmomatic.rules"
+include: ruleDir + "fastqProcessing/Quake.rules"
+include: ruleDir + "fastqProcessing/FastqMcf.rules"
+include: ruleDir + "fastqProcessing/ContaminationFiltering.rules"
+
+#Assembly
+include: ruleDir + "assembly/Wgs.rules"
+
+rule all:
+    input: "assembly/wgs.contigs.fasta"
