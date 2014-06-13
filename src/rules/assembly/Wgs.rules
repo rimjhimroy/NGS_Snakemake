@@ -45,27 +45,22 @@ rule wgsExecution:
         shell("runCA -d assembly/wgs/ -p assembly -s {specFile} {inputFiles}".format(specFile=specFile.fileName, inputFiles=" ".join(input)))
         
         
-ruleorder: fastqToCaPaired > fastqToCaSingle
-
-rule fastqToCaPaired:
+rule fastqToCa:
     input: lambda wildcards: CONFIG["options"]["wgs"]["input"][wildcards.sample]
     output: "assembly/{sample}.frg"
     run:
-        shell("fastqToCA -insertsize {insSize} {insDev} -libraryname {sample} -technology {tech} {direction} -mates {input[0]},{input[1]} "
-                  "> {output[0]}".format(
-                                         insSize=CONFIG["libraries"][wildcards.sample]["insertSize"],
-                                         insDev=CONFIG["libraries"][wildcards.sample]["insertSizeStdev"],
-                                         sample=wildcards.sample,
-                                         tech=getTech(CONFIG["libraries"][wildcards.sample]["platform"], CONFIG["libraries"][wildcards.sample]["readlen"]),
-                                         direction=getOrientation(CONFIG["libraries"][wildcards.sample]["type"]),
-                                         input=input,
-                                         output=output))
-
-rule fastqToCaSingle:
-    input: "preprocessing/{sample}_1.fastq"
-    output: "assembly/{sample}.frg"
-    run:
-        shell("fastqToCA -technology {tech} -reads {input[0]} > {output[0]}"
+        if len(input) == 2:
+            shell("fastqToCA -insertsize {insSize} {insDev} -libraryname {sample} -technology {tech} {direction} -mates {input[0]},{input[1]} "
+                      "> {output[0]}".format(
+                                             insSize=CONFIG["libraries"][wildcards.sample]["insertSize"],
+                                             insDev=CONFIG["libraries"][wildcards.sample]["insertSizeStdev"],
+                                             sample=wildcards.sample,
+                                             tech=getTech(CONFIG["libraries"][wildcards.sample]["platform"], CONFIG["libraries"][wildcards.sample]["readlen"]),
+                                             direction=getOrientation(CONFIG["libraries"][wildcards.sample]["type"]),
+                                             input=input,
+                                             output=output))
+        else:
+            shell("fastqToCA -technology {tech} -reads {input[0]} > {output[0]}"
                   "".format(
                             tech=getTech(CONFIG["libraries"][wildcards.sample]["platform"], CONFIG["libraries"][wildcards.sample]["readlen"]),
                             input=input,
