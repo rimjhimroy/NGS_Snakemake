@@ -26,8 +26,8 @@ include: ruleDir + "variantCalling/SamtoolsMpileup.rules"
 include: ruleDir + "variantCalling/Haplotyper.rules"
 
 #Analysis
-include: ruleDir + "variantCalling/analysis/AllelicDiversity.rules"
+include: ruleDir + "variantCalling/analysis/GenotypePhenotypeAssociation.rules"
 
 rule all:
 # input: "variantCalling/phased.snps.samtoolsMpileupSnps.vcf"
-    input: "variantCalling/all.phased.samtoolsMpileupSnps.allelicDiversity.csv"
+    input: "variantCalling/all.phased.samtoolsMpileupSnps.genotypePhenotypeAssociation.csv"
