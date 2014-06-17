@@ -4,15 +4,14 @@
             "reads" : ["/path/to/reads_1.fastq","/path/to/reads_2.fastq"],
             "type" : "pe",
             "insertSize" : 180,
+            "insertSizeStdev" : 36,
+            "readlen" : 100,
+            "platform" : "illumina"
         }
     },
-    "allpaths":{
+    "wgs":{
         "input":{
-            "someLibName":["../preprocessing/trim.fragData_1.fastq"]
-        },
-        "preparation":{
-            "optionalOpts": ""
-        },
-        "optionalOpts": "FF_MAX_STRETCH=5"
+            "someLibName":["../preprocessing/trim.reads_1.fastq"]
+        }
     }
 }

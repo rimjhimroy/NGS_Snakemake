@@ -1,5 +1,6 @@
 """
 @author: Jetse
+@version: 0.1
 
 
 """
@@ -9,22 +10,7 @@
 ###############
 from rules.variantCalling.analysis import Readers 
 from rules.variantCalling.analysis.model import Contig
-import csv
-
-#################
-##  Functions  ##
-#################
-#TODO: used more often create generic function in functions...
-def getChromosomes(faiIndex):
-    """
-    The method getChromosomes retrieves the chromosomes of a fai indexed reference file
-    """
-    chromosomes = []
-    with open(faiIndex) as indexFile:
-        indexReader = csv.reader(indexFile, delimiter="\t")
-        for line in indexReader:
-            chromosomes.append(line[0])
-    return chromosomes
+from rules.utils import ChromosomeGetter
 
 #############
 ##  Rules  ##
@@ -40,7 +26,7 @@ rule allelicDiversityPerChrom:
 rule mergeCsv:
     input: 
         index = CONFIG["mapping"]["referenceGenome"] + ".fai",
-        chroms = expand("variantCalling/phased.{chrom}_{{prefix}}.allelicDiversity.csv",chrom=getChromosomes(CONFIG["mapping"]["referenceGenome"] + ".fai"))
+        chroms = expand("variantCalling/phased.{chrom}_{{prefix}}.allelicDiversity.csv",chrom=ChromosomeGetter.getChromosomes(CONFIG["mapping"]["referenceGenome"] + ".fai"))
     output: "variantCalling/all.phased.{prefix}.allelicDiversity.csv"
     shell: "cat {input.chroms} > {output[0]}"
 

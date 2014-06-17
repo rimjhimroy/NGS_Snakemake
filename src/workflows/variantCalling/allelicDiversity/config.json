@@ -1,0 +1,21 @@
+{
+    "gffFile":"/path/to/gffFile",
+	"refGenome":"/path/to/referenceGenome.fasta"
+    "options":{
+        "java":{
+            "memUsage":"-Xmx30g"
+        },
+        "beagle":{
+            "path":"/path/to/beagle.jar"
+        },
+        "gatk":{
+            "path":"/path/to/gatk.jar"
+        },
+        "picardTools":{
+            "path":"/path/to/pacardTools"
+        },
+        "mpileup":{
+            "reads":["mapped/headered.noDup.md.sorted"]
+        }
+    }
+}

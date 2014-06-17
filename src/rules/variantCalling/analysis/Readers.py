@@ -1,22 +1,22 @@
 from rules.variantCalling.analysis.model import Phenotype, Contig
 import re, logging, os
-"""The module Readers contains all readers for reading tab delimited files of the phenotyping program.
-
+"""
+The module Readers contains all readers for reading tab delimited files of the phenotyping program.
 """
 
 class Reader(object):
-    """The reader is an abstract class for reading tab delimited files.
-    
+    """
+    The reader is an abstract class for reading tab delimited files.
     """
     
     def readFile(self, inFile):
-        """The method readFile reads a tab delimited file. Lines starting with a '#' are skipped.
+        """
+        The method readFile reads a tab delimited file. Lines starting with a '#' are skipped.
         When de line starts with #CHROM this will be the header information of the vcf file.
         Every other line will execute the method _parseLine in the child objects, is required!
         Afterwards the method actionAfterReading in the child objects will be called, is optional
         :param inFile: The file to read
         :type inFile: str -- path to the file
-        
         """
         self.header = None
         noOfParsedLines = 0
@@ -37,7 +37,8 @@ class Reader(object):
         self._actionAfterReading()
         
     def _parseLine(self, info, header):
-        """The method _parseLine parses the line of a tab separated file.
+        """
+        The method _parseLine parses the line of a tab separated file.
         This is different in all files so has to be implemented in the child objects
         :param info: The splitted line of a tab separated file
         :type info: list
@@ -47,13 +48,14 @@ class Reader(object):
         raise NotImplementedError("implement _parseLine in all subclasses")
     
     def _actionAfterReading(self):
-        """If there has an action to be executed always after reading a file, this method can be implemented.
-        
+        """
+        If there has an action to be executed always after reading a file, this method can be implemented.
         """
         pass
         
 class PhenotypeReader(Reader):
-    """The method PhenotypeReader reads a phenotype file.
+    """
+    The method PhenotypeReader reads a phenotype file.
     The phenotype file is a tab separated file, the header line indicates the accessions.
     All other lines indicate the alleles of a phenotype of an accession.
     File format:
@@ -62,22 +64,21 @@ class PhenotypeReader(Reader):
     +-----------+---------+---------+---------+
     |phenotype  |allele   |allele   |allele   |
     +-----------+---------+---------+---------+
-    
     """
     
     def __init__(self):
-        """The constructor of the PhenotypeReader sets the given phenotypes as instance variable
+        """
+        The constructor of the PhenotypeReader sets the given phenotypes as instance variable
         :param phenotypes: an dictionary phenotype objects where to add the alleles to
         :type phenotypes: an dictionary of :py:class:`Phenotype.Phenotype` objects with the description as key
-        
         """
         self.phenotypes = []
     
     def _parseLine(self, info):
-        """Implementation of the super method (where the args are explained).
+        """
+        Implementation of the super method (where the args are explained).
         If the line is the first line, the accessions will be saved as an instance variable.
         Else the alleles will be added to the phenotype object
-        
         """
         if self.header == None:
             self.header = info
@@ -94,12 +95,13 @@ class PhenotypeReader(Reader):
         pass
 
 class VcfReader(Reader):
-    """The VcfReader reads a vcf file.
-    
+    """
+    The VcfReader reads a vcf file.
     """
     
     def __init__(self, contigs):
-        """The constructor sets the given contigs as an instance variable
+        """
+        The constructor sets the given contigs as an instance variable
         :param contigs: a list of Contig objects to check whether the SNPs are in one of used contigs
         :type contigs: a list of :py:class:`Contig.Contig` instances
         """
@@ -107,9 +109,9 @@ class VcfReader(Reader):
         self.contigs.sort(key = lambda x: int(x.end))
                 
     def _parseLine(self, info):
-        """Implementation of the super method (where the args are explained).
+        """
+        Implementation of the super method (where the args are explained).
         this method checks whether the SNP is in a contig, if this one is in a contig, the snp will be added to the contig, else do nothing...
-        
         """
         try:
             pos = int(info[1])
@@ -126,16 +128,17 @@ class VcfReader(Reader):
                 contig.addSnp(info, self.header)
               
     def _actionAfterReading(self):
-        """Implementation of the super method.
+        """
+        Implementation of the super method.
         After reading the file, the haplotypes have to be calculated for each contig.
-        
         """
         for contig in self.contigs:
             contig.constructHaplotypes()
         
             
 class LociReader(Reader):
-    """The LociReader reads a file with all candidate genes of a phenotype.
+    """
+    The LociReader reads a file with all candidate genes of a phenotype.
     This file consists of 2 columns, the first column describes the phenotype, the second column describes the contig ID
     All phenotypes and contigs can occur multiple times!
     Format:
@@ -147,15 +150,15 @@ class LociReader(Reader):
     """
     
     def __init__(self):
-        """The constructor of the LociReader creates an empty dictionary to save all contigs per phenotype in.
-        
+        """
+        The constructor of the LociReader creates an empty dictionary to save all contigs per phenotype in.
         """
         self.phenotypes = {}
         
     def _parseLine(self, info):
-        """Implementation of the super method (where the args are explained).
-        This method parses a line of a loci file, this method fills the phenotype dictionary with contigs which are involved in a phenotype.
-        
+        """
+        Implementation of the super method (where the args are explained).
+        This method parses a line of a loci file, this method fills the phenotype dictionary with contigs which are involved in a phenotype.        
         """
         if info[0] in self.phenotypes:
             self.phenotypes[info[0]].addContig(info[1])
@@ -165,8 +168,8 @@ class LociReader(Reader):
         
             
 class GffReader(Reader):
-    """The GffReader reads a GFF3 file.
-    
+    """
+    The GffReader reads a GFF3 file.    
     """
     
     idRegex = re.compile("Name=([^;]*)")
@@ -185,10 +188,10 @@ class GffReader(Reader):
                     self.contigs[contig.ID] = contig
         
     def _parseLine(self, info):
-        """Implementation of the super method (where the args are explained).
+        """
+        Implementation of the super method (where the args are explained).
         If the contig ID is in the dictionary of contigs, information is added to this contig.
         If there is no phenotype, all contigs are added to the dictionary of contigs.
-        
         """
         try:
             contigId = GffReader.idRegex.search(info[8]).group(1)
@@ -221,7 +224,6 @@ class AccessionConverter(Reader):
         :type eusolID: str.
         :returns: the accession of an eusol ID
         :raises: KeyError when there is no accession ID for this eusol ID.
-        
         """
         return self.EusolToAccession[eusolID]
  

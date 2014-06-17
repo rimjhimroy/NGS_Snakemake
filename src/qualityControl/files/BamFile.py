@@ -10,7 +10,7 @@ class BamFile:
         self.sam = sam
         
     def isValid(self):
-        raise NotImplementedError()
+        print("WARNING: bam check not yet implemented, always returning true!")
         return True
     
     def getInsertSizeDistribution(self):

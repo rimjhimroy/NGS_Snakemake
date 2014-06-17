@@ -27,33 +27,48 @@ Sequence from longer fragments will enable longer-range continuity.
 }
 
 """
-    
+
+
 ################
 ##  Allpaths  ##
 ################
+import os, subprocess
+
+ALLPATHS_VERSION = subprocess.check_output("RunAllPathsLG --version", shell=True).decode("utf-8").split()[7]
+
+
 rule prepareAllpaths:
     input: 
-        reads = sum(list(CONFIG["allpaths"]["input"].values()),[]),
+        reads = [item for sublist in CONFIG["allpaths"]["input"].values() for item in sublist],
         libsCsv = "assembly/assembly/libs.csv",
         groupsCsv = "assembly/assembly/groups.csv"
     output: "assembly/assembly/jump_reads_orig.fastb"
+    version: ALLPATHS_VERSION
     params:
         optionalOpts = CONFIG["allpaths"]["preparation"]["optionalOpts"]
-    shell: "PrepareAllPathsInputs.pl {params.optionalOpts} DATA_DIR=assembly/ IN_GROUPS_CSV={input.groupsCsv} IN_LIBS_CSV={input.libsCsv} PLOIDY=2 OVERWRITE=1"  
- 
+    run: 
+        shell("PrepareAllPathsInputs.pl {params.optionalOpts} DATA_DIR={workDir}/assembly/assembly/ "
+            "IN_GROUPS_CSV={input.groupsCsv} IN_LIBS_CSV={input.libsCsv} PLOIDY=2 OVERWRITE=1".format(params=params,
+                                                                                                      workDir=os.getcwd(),
+                                                                                                      input=input))
+
 rule allpaths:
     input: rules.prepareAllpaths.output
     output: 
         contigs = "assembly/assembly/assembly/ASSEMBLIES/assembly/final.contigs.fasta",
         scaffolds = "assembly/assembly/assembly/ASSEMBLIES/assembly/final.assembly.fasta"
     threads: 999
-    shell: "RunAllPathsLG PRE=assembly/ REFERENCE_NAME=assembly DATA_SUBDIR=assembly RUN=assembly SUBDIR=assembly OVERWRITE=TRUE THREADS={threads}"
+    version: ALLPATHS_VERSION
+    shell: "RunAllPathsLG PRE=./ REFERENCE_NAME=assembly DATA_SUBDIR=assembly RUN=assembly SUBDIR=assembly OVERWRITE=TRUE THREADS={threads}"
   
 rule allpathsCleanup:
-    input: rules.allpaths.output
+    input: 
+        contigs = "assembly/assembly/assembly/ASSEMBLIES/assembly/final.contigs.fasta",
+        scaffolds = "assembly/assembly/assembly/ASSEMBLIES/assembly/final.assembly.fasta"
     output: 
         contigs = "assembly/allpaths.contigs.fasta",
         scaffolds = "assembly/allpaths.scaffolds.fasta"
+    version: "0.1"
     shell: "mv {input.contigs} {output.contigs};"
         "mv {input.scaffolds} {output.scaffolds};"
         "rm -r assembly/assembly"
@@ -61,12 +76,14 @@ rule allpathsCleanup:
 rule inLibsCsv:
     params: libs = CONFIG["allpaths"]["input"]
     output: "assembly/assembly/libs.csv"
+    version: "0.1"
     run:
         createInLibsCsv(params, output[0])
         
 rule inGroupsCsv:
     params: CONFIG["libraries"]
     output: "assembly/assembly/groups.csv"
+    version: "0.1"
     run: 
         createInGroupsCsv(params, output[0])
 
@@ -79,7 +96,6 @@ def createInLibsCsv(libraries, outputFile):
     """
     with open(outputFile, "w") as csvWriter:
         csvWriter.write("library_name, project_name, organism_name, type, paired, frag_size, frag_stddev, insert_size, insert_stddev, read_orientation, genomic_start, genomic_end\n")
-        print(libraries)
         for lib in libraries:
             csvWriter.write(lib + ", ")
             csvWriter.write("assembly, ")

@@ -37,9 +37,13 @@ import math, os
 ##########################
 ##  WGS assembler rules ##
 ##########################
+WGS_VERSION = re.compile("CA version CA (.*?) \(").search(subprocess.Popen("runCA -version", shell=True, stderr=subprocess.PIPE).stderr.read().decode("utf-8")).group(1).strip()
+
+
 rule wgsExecution:
     input: expand("assembly/{sample}.frg",sample=CONFIG["options"]["wgs"]["input"].keys())
     output: "assembly/wgs/9-terminator/assembly.ctg.fasta"
+    version: WGS_VERSION
     run: 
         specFile = SpecFile("assembly/wgs.cnf",CONFIG["maxMem"],threads)
         shell("runCA -d assembly/wgs/ -p assembly -s {specFile} {inputFiles}".format(specFile=specFile.fileName, inputFiles=" ".join(input)))
@@ -48,6 +52,7 @@ rule wgsExecution:
 rule fastqToCa:
     input: lambda wildcards: CONFIG["options"]["wgs"]["input"][wildcards.sample]
     output: "assembly/{sample}.frg"
+    version: WGS_VERSION
     run:
         if len(input) == 2:
             shell("fastqToCA -insertsize {insSize} {insDev} -libraryname {sample} -technology {tech} {direction} -mates {input[0]},{input[1]} "

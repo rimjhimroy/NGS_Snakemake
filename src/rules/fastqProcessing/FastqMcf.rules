@@ -30,6 +30,7 @@ from qualityControl.files import FastqFile
 #################
 ##  Fastq-mcf  ##
 #################
+
 ruleorder: fastqMcfPaired > fastqMcfSingle
 
 rule fastqMcfPaired:

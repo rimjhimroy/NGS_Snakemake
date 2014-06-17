@@ -11,20 +11,25 @@ A configuration file like the following is expected in a global CONFIG variable:
     }
 }
 """
+import subprocess, re
+SAMTOOLS_VERSION = re.compile("Version:(.*?)\n").search(subprocess.Popen("samtools", shell=True, stderr=subprocess.PIPE).stderr.read().decode("utf-8")).group(1).strip()
 
 rule samToBam:
     input: "mapped/{sample}.sam"
     output: "mapped/{sample}.bam"
+    version: SAMTOOLS_VERSION
     shell: "samtools view -bS {input[0]} > {output[0]}"
      
 rule indexBam:
     input: "mapped/sorted.{sample}.bam"
     output: "mapped/{sample}.bam.idx"
+    version: SAMTOOLS_VERSION
     shell: "samtools index {input[0]}"
      
 rule sortBam:
     input: "mapped/{sample}.bam"
     output: "mapped/sorted.{sample}.bam"
+    version: SAMTOOLS_VERSION
     shell: "samtools sort -o {input[0]} {output[0]} > {output[0]}"
         
 rule addMdTag:
@@ -32,9 +37,11 @@ rule addMdTag:
         bam="mapped/{sample}.bam",
         reference=CONFIG["mapping"]["referenceGenome"]
     output: "mapped/md.{sample}.bam"
+    version: SAMTOOLS_VERSION
     shell: "samtools calmd {input.bam} {input.reference} > {output[0]}"
     
 rule faidX:
     input: "{prefix}.fasta"
     output: "{prefix}.fasta.fai"
+    version: SAMTOOLS_VERSION
     shell: "samtools faidx {input[0]}"
