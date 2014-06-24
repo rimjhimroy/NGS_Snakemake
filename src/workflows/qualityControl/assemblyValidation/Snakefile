@@ -8,7 +8,7 @@ ruleDir = os.path.dirname(inspect.getframeinfo(inspect.currentframe()).filename)
 with open("config.json") as f:
     CONFIG = json.load(f)
 
-include: ruleDir + "/mappers/Bwa.rules"
+include: ruleDir + "/qualityControl/AssemblyValidation.rules"
 
 rule all:
-    input: "report/report.xpdf"
+    input: "report/report.pdf"

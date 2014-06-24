@@ -12,6 +12,13 @@ if "outputDir" in CONFIG:
 
 ruleDir = os.path.dirname(inspect.getframeinfo(inspect.currentframe()).filename) + "/../../../rules/"
 
+rule moveRawToPreprocessed:
+    input: "{sample}.fastq"
+    output: "preprocessing/{sample}.fastq"
+    shell: "ln -s {input[0]} {output[0]}"
+
+include: ruleDir + "utils/ExtensionChanger.rules"
+
 # Mapper:
 include: ruleDir + "mappers/Bowtie.rules"
 
