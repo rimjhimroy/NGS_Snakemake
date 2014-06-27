@@ -1,7 +1,7 @@
 """
 @author: Jetse
 @version: 0.1
- 
+
 Trimming of fastq files. For usage, include this in your workflow.
 
 Required programs:
@@ -25,7 +25,7 @@ Expects a global variable CONFIG (e.g. parsed from json) of at least the followi
         }
     }
 }
-Expects the input files in the working directory. For paired end data the files have to end with _1.fastq (forward reads) and 
+Expects the input files in the working directory. For paired end data the files have to end with _1.fastq (forward reads) and
 _2.fastq (reversed reads).
 
 """
@@ -33,7 +33,7 @@ _2.fastq (reversed reads).
 ##  Imports  ##
 ###############
 from qualityControl.files import FastqFile
-import collections
+import collections, subprocess
 
 ###################
 ##  Trimmomatic  ##
@@ -50,7 +50,7 @@ rule trimmomaticPaired:
         forwardUnpaired = "preprocessing/trim.{sample}_unpaired_1.fastq",
         reversedUnpaired = "preprocessing/trim.{sample}_unpaired_2.fastq"
     threads: 999
-    run: 
+    run:
         TrimOpts = collections.namedtuple("TrimOpts", CONFIG["options"]["trimmomatic"].keys())
         trimOpts = TrimOpts(**CONFIG["options"]["trimmomatic"])
         shell("java -jar {trimOpts.jar} PE {trimOpts.phred} -threads {threads} "
@@ -67,7 +67,7 @@ rule trimmomaticPaired:
                     threads=threads,
                     trimOpts=trimOpts))
         FastqFile.FastqFile(output.forward, output.reversed).isValid(dna=True)
-        
+
 rule trimmomaticSingle:
     input: "preprocessing/{sample}.fastq"
     output: "preprocessing/trim.{sample}.fastq"

@@ -4,13 +4,13 @@
 @attention: Not tested yet, full dataset needed...
 @bug: output of quake may have to be changed, will figure out in tests
 
-"Quake is a package to correct substitution sequencing errors in experiments with deep coverage (e.g. >15X), 
-specifically intended for Illumina sequencing reads. Quake adopts the k-mer error correction framework, 
-first introduced by the EULER genome assembly package. Unlike EULER and similar progams, 
-Quake utilizes a robust mixture model of erroneous and genuine k-mer distributions to determine where errors are 
-located. Then Quake uses read quality values and learns the nucleotide to nucleotide error rates to determine what 
-types of errors are most likely. This leads to more corrections and greater accuracy, especially with respect to 
-avoiding mis-corrections, which create false sequence unsimilar to anything in the original genome sequence from 
+"Quake is a package to correct substitution sequencing errors in experiments with deep coverage (e.g. >15X),
+specifically intended for Illumina sequencing reads. Quake adopts the k-mer error correction framework,
+first introduced by the EULER genome assembly package. Unlike EULER and similar progams,
+Quake utilizes a robust mixture model of erroneous and genuine k-mer distributions to determine where errors are
+located. Then Quake uses read quality values and learns the nucleotide to nucleotide error rates to determine what
+types of errors are most likely. This leads to more corrections and greater accuracy, especially with respect to
+avoiding mis-corrections, which create false sequence unsimilar to anything in the original genome sequence from
 which the read was taken."
 
 Expects a global variable CONFIG (e.g. parsed from json) of at least the following structure:
@@ -31,6 +31,7 @@ Data requirements:
 ##  Imports  ##
 ###############
 from qualityControl.files import FastqFile
+import subprocess
 
 #############
 ##  Quake  ##
@@ -43,9 +44,9 @@ rule quakePaired:
     input: "preprocessing/{sample}.filenames.txt",
     output:
         forward = "preprocessing/quake.{sample}_1.fastq",
-        reversed = "preprocessing/quake.{sample}_2.fastq" 
+        reversed = "preprocessing/quake.{sample}_2.fastq"
     threads: 999
-    run: 
+    run:
         shell("python2 {quakePath} {optional} -f {readsFile} -k {kmerSize} -p {threads}"
               "".format(quakePath=CONFIG["options"]["quake"]["path"],
                         optional=CONFIG["options"]["quake"]["optionalOpts"],
@@ -63,7 +64,7 @@ rule fastqNamesFile:
         reversed = "preprocessing/{samples}_2.fastq"
     output:"preprocessing/{samples}.filenames.txt"
     shell: "echo \"{input.forward} {input.reversed}\" > {output[0]}"
-            
+
 ##  Unpaired
 rule quakeSingle:
     input: fastq = "preprocessing/{sample}.fastq"

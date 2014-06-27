@@ -4,15 +4,15 @@
 @attention: TODO: Remove all # from the FileControl methods to include the control (biopython is needed for testing)
 @attention: Not tested yet, bowtie2 needs 64 bit machine, virtual machine is 32 bit...
 
-This module can be executed for any organism with a known reference genome. 
-The {organism} is used as a wildcard, and has to be present as a key in the JSON file below the 
+This module can be executed for any organism with a known reference genome.
+The {organism} is used as a wildcard, and has to be present as a key in the JSON file below the
 "contaminationRefGenomes". A small example is shown below:
 
     "contaminationRefGenomes" : {
         "PhiX" : "/home/jaco001/programmingProjects/assembly/src/preprocessing/phixDb/PhiX.fasta"
         "eColi" : "/home/jaco001/programmingProjects/assembly/src/preprocessing/eColiDb/eColi.fasta"
     },
-    
+
 In this JSON there are two reference genomes. When the fastq reads which map on the PhiX reference genome have to be
 filtered, the prefix PhiXFiltered has to be used. The command eColiFiltered will filter all reads out that map on the
 eColi reference genome.
@@ -38,23 +38,24 @@ For unpaired data, the libraries section is not needed in this module.
 ##  Imports  ##
 ###############
 from qualityControl.files import FastqFile
+import subprocess
 
 ###############################
 ##  Contamination filtering  ##
-###############################    
+###############################
 BOWTIE_VERSION = re.compile("version (.*?)\n").search(subprocess.check_output("bowtie2 --version", shell=True).decode("utf-8")).group(1).strip()
 
 rule filterPaired:
-    input: 
+    input:
         forward = "preprocessing/{sample}_1.fastq",
         reversed = "preprocessing/{sample}_2.fastq",
         reference = lambda wildcards: CONFIG["contaminationRefGenomes"][wildcards.org],
         index = lambda wildcards: CONFIG["contaminationRefGenomes"][wildcards.org] + ".1.bt2"
-    output: 
+    output:
         forward = "preprocessing/{org}Filtered.{sample}_1.fastq",
         reversed = "preprocessing/{org}Filtered.{sample}_2.fastq"
     threads: 999
-    run: 
+    run:
         insertSize = int(CONFIG["libraries"][wildcards.sample]["insertSize"])
         print("bowtie2 -p {threads} -x {input.reference} "
               "--un-conc {output.forward}_tmp_unmapppedPhix.fastq "
@@ -67,7 +68,7 @@ rule filterPaired:
         os.rename(output.forward + "_tmp_unmapppedPhix.1.fastq", output.forward)
         os.rename(output.forward + "_tmp_unmapppedPhix.2.fastq", output.reversed)
         FastqFile.FastqFile(output.forward, output.reversed).isValid(dna=True)
-            
+
 rule filterSingle:
     input:
         fastq = "preprocessing/{sample}.fastq",
@@ -82,4 +83,3 @@ rule filterSingle:
                                                    input=input,
                                                    output=output))
         FastqFile.FastqFile(output[0]).isValid(dna=True)
-        
