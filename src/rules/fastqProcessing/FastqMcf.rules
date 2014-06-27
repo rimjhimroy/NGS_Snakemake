@@ -10,11 +10,9 @@ Required programs:
 Expects a global variable CONFIG (e.g. parsed from json) of at least the following structure:
 {
     "illuminaAdapters": "/path/to/adapters",
-    "options":{
-        "fastqMcf":{
-            "dupLen": "60",
-            "optionalOptions": ""
-        },
+    "fastqMcf":{
+        "dupLen": "60",
+        "optionalOptions": ""
     }
 }
 
@@ -42,8 +40,8 @@ rule fastqMcfPaired:
         forward = "preprocessing/mcf.{sample}_1.fastq",
         reversed = "preprocessing/mcf.{sample}_2.fastq"
     run:
-        shell("fastq-mcf {optionalParams} -D  {dups} -o {output.forward} -o {output.reversed} {adapterFile} {input.forward} {input.reversed}".format(optionalParams=CONFIG["options"]["fastqMcf"]["optionalOptions"],
-                                                                                                                                                    dups=CONFIG["options"]["fastqMcf"]["dupLen"],
+        shell("fastq-mcf {optionalParams} -D  {dups} -o {output.forward} -o {output.reversed} {adapterFile} {input.forward} {input.reversed}".format(optionalParams=CONFIG["fastqMcf"]["optionalOptions"],
+                                                                                                                                                    dups=CONFIG["fastqMcf"]["dupLen"],
                                                                                                                                                     adapterFile=CONFIG["illuminaAdapters"],
                                                                                                                                                     input=input,
                                                                                                                                                     output=output))
@@ -53,8 +51,8 @@ rule fastqMcfSingle:
     input:"preprocessing/{sample}.fastq",
     output: "preprocessing/mcf.{sample}.fastq"
     run:
-        shell("fastq-mcf {optionalParams} -D  {dups} -o {output[0]} {adapterFile} {input[0]}".format(optionalParams=CONFIG["options"]["fastqMcf"]["optionalOptions"],
-                                                                                                        dups=CONFIG["options"]["fastqMcf"]["dupLen"],
+        shell("fastq-mcf {optionalParams} -D  {dups} -o {output[0]} {adapterFile} {input[0]}".format(optionalParams=CONFIG["fastqMcf"]["optionalOptions"],
+                                                                                                        dups=CONFIG["fastqMcf"]["dupLen"],
                                                                                                         adapterFile=CONFIG["illuminaAdapters"],
                                                                                                         input=input,
                                                                                                         output=output))

@@ -15,13 +15,12 @@ which the read was taken."
 
 Expects a global variable CONFIG (e.g. parsed from json) of at least the following structure:
 {
-    "kmerSize": 17
-    "options":{
-        "quake":{
-            "path": "/home/VLPB/programs/Quake/bin/quake.py",
-            "optionalOpts": ""
-        }
+    "kmerSize": 17,
+    "quake":{
+        "path": "/home/VLPB/programs/Quake/bin/quake.py",
+        "optionalOpts": ""
     }
+
 }
 
 Data requirements:
@@ -48,8 +47,8 @@ rule quakePaired:
     threads: 999
     run:
         shell("python2 {quakePath} {optional} -f {readsFile} -k {kmerSize} -p {threads}"
-              "".format(quakePath=CONFIG["options"]["quake"]["path"],
-                        optional=CONFIG["options"]["quake"]["optionalOpts"],
+              "".format(quakePath=CONFIG["quake"]["path"],
+                        optional=CONFIG["quake"]["optionalOpts"],
                         readsFile=input[0],
                         kmerSize=CONFIG["kmerSize"],
                         threads=threads))
@@ -72,8 +71,8 @@ rule quakeSingle:
     threads: 999
     run:
         shell("python2 {quakePath} {optional} -r {readsFile} -k {kmerSize} -p {threads}"
-              "".format(quakePath=CONFIG["options"]["quake"]["path"],
-                        optional=CONFIG["options"]["quake"]["optionalOpts"],
+              "".format(quakePath=CONFIG["quake"]["path"],
+                        optional=CONFIG["quake"]["optionalOpts"],
                         readsFile=input[0],
                         kmerSize=CONFIG["kmerSize"],
                         threads=threads))
