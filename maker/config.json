@@ -1,6 +1,6 @@
 {
 	"base":{
-		"working_dir":"/tmp",
+		"working_dir":"/tmp/VLPB_maker",
 		"maker_dir":"/home/WUR/warri004/downloads/maker/bin/"
 	},
 	"maker_opts":{
@@ -31,6 +31,7 @@
 
 	},
 	"maker_installation": {
-		"maker_URL":"http://yandell.topaz.genetics.utah.edu/maker_downloads/B325/BC62/3734/228B26D754322D53611E7784111F/maker-2.31.6.tgz"
+		"maker_URL":"http://assembly.ab.wurnet.nl/~jvh/maker-2.31.6.tgz",
+		"version":"2.31.6"
 	}
 }
