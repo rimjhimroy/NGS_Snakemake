@@ -1,7 +1,7 @@
 {
 	"base":{
 		"working_dir":"/tmp",
-		"maker_exe":"/home/WUR/warri004/downloads/maker/bin/maker"
+		"maker_dir":"/home/WUR/warri004/downloads/maker/bin/"
 	},
 	"maker_opts":{
 		"genome":"cotesia.fa",
@@ -13,14 +13,14 @@
 		"snaphmm": "/home/WUR/warri004/downloads/maker/exe/snap/HMM/D.melanogaster.hmm",
 		"augustus_species":"nasonia",
 		"est2genome":"1",
-		"protein2genome":"1",		
+		"protein2genome":"1",
 		"cpus":"8"
 	},
 	"maker_bopts":{
-		"blast_type":"ncbi+"				
+		"blast_type":"ncbi+"
 	},
 	"maker_exe": {
-		"makeblastdb":"/home/WUR/warri004/downloads/maker/bin/../exe/ncbi-blast-2.2.28+/bin/makeblastdb", 
+		"makeblastdb":"/home/WUR/warri004/downloads/maker/bin/../exe/ncbi-blast-2.2.28+/bin/makeblastdb",
 		"blastn":"/home/WUR/warri004/downloads/maker/bin/../exe/ncbi-blast-2.2.28+/bin/blastn",
 		"blastx":"/home/WUR/warri004/downloads/maker/bin/../exe/ncbi-blast-2.2.28+/bin/blastx",
 		"tblastx":"/home/WUR/warri004/downloads/maker/bin/../exe/ncbi-blast-2.2.28+/bin/tblastx",
@@ -28,8 +28,9 @@
 		"exonerate":"/home/WUR/warri004/downloads/maker/bin/../exe/exonerate-2.2.0-x86_64/bin/exonerate",
 		"snap":"/home/WUR/warri004/downloads/maker/bin/../exe/snap/snap #location of snap executable",
 		"augustus":"/home/WUR/warri004/downloads/maker/bin/../exe/augustus.2.5.5/bin/augustus"
-	
+
+	},
+	"maker_installation": {
+		"maker_URL":"http://yandell.topaz.genetics.utah.edu/maker_downloads/B325/BC62/3734/228B26D754322D53611E7784111F/maker-2.31.6.tgz"
 	}
-	
-	
 }
