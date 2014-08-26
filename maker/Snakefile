@@ -1,0 +1,68 @@
+"""Run the maker annotation pipeline"""
+
+import json, os, inspect
+import configparser
+import io
+
+# Get the config file: 
+with open("config.json") as f:
+    CONFIG = json.load(f)
+
+# Set some basic variables (snakemake doesn't always allow these calls directly in rules
+working_dir = CONFIG['base']['working_dir']
+maker_exe = CONFIG["base"]["maker_exe"]
+maker_out = ".".join(CONFIG["maker_opts"]["genome"].split(".")[:-1]) + ".output"
+
+""" The function get the maker configuration file ctl and overrides these settings when found in the section of the JSON""" 
+def read_maker_opts_ctl(section, ctl):
+    config = configparser.RawConfigParser()
+    config.read(ctl)
+    # let's see which settings have been overridden:
+    for c in config.items("maker"):
+        if c[0] in CONFIG[section]:
+            config.set("maker", c[0], CONFIG[section][c[0]])
+    # place the new configuration in a single string:
+    output = io.StringIO()
+    config.write(output)
+    return output.getvalue()
+
+""" maker doesn't give proper output, so we need our own flag file"""
+rule all:
+    input: expand("{working_dir}/maker_done.txt", working_dir=working_dir)
+    
+""" use this rule to clean-up maker settings """
+rule clean_maker:
+    shell: "rm -f {working_dir}/maker_*.ctl {working_dir}/maker_done.txt"
+
+""" use this rule to clean-up all the data produced by maker """
+rule clean_data:
+    shell: "rm -rf {working_dir}/{maker_out}"
+
+""" create the maker_bopts.ctl file """
+rule maker_bopts:
+    input: "maker_bopts.ctl.conf"
+    params : configured = read_maker_opts_ctl("maker_bopts", "maker_bopts.ctl.conf")
+    output: "{working_dir}/maker_bopts.ctl"
+    shell: 'echo -e "{params.configured}" | grep -v "\[maker\]" > {output}'
+    
+""" create the maker_opts.ctl file """
+rule maker_opts:
+    input: "maker_opts.ctl.conf"
+    params : configured = read_maker_opts_ctl("maker_opts", "maker_opts.ctl.conf")
+    output: "{working_dir}/maker_opts.ctl"
+    shell: 'echo -e "{params.configured}" | grep -v "\[maker\]" > {output}'
+
+""" create the maker_exe.ctl file """
+rule maker_exe:
+    input: "maker_exe.ctl.conf"
+    params : configured = read_maker_opts_ctl("maker_exe", "maker_exe.ctl.conf")
+    output: "{working_dir}/maker_exe.ctl"
+    shell: 'echo -e "{params.configured}" | grep -v "\[maker\]" > {output}'
+
+""" rule to run maker based on the given configuration """
+rule maker:
+    input:[rules.maker_bopts.output,rules.maker_opts.output,rules.maker_exe.output]
+    output: "{working_dir}/maker_done.txt"
+    shell: 'cd {working_dir}; {maker_exe}; touch {working_dir}/maker_done.txt'
+
+
