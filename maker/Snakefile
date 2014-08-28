@@ -75,4 +75,52 @@ rule maker_download:
         "wget"+CONFIG['maker_installation']['wget_options']+CONFIG['maker_installation']['maker_URL']
 
 
+# Install maker
+rule maker_installation:
+    input: rules.maker_download.output
+    output: CONFIG["base"]["maker_dir"] + 'maker'
+    shell:
+        "cd `dirname {input}` ;"
+        "tar xvzf {input}"
 
+# Download and install Augustus
+rule augustus_installation:
+    output: CONFIG["base"]["maker_dir"] + '/augustus'
+    shell:
+        "TEMPDIR=`mktemp -d`;"
+        "cd $TEMPDIR;"
+        "wget"+CONFIG['maker_installation']['wget_options']+CONFIG['maker_installation']['augustus_URL']+";"
+        "tar xvzf augustus*;"
+        "rm *.tar.*;"
+        "mv -v augustus* {output};"
+        "echo 'export PATH='`readlink -f {output}/bin/`':$PATH' >>" + CONFIG['base']['maker.bashrc'] + ";"
+        "echo 'export AUGUSTUS_CONFIG_PATH='`readlink -f {output}/config/`  >>"+ CONFIG['base']['maker.bashrc'] + ";"
+        "cd / && rmdir -v $TEMPDIR;"
+
+# Download and install Exonerate
+rule exonerate_installation:
+    output: CONFIG["base"]["maker_dir"] + '/exonerate'
+    shell:
+        "TEMPDIR=`mktemp -d`;"
+        "cd $TEMPDIR;"
+        "wget"+CONFIG['maker_installation']['wget_options']+CONFIG['maker_installation']['exonerate_URL']+";"
+        "tar xvzf exonerate*;"
+        "rm *.tar.*;"
+        "mv -v exonerate* {output};"
+        "echo 'export PATH='`readlink -f {output}/bin/`':$PATH' >>" + CONFIG['base']['maker.bashrc'] + ";"
+        "cd / && rmdir -v $TEMPDIR;"
+
+# Download and install SNAP
+rule snap_installation:
+    output: CONFIG["base"]["maker_dir"] + '/snap'
+    shell:
+        "TEMPDIR=`mktemp -d`;"
+        "cd $TEMPDIR;"
+        "wget"+CONFIG['maker_installation']['wget_options']+CONFIG['maker_installation']['snap_URL']+";"
+        "tar xvzf snap*;"
+        "rm *.tar.*;"
+        "mv -v snap* {output};"
+        "cd {output} && make;"
+        "echo 'export ZOE='`readlink -f {output}/Zoe/` >>" + CONFIG['base']['maker.bashrc'] + ";"
+        "echo 'export PATH='`readlink -f {output}`':$PATH' >>" + CONFIG['base']['maker.bashrc'] + ";"
+        "cd / && rmdir -v $TEMPDIR;"

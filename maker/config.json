@@ -1,7 +1,8 @@
 {
 	"base":{
 		"working_dir":"/tmp/VLPB_maker",
-		"maker_dir":"/home/WUR/warri004/downloads/maker/bin/"
+		"maker_dir":"/tmp/VLPB_maker/maker/bin/",
+		"maker.bashrc":"/tmp/VLPB_maker/maker/bin/maker.bashrc"
 	},
 	"maker_opts":{
 		"genome":"cotesia.fa",
@@ -33,6 +34,9 @@
 	"maker_installation": {
 		"maker_URL":"http://assembly.ab.wurnet.nl/~jvh/maker-2.31.6.tgz",
 		"version":"2.31.6",
-		"wget_options":" -c "
+		"wget_options":" -c ",
+		"augustus_URL":"http://augustus.gobics.de/binaries/augustus.2.5.5.tar.gz",
+		"exonerate_URL":"http://www.ebi.ac.uk/~guy/exonerate/exonerate-2.2.0-x86_64.tar.gz",
+		"snap_URL":"http://korflab.ucdavis.edu/Software/snap-2013-11-29.tar.gz"
 	}
 }
