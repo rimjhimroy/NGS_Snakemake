@@ -66,4 +66,13 @@ rule maker:
     output: "{working_dir}/maker_done.txt"
     shell: 'cd {working_dir}; {maker_exe}; touch {working_dir}/maker_done.txt'
 
+#  Download maker
+# TODO : Fix output handling, this is ugly
+rule maker_download:
+    output: expand("{working_dir}", working_dir=working_dir)[0]+"/maker-"+CONFIG['maker_installation']['version']+".tgz"
+    shell:
+        "cd {working_dir}; "
+        "wget"+CONFIG['maker_installation']['wget_options']+CONFIG['maker_installation']['maker_URL']
+
+
 

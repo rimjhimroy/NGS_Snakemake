@@ -32,6 +32,7 @@
 	},
 	"maker_installation": {
 		"maker_URL":"http://assembly.ab.wurnet.nl/~jvh/maker-2.31.6.tgz",
-		"version":"2.31.6"
+		"version":"2.31.6",
+		"wget_options":" -c "
 	}
 }
