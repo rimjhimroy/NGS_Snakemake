@@ -34,9 +34,12 @@
 	"maker_installation": {
 		"maker_URL":"http://assembly.ab.wurnet.nl/~jvh/maker-2.31.6.tgz",
 		"version":"2.31.6",
-		"wget_options":" -c ",
+		"wget_options":" -c --proxy=off ",
 		"augustus_URL":"http://augustus.gobics.de/binaries/augustus.2.5.5.tar.gz",
 		"exonerate_URL":"http://www.ebi.ac.uk/~guy/exonerate/exonerate-2.2.0-x86_64.tar.gz",
-		"snap_URL":"http://korflab.ucdavis.edu/Software/snap-2013-11-29.tar.gz"
+		"snap_URL":"http://korflab.ucdavis.edu/Software/snap-2013-11-29.tar.gz",
+		"trf_URL":"http://tandem.bu.edu/trf/downloads/trf407b.linux64",
+		"blast+_URL": "ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/2.2.29/ncbi-blast-2.2.29+-x64-linux.tar.gz",
+		"rmblast_URL": "ftp://ftp.ncbi.nlm.nih.gov/blast/executables/rmblast/2.2.28/ncbi-rmblastn-2.2.28-x64-linux.tar.gz ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/2.2.28/ncbi-blast-2.2.28+-x64-linux.tar.gz"
 	}
 }

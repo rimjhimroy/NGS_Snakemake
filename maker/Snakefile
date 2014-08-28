@@ -124,3 +124,41 @@ rule snap_installation:
         "echo 'export ZOE='`readlink -f {output}/Zoe/` >>" + CONFIG['base']['maker.bashrc'] + ";"
         "echo 'export PATH='`readlink -f {output}`':$PATH' >>" + CONFIG['base']['maker.bashrc'] + ";"
         "cd / && rmdir -v $TEMPDIR;"
+
+# Download and install TRF
+rule trf_installation:
+    output: CONFIG["base"]["maker_dir"] + '/trf'
+    shell:
+        "mkdir -p {output};"
+        "cd {output};"
+        "wget"+CONFIG['maker_installation']['wget_options']+CONFIG['maker_installation']['trf_URL']+";"
+        "mv -v trf* trf;"
+        "chmod -v ugo+x trf;"
+        "echo 'export PATH='`readlink -f {output}`':$PATH' >>" + CONFIG['base']['maker.bashrc'] + ";"
+
+# Download and install BLAST+
+rule blast_plus_installation:
+    output: CONFIG["base"]["maker_dir"] + 'blast+'
+    shell:
+        "TEMPDIR=`mktemp -d`;"
+        "cd $TEMPDIR;"
+        "wget"+CONFIG['maker_installation']['wget_options']+CONFIG['maker_installation']['blast+_URL']+" && "
+        "tar xvzf ncbi* && "
+        "rm *.tar.* && "
+        "mv -v ncbi* {output} && "
+        "echo 'export PATH='`readlink -f {output}/bin`':$PATH' >>" + CONFIG['base']['maker.bashrc'] + ";"
+        "cd / && rmdir -v $TEMPDIR;"
+
+# Download and install RMBLAST plus corresponding BLAST+
+rule rmblast_installation:
+    output: CONFIG["base"]["maker_dir"] + 'rmblast'
+    shell:
+        "TEMPDIR=`mktemp -d`;"
+        "cd $TEMPDIR;"
+        "wget"+CONFIG['maker_installation']['wget_options']+CONFIG['maker_installation']['rmblast_URL']+" && "
+        "tar xvzf ncbi-blast* && "
+        "tar xvzf ncbi-rmblast* && "
+        "rm -v *.tar.* && "
+        "cp -R ncbi-rmblast*/* ncbi-blast*/ &&"
+        "mv -v ncbi-blast* {output} && "
+        "cd / && rm -vrf $TEMPDIR;"
