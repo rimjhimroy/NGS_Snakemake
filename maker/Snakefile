@@ -93,6 +93,7 @@ rule augustus_installation:
         "tar xvzf augustus*;"
         "rm *.tar.*;"
         "mv -v augustus* {output};"
+        "touch {output} && "
         "echo 'export PATH='`readlink -f {output}/bin/`':$PATH' >>" + CONFIG['base']['maker.bashrc'] + ";"
         "echo 'export AUGUSTUS_CONFIG_PATH='`readlink -f {output}/config/`  >>"+ CONFIG['base']['maker.bashrc'] + ";"
         "cd / && rmdir -v $TEMPDIR;"
@@ -107,6 +108,7 @@ rule exonerate_installation:
         "tar xvzf exonerate*;"
         "rm *.tar.*;"
         "mv -v exonerate* {output};"
+        "touch {output} && "
         "echo 'export PATH='`readlink -f {output}/bin/`':$PATH' >>" + CONFIG['base']['maker.bashrc'] + ";"
         "cd / && rmdir -v $TEMPDIR;"
 
@@ -120,6 +122,7 @@ rule snap_installation:
         "tar xvzf snap*;"
         "rm *.tar.*;"
         "mv -v snap* {output};"
+        "touch {output} && "
         "cd {output} && make;"
         "echo 'export ZOE='`readlink -f {output}/Zoe/` >>" + CONFIG['base']['maker.bashrc'] + ";"
         "echo 'export PATH='`readlink -f {output}`':$PATH' >>" + CONFIG['base']['maker.bashrc'] + ";"
@@ -146,6 +149,7 @@ rule blast_plus_installation:
         "tar xvzf ncbi* && "
         "rm *.tar.* && "
         "mv -v ncbi* {output} && "
+        "touch {output} && "
         "echo 'export PATH='`readlink -f {output}/bin`':$PATH' >>" + CONFIG['base']['maker.bashrc'] + ";"
         "cd / && rmdir -v $TEMPDIR;"
 
@@ -161,6 +165,7 @@ rule rmblast_installation:
         "rm -v *.tar.* && "
         "cp -R ncbi-rmblast*/* ncbi-blast*/ &&"
         "mv -v ncbi-blast* {output} && "
+        "touch {output} && "
         "cd / && rm -vrf $TEMPDIR;"
 
 # Download and install GIRI RepBase
@@ -172,4 +177,28 @@ rule repbase_installation:
         "curl --remote-name --anyauth --netrc-file "+CONFIG['maker_installation']['repeatmaskerlibraries_URL_netrc']+" "+CONFIG['maker_installation']['repeatmaskerlibraries_URL']+" && "
         "tar xvzf repeatmaskerlibraries* && "
         "mv -v Libraries {output} && "
+        "touch {output} && "
+        "cd / && rm -vrf $TEMPDIR;"
+
+# Download and install Repeatmasker
+rule repeatmasker_installation:
+    input:
+        REPBASE=rules.repbase_installation.output,
+        RMBLAST=rules.rmblast_installation.output,
+        TRF=rules.trf_installation.output
+    output: CONFIG["base"]["maker_dir"] + 'repeatmasker'
+    shell:
+        "TEMPDIR=`mktemp -d`;"
+        "cd $TEMPDIR;"
+        "wget"+CONFIG['maker_installation']['wget_options']+CONFIG['maker_installation']['repeatmasker_URL']+" && "
+        "tar xvzf RepeatMasker-open-* && "
+        "rm -v *.tar.* && "
+        "mv -v RepeatMasker* {output} && "
+        "touch {output} && "
+        "cd {output} && grep -l -r '#!/u1' * | xargs -I {} sed -i 's|/u1/local/bin/perl|/usr/bin/env perl|' {} && "
+        "cp RepeatMaskerConfig.tmpl RepeatMaskerConfig.pm && chmod -x RepeatMaskerConfig.pm && "
+        "sed -i 's|$TRF_PRGM = \"\";|$TRF_PRGM = \"{input.TRF}/trf\";|' RepeatMaskerConfig.pm &&"
+        "sed -i 's|$DEFAULT_SEARCH_ENGINE = \"crossmatch\";|$DEFAULT_SEARCH_ENGINE = \"ncbi\";|' RepeatMaskerConfig.pm &&"
+        "sed -i 's|$RMBLAST_DIR   = \"/usr/local/rmblast\";|$RMBLAST_DIR   = \"{input.RMBLAST}/bin\";|' RepeatMaskerConfig.pm &&"
+        "mv -v  {input.REPBASE}/RepeatMaskerLib.embl Libraries && "
         "cd / && rm -vrf $TEMPDIR;"
