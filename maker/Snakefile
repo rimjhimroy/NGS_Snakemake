@@ -162,3 +162,14 @@ rule rmblast_installation:
         "cp -R ncbi-rmblast*/* ncbi-blast*/ &&"
         "mv -v ncbi-blast* {output} && "
         "cd / && rm -vrf $TEMPDIR;"
+
+# Download and install GIRI RepBase
+rule repbase_installation:
+    output: CONFIG["base"]["maker_dir"] + 'repbase'
+    shell:
+        "TEMPDIR=`mktemp -d`;"
+        "pushd $TEMPDIR && "
+        "curl --remote-name --anyauth --netrc-file "+CONFIG['maker_installation']['repeatmaskerlibraries_URL_netrc']+" "+CONFIG['maker_installation']['repeatmaskerlibraries_URL']+" && "
+        "tar xvzf repeatmaskerlibraries* && "
+        "mv -v Libraries {output} && "
+        "cd / && rm -vrf $TEMPDIR;"
