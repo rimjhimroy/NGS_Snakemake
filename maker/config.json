@@ -2,6 +2,7 @@
 	"base":{
 		"working_dir":"/tmp/VLPB_maker",
 		"maker_dir":"/tmp/VLPB_maker/maker/bin/",
+		"maker_installation_dir":"/tmp/VLPB_maker/maker/",
 		"maker_helpers_dir":"/tmp/VLPB_maker/maker_helpers/",
 		"maker.bashrc":"/tmp/VLPB_maker/maker_helpers/maker.bashrc"
 	},

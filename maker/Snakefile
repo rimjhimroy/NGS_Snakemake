@@ -70,7 +70,7 @@ rule maker:
 
 # Download and install Augustus
 rule augustus_installation:
-    output: CONFIG["base"]["maker_helpers_dir"] + '/augustus'
+    output: CONFIG["base"]["maker_helpers_dir"] + 'augustus'
     shell:
         "TEMPDIR=`mktemp -d`;"
         "cd $TEMPDIR;"
@@ -85,7 +85,7 @@ rule augustus_installation:
 
 # Download and install Exonerate
 rule exonerate_installation:
-    output: CONFIG["base"]["maker_helpers_dir"] + '/exonerate'
+    output: CONFIG["base"]["maker_helpers_dir"] + 'exonerate'
     shell:
         "TEMPDIR=`mktemp -d`;"
         "cd $TEMPDIR;"
@@ -99,7 +99,7 @@ rule exonerate_installation:
 
 # Download and install SNAP
 rule snap_installation:
-    output: CONFIG["base"]["maker_helpers_dir"] + '/snap'
+    output: CONFIG["base"]["maker_helpers_dir"] + 'snap'
     shell:
         "TEMPDIR=`mktemp -d`;"
         "cd $TEMPDIR;"
@@ -199,12 +199,13 @@ rule maker_installation:
         rules.snap_installation.output,
         rules.exonerate_installation.output,
         rules.augustus_installation.output
-    output: CONFIG["base"]["maker_dir"]
+    output: CONFIG["base"]["maker_installation_dir"]
     shell:
         "TEMPDIR=`mktemp -d`;"
         "cd $TEMPDIR;"
         "wget"+CONFIG['maker_installation']['wget_options']+CONFIG['maker_installation']['maker_URL']+" && "
         "tar xvzf maker* && "
         "rm -v maker*.tgz && "
-        "mv maker {output} &&"
+        "touch maker && "
+        "mv maker `dirname {output}` && "
         "cd / && rm -rv $TEMPDIR;"
