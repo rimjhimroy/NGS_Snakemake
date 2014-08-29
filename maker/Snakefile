@@ -115,7 +115,7 @@ rule snap_installation:
         "mv -v snap* {output};"
         "touch {output} && "
         "cd {output} && make;"
-        "echo 'export ZOE='`readlink -f {output}/Zoe/` >>" + CONFIG['base']['maker.bashrc'] + ";"
+        "echo 'export ZOE='`readlink -f {output}` >>" + CONFIG['base']['maker.bashrc'] + ";"
         "echo 'export PATH='`readlink -f {output}`':$PATH' >>" + CONFIG['base']['maker.bashrc'] + ";"
         "cd / && rmdir -v $TEMPDIR;"
 
