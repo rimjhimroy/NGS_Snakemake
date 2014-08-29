@@ -10,7 +10,6 @@ with open("config.json") as f:
 
 # Set some basic variables (snakemake doesn't always allow these calls directly in rules
 working_dir = CONFIG['base']['working_dir']
-maker_exe = CONFIG["base"]["maker_dir"] + 'maker'
 maker_out = ".".join(CONFIG["maker_opts"]["genome"].split(".")[:-1]) + ".output"
 
 """ This function takes the maker configuration file ctl and overrides settings if found in the relevant section of config.json"""
@@ -62,9 +61,16 @@ rule maker_exe:
 
 """ rule to run maker based on the given configuration """
 rule maker:
-    input:[rules.maker_bopts.output,rules.maker_opts.output,rules.maker_exe.output]
+    input:
+        rules.maker_bopts.output,
+        rules.maker_opts.output,
+        rules.maker_exe.output,
+        MAKER=rules.maker_installation.output
     output: "{working_dir}/maker_done.txt"
-    shell: 'cd {working_dir}; {maker_exe}; touch {working_dir}/maker_done.txt'
+    shell: 'cd {working_dir} && '
+           "source " + CONFIG['base']['maker.bashrc'] + " && "
+           '{input.MAKER} &&'
+           'touch {working_dir}/maker_done.txt'
 
 # Install maker dependancies :
 
@@ -75,7 +81,7 @@ rule augustus_installation:
         "TEMPDIR=`mktemp -d`;"
         "cd $TEMPDIR;"
         "wget"+CONFIG['maker_installation']['wget_options']+CONFIG['maker_installation']['augustus_URL']+";"
-        "tar xvzf augustus*;"
+        "tar xzf augustus*;"
         "rm *.tar.*;"
         "mv -v augustus* {output};"
         "touch {output} && "
@@ -90,7 +96,7 @@ rule exonerate_installation:
         "TEMPDIR=`mktemp -d`;"
         "cd $TEMPDIR;"
         "wget"+CONFIG['maker_installation']['wget_options']+CONFIG['maker_installation']['exonerate_URL']+";"
-        "tar xvzf exonerate*;"
+        "tar xzf exonerate*;"
         "rm *.tar.*;"
         "mv -v exonerate* {output};"
         "touch {output} && "
@@ -104,7 +110,7 @@ rule snap_installation:
         "TEMPDIR=`mktemp -d`;"
         "cd $TEMPDIR;"
         "wget"+CONFIG['maker_installation']['wget_options']+CONFIG['maker_installation']['snap_URL']+";"
-        "tar xvzf snap*;"
+        "tar xzf snap*;"
         "rm *.tar.*;"
         "mv -v snap* {output};"
         "touch {output} && "
@@ -131,7 +137,7 @@ rule blast_plus_installation:
         "TEMPDIR=`mktemp -d`;"
         "cd $TEMPDIR;"
         "wget"+CONFIG['maker_installation']['wget_options']+CONFIG['maker_installation']['blast+_URL']+" && "
-        "tar xvzf ncbi* && "
+        "tar xzf ncbi* && "
         "rm *.tar.* && "
         "mv -v ncbi* {output} && "
         "touch {output} && "
@@ -145,8 +151,8 @@ rule rmblast_installation:
         "TEMPDIR=`mktemp -d`;"
         "cd $TEMPDIR;"
         "wget"+CONFIG['maker_installation']['wget_options']+CONFIG['maker_installation']['rmblast_URL']+" && "
-        "tar xvzf ncbi-blast* && "
-        "tar xvzf ncbi-rmblast* && "
+        "tar xzf ncbi-blast* && "
+        "tar xzf ncbi-rmblast* && "
         "rm -v *.tar.* && "
         "cp -R ncbi-rmblast*/* ncbi-blast*/ &&"
         "mv -v ncbi-blast* {output} && "
@@ -160,7 +166,7 @@ rule repbase_installation:
         "TEMPDIR=`mktemp -d`;"
         "pushd $TEMPDIR && "
         "curl --remote-name --anyauth --netrc-file "+CONFIG['maker_installation']['repeatmaskerlibraries_URL_netrc']+" "+CONFIG['maker_installation']['repeatmaskerlibraries_URL']+" && "
-        "tar xvzf repeatmaskerlibraries* && "
+        "tar xzf repeatmaskerlibraries* && "
         "mv -v Libraries {output} && "
         "touch {output} && "
         "cd / && rm -vrf $TEMPDIR;"
@@ -176,7 +182,7 @@ rule repeatmasker_installation:
         "TEMPDIR=`mktemp -d`;"
         "cd $TEMPDIR;"
         "wget"+CONFIG['maker_installation']['wget_options']+CONFIG['maker_installation']['repeatmasker_URL']+" && "
-        "tar xvzf RepeatMasker-open-* && "
+        "tar xzf RepeatMasker-open-* && "
         "rm -v *.tar.* && "
         "mv -v RepeatMasker* {output} && "
         "cd {output} && grep -l -r '#!/u1' * | xargs -I '%' sed -i 's|/u1/local/bin/perl|/usr/bin/env perl|' % && "
@@ -186,6 +192,7 @@ rule repeatmasker_installation:
         'sed -i \'s|RMBLAST_DIR\s\+=.*|RMBLAST_DIR = "' + "{input.RMBLAST}" + '/bin";|\' RepeatMaskerConfig.pm && '
         "cp -v {input.REPBASE}/RepeatMaskerLib.embl Libraries/ ; "
         "touch {output} && "
+        "echo 'export PATH='`readlink -f {output}`':$PATH' >>" + CONFIG['base']['maker.bashrc'] + " && "
         "cd / && rm -rv $TEMPDIR;"
 
 
@@ -199,13 +206,16 @@ rule maker_installation:
         rules.snap_installation.output,
         rules.exonerate_installation.output,
         rules.augustus_installation.output
-    output: CONFIG["base"]["maker_installation_dir"]
+    output: CONFIG["base"]["maker_installation_dir"]+"maker/bin/maker"
     shell:
         "TEMPDIR=`mktemp -d`;"
         "cd $TEMPDIR;"
         "wget"+CONFIG['maker_installation']['wget_options']+CONFIG['maker_installation']['maker_URL']+" && "
-        "tar xvzf maker* && "
+        "tar xzf maker* && "
         "rm -v maker*.tgz && "
         "touch maker && "
-        "mv maker `dirname {output}` && "
+        "cp --recursive maker "+CONFIG["base"]["maker_installation_dir"] +" && "
         "cd / && rm -rv $TEMPDIR;"
+        "cd "+CONFIG["base"]["maker_installation_dir"] +"maker/src && source " + CONFIG['base']['maker.bashrc'] + " && "
+        "perl Build.PL &&"
+        "./Build install"

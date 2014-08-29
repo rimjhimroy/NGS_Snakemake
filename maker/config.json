@@ -2,7 +2,7 @@
 	"base":{
 		"working_dir":"/tmp/VLPB_maker",
 		"maker_dir":"/tmp/VLPB_maker/maker/bin/",
-		"maker_installation_dir":"/tmp/VLPB_maker/maker/",
+		"maker_installation_dir":"/tmp/VLPB_maker/",
 		"maker_helpers_dir":"/tmp/VLPB_maker/maker_helpers/",
 		"maker.bashrc":"/tmp/VLPB_maker/maker_helpers/maker.bashrc"
 	},
@@ -11,9 +11,9 @@
 		"organism_type":"eukaryotic",
 		"est": "",
 		"protein": "",
-		"repeat_protein": "/home/WUR/warri004/downloads/maker/data/te_proteins.fasta",
+		"repeat_protein": "/tmp/VLPB_maker/maker/data/te_proteins.fasta",
 		"model_org": "all",
-		"snaphmm": "/home/WUR/warri004/downloads/maker/exe/snap/HMM/D.melanogaster.hmm",
+		"snaphmm": "/tmp/VLPB_maker/maker/maker_helpers/snap/HMM/D.melanogaster.hmm",
 		"augustus_species":"nasonia",
 		"est2genome":"1",
 		"protein2genome":"1",
