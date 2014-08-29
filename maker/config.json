@@ -7,13 +7,13 @@
 		"maker.bashrc":"/tmp/VLPB_maker/maker_helpers/maker.bashrc"
 	},
 	"maker_opts":{
-		"genome":"cotesia.fa",
+		"genome":"dpp_contig.fasta",
 		"organism_type":"eukaryotic",
-		"est": "",
-		"protein": "",
+		"est": "dpp_est.fasta",
+		"protein": "dpp_protein.fasta",
 		"repeat_protein": "/tmp/VLPB_maker/maker/data/te_proteins.fasta",
 		"model_org": "all",
-		"snaphmm": "/tmp/VLPB_maker/maker/maker_helpers/snap/HMM/D.melanogaster.hmm",
+		"snaphmm": "/tmp/VLPB_maker/maker_helpers/snap/HMM/D.melanogaster.hmm",
 		"augustus_species":"nasonia",
 		"est2genome":"1",
 		"protein2genome":"1",
@@ -27,9 +27,9 @@
 		"blastn":"/tmp/VLPB_maker/maker_helpers/blast+/bin/blastn",
 		"blastx":"/tmp/VLPB_maker/maker_helpers/blast+/bin/blastx",
 		"tblastx":"/tmp/VLPB_maker/maker_helpers/blast+/bin/tblastx",
-		"RepeatMasker":"/tmp/VLPB_maker/maker_helpers/RepeatMasker/RepeatMasker",
+		"RepeatMasker":"/tmp/VLPB_maker/maker_helpers/repeatmasker/RepeatMasker",
 		"exonerate":"/tmp/VLPB_maker/maker_helpers/exonerate/bin/exonerate",
-		"snap":"/tmp/VLPB_maker/maker/maker_helpers/snap/snap",
+		"snap":"/tmp/VLPB_maker/maker_helpers/snap/snap",
 		"augustus":"/tmp/VLPB_maker/maker_helpers/augustus/bin/augustus"
 
 	},
