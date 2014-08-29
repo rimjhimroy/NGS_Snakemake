@@ -66,26 +66,11 @@ rule maker:
     output: "{working_dir}/maker_done.txt"
     shell: 'cd {working_dir}; {maker_exe}; touch {working_dir}/maker_done.txt'
 
-#  Download maker
-# TODO : Fix output handling, this is ugly
-rule maker_download:
-    output: expand("{working_dir}", working_dir=working_dir)[0]+"/maker-"+CONFIG['maker_installation']['version']+".tgz"
-    shell:
-        "cd {working_dir}; "
-        "wget"+CONFIG['maker_installation']['wget_options']+CONFIG['maker_installation']['maker_URL']
-
-
-# Install maker
-rule maker_installation:
-    input: rules.maker_download.output
-    output: CONFIG["base"]["maker_dir"] + 'maker'
-    shell:
-        "cd `dirname {input}` ;"
-        "tar xvzf {input}"
+# Install maker dependancies :
 
 # Download and install Augustus
 rule augustus_installation:
-    output: CONFIG["base"]["maker_dir"] + '/augustus'
+    output: CONFIG["base"]["maker_helpers_dir"] + '/augustus'
     shell:
         "TEMPDIR=`mktemp -d`;"
         "cd $TEMPDIR;"
@@ -100,7 +85,7 @@ rule augustus_installation:
 
 # Download and install Exonerate
 rule exonerate_installation:
-    output: CONFIG["base"]["maker_dir"] + '/exonerate'
+    output: CONFIG["base"]["maker_helpers_dir"] + '/exonerate'
     shell:
         "TEMPDIR=`mktemp -d`;"
         "cd $TEMPDIR;"
@@ -114,7 +99,7 @@ rule exonerate_installation:
 
 # Download and install SNAP
 rule snap_installation:
-    output: CONFIG["base"]["maker_dir"] + '/snap'
+    output: CONFIG["base"]["maker_helpers_dir"] + '/snap'
     shell:
         "TEMPDIR=`mktemp -d`;"
         "cd $TEMPDIR;"
@@ -130,7 +115,7 @@ rule snap_installation:
 
 # Download and install TRF
 rule trf_installation:
-    output: CONFIG["base"]["maker_dir"] + 'trf'
+    output: CONFIG["base"]["maker_helpers_dir"] + 'trf'
     shell:
         "mkdir -p {output};"
         "cd {output};"
@@ -141,7 +126,7 @@ rule trf_installation:
 
 # Download and install BLAST+
 rule blast_plus_installation:
-    output: CONFIG["base"]["maker_dir"] + 'blast+'
+    output: CONFIG["base"]["maker_helpers_dir"] + 'blast+'
     shell:
         "TEMPDIR=`mktemp -d`;"
         "cd $TEMPDIR;"
@@ -155,7 +140,7 @@ rule blast_plus_installation:
 
 # Download and install RMBLAST plus corresponding BLAST+
 rule rmblast_installation:
-    output: CONFIG["base"]["maker_dir"] + 'rmblast'
+    output: CONFIG["base"]["maker_helpers_dir"] + 'rmblast'
     shell:
         "TEMPDIR=`mktemp -d`;"
         "cd $TEMPDIR;"
@@ -170,7 +155,7 @@ rule rmblast_installation:
 
 # Download and install GIRI RepBase
 rule repbase_installation:
-    output: CONFIG["base"]["maker_dir"] + 'repbase'
+    output: CONFIG["base"]["maker_helpers_dir"] + 'repbase'
     shell:
         "TEMPDIR=`mktemp -d`;"
         "pushd $TEMPDIR && "
@@ -186,7 +171,7 @@ rule repeatmasker_installation:
         REPBASE=rules.repbase_installation.output,
         RMBLAST=rules.rmblast_installation.output,
         TRF=rules.trf_installation.output
-    output: CONFIG["base"]["maker_dir"] + 'repeatmasker'
+    output: CONFIG["base"]["maker_helpers_dir"] + 'repeatmasker'
     shell:
         "TEMPDIR=`mktemp -d`;"
         "cd $TEMPDIR;"
@@ -201,4 +186,25 @@ rule repeatmasker_installation:
         'sed -i \'s|RMBLAST_DIR\s\+=.*|RMBLAST_DIR = "' + "{input.RMBLAST}" + '/bin";|\' RepeatMaskerConfig.pm && '
         "cp -v {input.REPBASE}/RepeatMaskerLib.embl Libraries/ ; "
         "touch {output} && "
+        "cd / && rm -rv $TEMPDIR;"
+
+
+#  Download and install Maker
+# TODO : Fix output handling, this is ugly
+
+rule maker_installation:
+    input:
+        rules.repeatmasker_installation.output,
+        rules.blast_plus_installation.output,
+        rules.snap_installation.output,
+        rules.exonerate_installation.output,
+        rules.augustus_installation.output
+    output: CONFIG["base"]["maker_dir"]
+    shell:
+        "TEMPDIR=`mktemp -d`;"
+        "cd $TEMPDIR;"
+        "wget"+CONFIG['maker_installation']['wget_options']+CONFIG['maker_installation']['maker_URL']+" && "
+        "tar xvzf maker* && "
+        "rm -v maker*.tgz && "
+        "mv maker {output} &&"
         "cd / && rm -rv $TEMPDIR;"

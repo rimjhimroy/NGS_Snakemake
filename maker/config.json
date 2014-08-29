@@ -2,7 +2,8 @@
 	"base":{
 		"working_dir":"/tmp/VLPB_maker",
 		"maker_dir":"/tmp/VLPB_maker/maker/bin/",
-		"maker.bashrc":"/tmp/VLPB_maker/maker/bin/maker.bashrc"
+		"maker_helpers_dir":"/tmp/VLPB_maker/maker_helpers/",
+		"maker.bashrc":"/tmp/VLPB_maker/maker_helpers/maker.bashrc"
 	},
 	"maker_opts":{
 		"genome":"cotesia.fa",
@@ -21,14 +22,14 @@
 		"blast_type":"ncbi+"
 	},
 	"maker_exe": {
-		"makeblastdb":"/home/WUR/warri004/downloads/maker/bin/../exe/ncbi-blast-2.2.28+/bin/makeblastdb",
-		"blastn":"/home/WUR/warri004/downloads/maker/bin/../exe/ncbi-blast-2.2.28+/bin/blastn",
-		"blastx":"/home/WUR/warri004/downloads/maker/bin/../exe/ncbi-blast-2.2.28+/bin/blastx",
-		"tblastx":"/home/WUR/warri004/downloads/maker/bin/../exe/ncbi-blast-2.2.28+/bin/tblastx",
-		"RepeatMasker":"/home/WUR/warri004/downloads/maker/bin/../exe/RepeatMasker/RepeatMasker",
-		"exonerate":"/home/WUR/warri004/downloads/maker/bin/../exe/exonerate-2.2.0-x86_64/bin/exonerate",
-		"snap":"/home/WUR/warri004/downloads/maker/bin/../exe/snap/snap #location of snap executable",
-		"augustus":"/home/WUR/warri004/downloads/maker/bin/../exe/augustus.2.5.5/bin/augustus"
+		"makeblastdb":"/tmp/VLPB_maker/maker_helpers/blast+/bin/makeblastdb",
+		"blastn":"/tmp/VLPB_maker/maker_helpers/blast+/bin/blastn",
+		"blastx":"/tmp/VLPB_maker/maker_helpers/blast+/bin/blastx",
+		"tblastx":"/tmp/VLPB_maker/maker_helpers/blast+/bin/tblastx",
+		"RepeatMasker":"/tmp/VLPB_maker/maker_helpers/RepeatMasker/RepeatMasker",
+		"exonerate":"/tmp/VLPB_maker/maker_helpers/exonerate/bin/exonerate",
+		"snap":"/tmp/VLPB_maker/maker/maker_helpers/snap/snap #location of snap executable",
+		"augustus":"/tmp/VLPB_maker/maker_helpers/augustus/bin/augustus"
 
 	},
 	"maker_installation": {
