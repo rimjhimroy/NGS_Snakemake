@@ -130,7 +130,7 @@ rule snap_installation:
 
 # Download and install TRF
 rule trf_installation:
-    output: CONFIG["base"]["maker_dir"] + '/trf'
+    output: CONFIG["base"]["maker_dir"] + 'trf'
     shell:
         "mkdir -p {output};"
         "cd {output};"
@@ -194,11 +194,11 @@ rule repeatmasker_installation:
         "tar xvzf RepeatMasker-open-* && "
         "rm -v *.tar.* && "
         "mv -v RepeatMasker* {output} && "
-        "touch {output} && "
-        "cd {output} && grep -l -r '#!/u1' * | xargs -I {} sed -i 's|/u1/local/bin/perl|/usr/bin/env perl|' {} && "
+        "cd {output} && grep -l -r '#!/u1' * | xargs -I '%' sed -i 's|/u1/local/bin/perl|/usr/bin/env perl|' % && "
         "cp RepeatMaskerConfig.tmpl RepeatMaskerConfig.pm && chmod -x RepeatMaskerConfig.pm && "
-        "sed -i 's|$TRF_PRGM = \"\";|$TRF_PRGM = \"{input.TRF}/trf\";|' RepeatMaskerConfig.pm &&"
-        "sed -i 's|$DEFAULT_SEARCH_ENGINE = \"crossmatch\";|$DEFAULT_SEARCH_ENGINE = \"ncbi\";|' RepeatMaskerConfig.pm &&"
-        "sed -i 's|$RMBLAST_DIR   = \"/usr/local/rmblast\";|$RMBLAST_DIR   = \"{input.RMBLAST}/bin\";|' RepeatMaskerConfig.pm &&"
-        "mv -v  {input.REPBASE}/RepeatMaskerLib.embl Libraries && "
-        "cd / && rm -vrf $TEMPDIR;"
+        'sed -i \'s|DEFAULT_SEARCH_ENGINE\s\+=.*|DEFAULT_SEARCH_ENGINE = "ncbi";|\' RepeatMaskerConfig.pm && '
+        'sed -i \'s|TRF_PRGM\s\+=.*|TRF_PRGM = "' + "{input.TRF}" + '|\' RepeatMaskerConfig.pm && '
+        'sed -i \'s|RMBLAST_DIR\s\+=.*|RMBLAST_DIR = "' + "{input.RMBLAST}" + '/bin";|\' RepeatMaskerConfig.pm && '
+        "cp -v {input.REPBASE}/RepeatMaskerLib.embl Libraries/ ; "
+        "touch {output} && "
+        "cd / && rm -rv $TEMPDIR;"
