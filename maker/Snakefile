@@ -15,6 +15,7 @@ maker_out = ".".join(CONFIG["maker_opts"]["genome"].split(".")[:-1]) + ".output"
 """ This function takes the maker configuration file ctl and overrides settings if found in the relevant section of config.json"""
 def read_maker_opts_ctl(section, ctl):
     config = configparser.RawConfigParser()
+    config.optionxform = str # Return options as they are, do not convert to lowercase
     config.read(ctl)
     # All settings are in the "maker" section
     # Loop over all the settings, and if a matching entry is found in config.json, replace
@@ -23,7 +24,7 @@ def read_maker_opts_ctl(section, ctl):
             config.set("maker", c[0], CONFIG[section][c[0]])
     # Place the new configuration in a single string:
     output = io.StringIO()
-    config.write(output)
+    config.write(output,space_around_delimiters=False)
     return output.getvalue()
 
 """ maker doesn't give proper output, so we need our own flag file"""
@@ -58,19 +59,6 @@ rule maker_exe:
     params : configured = read_maker_opts_ctl("maker_exe", "maker_exe.ctl.conf")
     output: "{working_dir}/maker_exe.ctl"
     shell: 'echo -e "{params.configured}" | grep -v "\[maker\]" > {output}'
-
-""" rule to run maker based on the given configuration """
-rule maker:
-    input:
-        rules.maker_bopts.output,
-        rules.maker_opts.output,
-        rules.maker_exe.output,
-        MAKER=rules.maker_installation.output
-    output: "{working_dir}/maker_done.txt"
-    shell: 'cd {working_dir} && '
-           "source " + CONFIG['base']['maker.bashrc'] + " && "
-           '{input.MAKER} &&'
-           'touch {working_dir}/maker_done.txt'
 
 # Install maker dependancies :
 
@@ -218,4 +206,17 @@ rule maker_installation:
         "cd / && rm -rv $TEMPDIR;"
         "cd "+CONFIG["base"]["maker_installation_dir"] +"maker/src && source " + CONFIG['base']['maker.bashrc'] + " && "
         "perl Build.PL &&"
-        "./Build install"
+        "./Build install
+
+"""" rule to run maker based on the given configuration """
+rule maker:
+    input:
+        rules.maker_bopts.output,
+        rules.maker_opts.output,
+        rules.maker_exe.output,
+        MAKER=rules.maker_installation.output
+    output: "{working_dir}/maker_done.txt"
+    shell: 'cd {working_dir} && '
+           "source " + CONFIG['base']['maker.bashrc'] + " && "
+           '{input.MAKER} &&'
+           'touch {working_dir}/maker_done.txt'
