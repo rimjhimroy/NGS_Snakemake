@@ -112,13 +112,14 @@ rule snap_installation:
 
 # Download and install TRF
 rule trf_installation:
-    output: CONFIG["base"]["maker_helpers_dir"] + 'trf'
+    output: CONFIG["base"]["maker_helpers_dir"] + 'trf/trf'
     shell:
-        "mkdir -p {output};"
-        "cd {output};"
-        "wget"+CONFIG['maker_installation']['wget_options']+CONFIG['maker_installation']['trf_URL']+";"
-        "mv -v trf* trf;"
-        "chmod -v ugo+x trf;"
+        "mkdir -p `dirname {output}` && "
+        "cd `dirname {output}` && "
+        "wget"+CONFIG['maker_installation']['wget_options']+CONFIG['maker_installation']['trf_URL']+" && "
+        "mv -v trf* trf && "
+        "chmod -v ugo+x trf && "
+        "touch {output} && "
         "echo 'export PATH='`readlink -f {output}`':$PATH' >>" + CONFIG['base']['maker.bashrc'] + ";"
 
 # Download and install BLAST+
@@ -179,7 +180,7 @@ rule repeatmasker_installation:
         "cd {output} && grep -l -r '#!/u1' * | xargs -I '%' sed -i 's|/u1/local/bin/perl|/usr/bin/env perl|' % && "
         "cp RepeatMaskerConfig.tmpl RepeatMaskerConfig.pm && chmod -x RepeatMaskerConfig.pm && "
         'sed -i \'s|DEFAULT_SEARCH_ENGINE\s\+=.*|DEFAULT_SEARCH_ENGINE = "ncbi";|\' RepeatMaskerConfig.pm && '
-        'sed -i \'s|TRF_PRGM\s\+=.*|TRF_PRGM = "' + "{input.TRF}" + '|\' RepeatMaskerConfig.pm && '
+        'sed -i \'s|TRF_PRGM\s\+=.*|TRF_PRGM = "' + "{input.TRF}" + '";|\' RepeatMaskerConfig.pm && '
         'sed -i \'s|RMBLAST_DIR\s\+=.*|RMBLAST_DIR = "' + "{input.RMBLAST}" + '/bin";|\' RepeatMaskerConfig.pm && '
         "cp -v {input.REPBASE}/RepeatMaskerLib.embl Libraries/ ; "
         "touch {output} && "
