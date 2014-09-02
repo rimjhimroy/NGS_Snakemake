@@ -206,7 +206,7 @@ rule maker_installation:
         "cd / && rm -rv $TEMPDIR;"
         "cd "+CONFIG["base"]["maker_installation_dir"] +"maker/src && source " + CONFIG['base']['maker.bashrc'] + " && "
         "perl Build.PL &&"
-        "./Build install
+        "./Build install"
 
 """" rule to run maker based on the given configuration """
 rule maker:
