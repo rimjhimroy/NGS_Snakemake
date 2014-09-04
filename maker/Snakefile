@@ -39,30 +39,6 @@ rule clean_maker:
 rule clean_data:
     shell: "rm -rf {working_dir}/{maker_out}"
 
-""" create the maker_bopts.ctl file """
-""" TODO : use maker -BOPTS to generate the file from scratch """
-rule maker_bopts:
-    input: "maker_bopts.ctl.conf"
-    params : configured = read_maker_opts_ctl("maker_bopts", "maker_bopts.ctl.conf")
-    output: "{working_dir}/maker_bopts.ctl"
-    shell: 'echo -e "{params.configured}" | grep -v "\[maker\]" > {output}'
-
-""" create the maker_opts.ctl file """
-""" TODO : use maker -OPTS to generate the file from scratch """
-rule maker_opts:
-    input: "maker_opts.ctl.conf"
-    params : configured = read_maker_opts_ctl("maker_opts", "maker_opts.ctl.conf")
-    output: "{working_dir}/maker_opts.ctl"
-    shell: 'echo -e "{params.configured}" | grep -v "\[maker\]" > {output}'
-
-""" create the maker_exe.ctl file """
-""" TODO : use maker -EXE to generate the file from scratch """
-rule maker_exe:
-    input: "maker_exe.ctl.conf"
-    params : configured = read_maker_opts_ctl("maker_exe", "maker_exe.ctl.conf")
-    output: "{working_dir}/maker_exe.ctl"
-    shell: 'echo -e "{params.configured}" | grep -v "\[maker\]" > {output}'
-
 # Install maker dependancies :
 
 # Download and install Augustus
