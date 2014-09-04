@@ -1,16 +1,16 @@
 {
 	"base":{
-		"working_dir":"/tmp/VLPB_maker",
+		"working_dir":"/home/jvh/scratch/VLPB_Annotation/TEMP_MAKER",
 		"maker_dir":"/tmp/VLPB_maker/maker/bin/",
 		"maker_installation_dir":"/tmp/VLPB_maker/",
 		"maker_helpers_dir":"/tmp/VLPB_maker/maker_helpers/",
 		"maker.bashrc":"/tmp/VLPB_maker/maker_helpers/maker.bashrc"
 	},
 	"maker_opts":{
-		"genome":"dpp_contig.fasta",
+		"genome":"/home/jvh/scratch/VLPB_Annotation/data/dpp_contig.fasta",
 		"organism_type":"eukaryotic",
-		"est": "dpp_est.fasta",
-		"protein": "dpp_protein.fasta",
+		"est": "/home/jvh/scratch/VLPB_Annotation/data/dpp_est.fasta",
+		"protein": "/home/jvh/scratch/VLPB_Annotation/data/dpp_protein.fasta",
 		"repeat_protein": "/tmp/VLPB_maker/maker/data/te_proteins.fasta",
 		"model_org": "all",
 		"snaphmm": "/tmp/VLPB_maker/maker_helpers/snap/HMM/D.melanogaster.hmm",
@@ -46,5 +46,12 @@
 		"repeatmasker_URL":"http://www.repeatmasker.org/RepeatMasker-open-4-0-5.tar.gz",
 		"repeatmaskerlibraries_URL":"http://www.girinst.org/server/RepBase/protected/repeatmaskerlibraries/repeatmaskerlibraries-20140131.tar.gz",
 		"repeatmaskerlibraries_URL_netrc":"/home/jvh/scratch/VLPB_Annotation/maker/.netrc"
+	},
+	"jbrowse_installation":{
+	    "jbrowse_url":"http://jbrowse.org/releases/JBrowse-1.11.5.zip",
+	    "interproscan_url":"ftp://ftp.ebi.ac.uk/pub/software/unix/iprscan/5/5.7-48.0/interproscan-5.7-48.0-64-bit.tar.gz",
+	    "panther_url":"ftp://ftp.ebi.ac.uk/pub/software/unix/iprscan/5/data/panther-data-9.0.tar.gz",
+	    "lookup_service_url":"ftp://ftp.ebi.ac.uk/pub/software/unix/iprscan/5/lookup_service/lookup_service_5.6-48.0.tar.gz",
+	    "uniprot_url":"ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/uniref/uniref100/"
 	}
 }

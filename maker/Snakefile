@@ -29,7 +29,8 @@ def read_maker_opts_ctl(section, ctl):
 
 """ maker doesn't give proper output, so we need our own flag file"""
 rule all:
-    input: expand("{working_dir}/maker_done.txt", working_dir=working_dir)
+    input: expand("{working_dir}/maker_done.txt", working_dir=working_dir),
+           expand("{working_dir}/uniprot", working_dir=working_dir)
 
 """ use this rule to clean-up maker settings """
 rule clean_maker:
@@ -230,3 +231,26 @@ rule maker:
            "source " + CONFIG['base']['maker.bashrc'] + " && "
            '{input.MAKER} &&'
            'touch {working_dir}/maker_done.txt'
+
+# Rule to concatenate all generated GFFs
+rule concatenate_gffs:
+    input: rules.maker.output
+    output: "{working_dir}/concatenated.gff"
+    shell: 'cd {working_dir} && '
+           "MAKER_OUTPUT=`find . -type d -wholename '*maker.output'` && "
+           "MAKER_PREFIX=`basename $MAKER_OUTPUT .maker.output` && "
+           "find $MAKER_OUTPUT -maxdepth 5 -type f -iname '*gff' | nl > contiglist.out "
+
+rule install_uniprot:
+    output: "{working_dir}/uniprot"
+    shell:
+        "source " + CONFIG['base']['maker.bashrc'] + " && "
+        "TEMPDIR=/tmp/VLPB_maker/uniprot && "
+        "cd $TEMPDIR && "
+        "lftp -e 'mirror --parallel=4 --continue --use-pget=15 --no-recursion --verbose --dereference --exclude-glob='*.xml.gz' "+CONFIG['jbrowse_installation']['uniprot_url']+" && "
+        "gunzip -vk uniref100.fasta.gz && "
+        'TITLE="UniRef100 - "`cat uniref100.release_note | grep Release | sed \'s/^[ \\t]*//\'` && '
+        'makeblastdb -in uniref100.fasta -dbtype prot -out uniref -title "$TITLE" -parse_seqids && '
+        "mkdir -p {output} && "
+        "mv -v * {output} && "
+        #"cd / && rm -rv $TEMPDIR;"
