@@ -1,19 +1,19 @@
 {
 	"base":{
 		"working_dir":"/home/jvh/scratch/VLPB_Annotation/TEMP_MAKER",
-		"maker_dir":"/tmp/VLPB_maker/maker/bin/",
-		"maker_installation_dir":"/tmp/VLPB_maker/",
-		"maker_helpers_dir":"/tmp/VLPB_maker/maker_helpers/",
-		"maker.bashrc":"/tmp/VLPB_maker/maker_helpers/maker.bashrc"
+		"maker_dir":"/home/jvh/scratch/VLPB_Annotation/bin/maker/bin/",
+		"maker_installation_dir":"/home/jvh/scratch/VLPB_Annotation/bin/",
+		"maker_helpers_dir":"/home/jvh/scratch/VLPB_Annotation/bin/maker_helpers/",
+		"maker.bashrc":"/home/jvh/scratch/VLPB_Annotation/bin/maker_helpers/maker.bashrc"
 	},
 	"maker_opts":{
 		"genome":"/home/jvh/scratch/VLPB_Annotation/data/dpp_contig.fasta",
 		"organism_type":"eukaryotic",
 		"est": "/home/jvh/scratch/VLPB_Annotation/data/dpp_est.fasta",
 		"protein": "/home/jvh/scratch/VLPB_Annotation/data/dpp_protein.fasta",
-		"repeat_protein": "/tmp/VLPB_maker/maker/data/te_proteins.fasta",
+		"repeat_protein": "/home/jvh/scratch/VLPB_Annotation/bin/maker/data/te_proteins.fasta",
 		"model_org": "all",
-		"snaphmm": "/tmp/VLPB_maker/maker_helpers/snap/HMM/D.melanogaster.hmm",
+		"snaphmm": "/home/jvh/scratch/VLPB_Annotation/bin/maker_helpers/snap/HMM/D.melanogaster.hmm",
 		"augustus_species":"nasonia",
 		"est2genome":"1",
 		"protein2genome":"1",
@@ -23,17 +23,31 @@
 		"blast_type":"ncbi+"
 	},
 	"maker_exe": {
-		"makeblastdb":"/tmp/VLPB_maker/maker_helpers/blast+/bin/makeblastdb",
-		"blastn":"/tmp/VLPB_maker/maker_helpers/blast+/bin/blastn",
-		"blastx":"/tmp/VLPB_maker/maker_helpers/blast+/bin/blastx",
-		"tblastx":"/tmp/VLPB_maker/maker_helpers/blast+/bin/tblastx",
-		"RepeatMasker":"/tmp/VLPB_maker/maker_helpers/repeatmasker/RepeatMasker",
-		"exonerate":"/tmp/VLPB_maker/maker_helpers/exonerate/bin/exonerate",
-		"snap":"/tmp/VLPB_maker/maker_helpers/snap/snap",
-		"augustus":"/tmp/VLPB_maker/maker_helpers/augustus/bin/augustus"
+		"makeblastdb":"/home/jvh/scratch/VLPB_Annotation/bin/maker_helpers/blast+/bin/makeblastdb",
+		"blastn":"/home/jvh/scratch/VLPB_Annotation/bin/maker_helpers/blast+/bin/blastn",
+		"blastx":"/home/jvh/scratch/VLPB_Annotation/bin/maker_helpers/blast+/bin/blastx",
+		"tblastx":"/home/jvh/scratch/VLPB_Annotation/bin/maker_helpers/blast+/bin/tblastx",
+		"RepeatMasker":"/home/jvh/scratch/VLPB_Annotation/bin/maker_helpers/repeatmasker/RepeatMasker",
+		"exonerate":"/home/jvh/scratch/VLPB_Annotation/bin/maker_helpers/exonerate/bin/exonerate",
+		"snap":"/home/jvh/scratch/VLPB_Annotation/bin/maker_helpers/snap/snap",
+		"augustus":"/home/jvh/scratch/VLPB_Annotation/bin/maker_helpers/augustus/bin/augustus"
 
 	},
 	"maker_installation": {
+		"maker_URL":                        "http://localhost/~jvh/maker_test.nobackup/maker-2.31.6.tgz",
+		"version":"2.31.6",
+		"wget_options":" -c --proxy=off ",
+		"augustus_URL":                     "http://localhost/~jvh/maker_test.nobackup/augustus.2.5.5.tar.gz",
+		"exonerate_URL":                    "http://localhost/~jvh/maker_test.nobackup/exonerate-2.2.0-x86_64.tar.gz",
+		"snap_URL":                         "http://localhost/~jvh/maker_test.nobackup/snap-2013-11-29.tar.gz",
+		"trf_URL":                          "http://localhost/~jvh/maker_test.nobackup/trf407b.linux64",
+		"blast+_URL":                       "http://localhost/~jvh/maker_test.nobackup/ncbi-blast-2.2.29+-x64-linux.tar.gz",
+		"rmblast_URL":                      "http://localhost/~jvh/maker_test.nobackup/rmblast/2.2.28/ncbi-rmblastn-2.2.28-x64-linux.tar.gz http://localhost/~jvh/maker_test.nobackup/ncbi-blast-2.2.28+-x64-linux.tar.gz",
+		"repeatmasker_URL":                 "http://localhost/~jvh/maker_test.nobackup/RepeatMasker-open-4-0-5.tar.gz",
+		"repeatmaskerlibraries_URL":        "http://localhost/~jvh/repbase.nobackup/repeatmaskerlibraries-20140131.tar.gz",
+		"repeatmaskerlibraries_URL_netrc":  "/home/jvh/scratch/VLPB_Annotation/maker/.netrc"
+	},
+		"maker_installation_production": {
 		"maker_URL":"http://assembly.ab.wurnet.nl/~jvh/maker-2.31.6.tgz",
 		"version":"2.31.6",
 		"wget_options":" -c --proxy=off ",
@@ -44,10 +58,18 @@
 		"blast+_URL": "ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/2.2.29/ncbi-blast-2.2.29+-x64-linux.tar.gz",
 		"rmblast_URL": "ftp://ftp.ncbi.nlm.nih.gov/blast/executables/rmblast/2.2.28/ncbi-rmblastn-2.2.28-x64-linux.tar.gz ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/2.2.28/ncbi-blast-2.2.28+-x64-linux.tar.gz",
 		"repeatmasker_URL":"http://www.repeatmasker.org/RepeatMasker-open-4-0-5.tar.gz",
-		"repeatmaskerlibraries_URL":"http://www.girinst.org/server/RepBase/protected/repeatmaskerlibraries/repeatmaskerlibraries-20140131.tar.gz",
+		"repeatmaskerlibraries_URL":"http://assembly.ab.wurnet.nl/~jvh/repbase/repeatmaskerlibraries-20140131.tar.gz",
+		"repeatmaskerlibraries_URL_org":"http://www.girinst.org/server/RepBase/protected/repeatmaskerlibraries/repeatmaskerlibraries-20140131.tar.gz",
 		"repeatmaskerlibraries_URL_netrc":"/home/jvh/scratch/VLPB_Annotation/maker/.netrc"
 	},
 	"jbrowse_installation":{
+	    "jbrowse_url":                      "http://localhost/~jvh/JBrowse-1.11.5.zip",
+	    "interproscan_url":                 "http://localhost/~jvh/interproscan-5.7-48.0-64-bit.tar.gz",
+	    "panther_url":                      "http://localhost/~jvh/panther-data-9.0.tar.gz",
+	    "lookup_service_url":               "http://localhost/~jvh/lookup_service_5.6-48.0.tar.gz",
+	    "uniprot_url":                      "http://localhost/~jvh/uniref100/"
+	},
+	"jbrowse_installation_production":{
 	    "jbrowse_url":"http://jbrowse.org/releases/JBrowse-1.11.5.zip",
 	    "interproscan_url":"ftp://ftp.ebi.ac.uk/pub/software/unix/iprscan/5/5.7-48.0/interproscan-5.7-48.0-64-bit.tar.gz",
 	    "panther_url":"ftp://ftp.ebi.ac.uk/pub/software/unix/iprscan/5/data/panther-data-9.0.tar.gz",
