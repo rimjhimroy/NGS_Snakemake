@@ -212,6 +212,36 @@ rule maker_installation:
         "perl Build.PL &&"
         "./Build install"
 
+""" create the maker_bopts.ctl file """
+rule maker_bopts:
+    input: rules.maker_installation.output
+    params : configured = read_maker_opts_ctl("maker_bopts", "maker_bopts.ctl.conf")
+    output: "{working_dir}/maker_bopts.ctl"
+    shell:
+        'cd {working_dir} && '
+        '{input} -BOPTS && '
+        'echo -e "{params.configured}" | grep -v "\[maker\]" > {output}'
+
+""" create the maker_opts.ctl file """
+rule maker_opts:
+    input: rules.maker_installation.output
+    params : configured = read_maker_opts_ctl("maker_opts", "maker_opts.ctl.conf")
+    output: "{working_dir}/maker_opts.ctl"
+    shell:
+        'cd {working_dir} && '
+        '{input} -OPTS && '
+        'echo -e "{params.configured}" | grep -v "\[maker\]" > {output}'
+
+""" create the maker_exe.ctl file """
+rule maker_exe:
+    input: rules.maker_installation.output
+    params : configured = read_maker_opts_ctl("maker_exe", "maker_exe.ctl.conf")
+    output: "{working_dir}/maker_exe.ctl"
+    shell:
+        'cd {working_dir} && '
+        '{input} -EXE && '
+        'echo -e "{params.configured}" | grep -v "\[maker\]" > {output}'
+
 """" rule to run maker based on the given configuration """
 rule maker:
     input:
