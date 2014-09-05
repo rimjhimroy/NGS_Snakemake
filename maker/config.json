@@ -42,9 +42,9 @@
 		"snap_URL":                         "http://localhost/~jvh/maker_test.nobackup/snap-2013-11-29.tar.gz",
 		"trf_URL":                          "http://localhost/~jvh/maker_test.nobackup/trf407b.linux64",
 		"blast+_URL":                       "http://localhost/~jvh/maker_test.nobackup/ncbi-blast-2.2.29+-x64-linux.tar.gz",
-		"rmblast_URL":                      "http://localhost/~jvh/maker_test.nobackup/rmblast/2.2.28/ncbi-rmblastn-2.2.28-x64-linux.tar.gz http://localhost/~jvh/maker_test.nobackup/ncbi-blast-2.2.28+-x64-linux.tar.gz",
+		"rmblast_URL":                      "http://localhost/~jvh/maker_test.nobackup/ncbi-rmblastn-2.2.28-x64-linux.tar.gz http://localhost/~jvh/maker_test.nobackup/ncbi-blast-2.2.28+-x64-linux.tar.gz",
 		"repeatmasker_URL":                 "http://localhost/~jvh/maker_test.nobackup/RepeatMasker-open-4-0-5.tar.gz",
-		"repeatmaskerlibraries_URL":        "http://localhost/~jvh/repbase.nobackup/repeatmaskerlibraries-20140131.tar.gz",
+		"repeatmaskerlibraries_URL":        "http://assembly.ab.wurnet.nl/~jvh/repbase.nobackup/repeatmaskerlibraries-20140131.tar.gz",
 		"repeatmaskerlibraries_URL_netrc":  "/home/jvh/scratch/VLPB_Annotation/maker/.netrc"
 	},
 		"maker_installation_production": {
