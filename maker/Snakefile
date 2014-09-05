@@ -53,11 +53,11 @@ rule augustus_installation:
         "wget"+CONFIG['maker_installation']['wget_options']+CONFIG['maker_installation']['augustus_URL']+";"
         "tar xzf augustus*;"
         "rm *.tar.*;"
-        "mv -v augustus* {output};"
+        "mv augustus* {output};"
         "touch {output} && "
         "echo 'export PATH='`readlink -f {output}/bin/`':$PATH' >>" + CONFIG['base']['maker.bashrc'] + ";"
         "echo 'export AUGUSTUS_CONFIG_PATH='`readlink -f {output}/config/`  >>"+ CONFIG['base']['maker.bashrc'] + ";"
-        "cd / && rmdir -v $TEMPDIR;"
+        "cd / && rmdir $TEMPDIR;"
 
 # Download and install Exonerate
 rule exonerate_installation:
@@ -68,10 +68,10 @@ rule exonerate_installation:
         "wget"+CONFIG['maker_installation']['wget_options']+CONFIG['maker_installation']['exonerate_URL']+";"
         "tar xzf exonerate*;"
         "rm *.tar.*;"
-        "mv -v exonerate* {output};"
+        "mv exonerate* {output};"
         "touch {output} && "
         "echo 'export PATH='`readlink -f {output}/bin/`':$PATH' >>" + CONFIG['base']['maker.bashrc'] + ";"
-        "cd / && rmdir -v $TEMPDIR;"
+        "cd / && rmdir $TEMPDIR;"
 
 # Download and install SNAP
 rule snap_installation:
@@ -82,12 +82,12 @@ rule snap_installation:
         "wget"+CONFIG['maker_installation']['wget_options']+CONFIG['maker_installation']['snap_URL']+";"
         "tar xzf snap*;"
         "rm *.tar.*;"
-        "mv -v snap* {output};"
+        "mv snap* {output};"
         "touch {output} && "
         "cd {output} && make;"
         "echo 'export ZOE='`readlink -f {output}` >>" + CONFIG['base']['maker.bashrc'] + ";"
         "echo 'export PATH='`readlink -f {output}`':$PATH' >>" + CONFIG['base']['maker.bashrc'] + ";"
-        "cd / && rmdir -v $TEMPDIR;"
+        "cd / && rmdir $TEMPDIR;"
 
 # Download and install TRF
 rule trf_installation:
@@ -96,8 +96,8 @@ rule trf_installation:
         "mkdir -p `dirname {output}` && "
         "cd `dirname {output}` && "
         "wget"+CONFIG['maker_installation']['wget_options']+CONFIG['maker_installation']['trf_URL']+" && "
-        "mv -v trf* trf && "
-        "chmod -v ugo+x trf && "
+        "mv trf* trf && "
+        "chmod ugo+x trf && "
         "touch {output} && "
         "echo 'export PATH='`readlink -f {output}`':$PATH' >>" + CONFIG['base']['maker.bashrc'] + ";"
 
@@ -110,10 +110,10 @@ rule blast_plus_installation:
         "wget"+CONFIG['maker_installation']['wget_options']+CONFIG['maker_installation']['blast+_URL']+" && "
         "tar xzf ncbi* && "
         "rm *.tar.* && "
-        "mv -v ncbi* {output} && "
+        "mv ncbi* {output} && "
         "touch {output} && "
         "echo 'export PATH='`readlink -f {output}/bin`':$PATH' >>" + CONFIG['base']['maker.bashrc'] + ";"
-        "cd / && rmdir -v $TEMPDIR;"
+        "cd / && rmdir $TEMPDIR;"
 
 # Download and install RMBLAST plus corresponding BLAST+
 rule rmblast_installation:
@@ -124,23 +124,24 @@ rule rmblast_installation:
         "wget"+CONFIG['maker_installation']['wget_options']+CONFIG['maker_installation']['rmblast_URL']+" && "
         "tar xzf ncbi-blast* && "
         "tar xzf ncbi-rmblast* && "
-        "rm -v *.tar.* && "
+        "rm  *.tar.* && "
         "cp -R ncbi-rmblast*/* ncbi-blast*/ &&"
-        "mv -v ncbi-blast* {output} && "
+        "mv  ncbi-blast* {output} && "
         "touch {output} && "
-        "cd / && rm -vrf $TEMPDIR;"
+        "cd / && rm -rf $TEMPDIR;"
 
 # Download and install GIRI RepBase
 rule repbase_installation:
     output: CONFIG["base"]["maker_helpers_dir"] + 'repbase'
     shell:
         "TEMPDIR=`mktemp -d`;"
-        "pushd $TEMPDIR && "
+        "cd $TEMPDIR && "
         "curl --remote-name --anyauth --netrc-file "+CONFIG['maker_installation']['repeatmaskerlibraries_URL_netrc']+" "+CONFIG['maker_installation']['repeatmaskerlibraries_URL']+" && "
         "tar xzf repeatmaskerlibraries* && "
-        "mv -v Libraries {output} && "
+        "mv  Libraries {output} && "
+        "mv  repeatmaskerlibraries* {output} && "
         "touch {output} && "
-        "cd / && rm -vrf $TEMPDIR;"
+        "cd / && rm -rf $TEMPDIR;"
 
 # Download and install Repeatmasker
 rule repeatmasker_installation:
@@ -154,17 +155,17 @@ rule repeatmasker_installation:
         "cd $TEMPDIR;"
         "wget"+CONFIG['maker_installation']['wget_options']+CONFIG['maker_installation']['repeatmasker_URL']+" && "
         "tar xzf RepeatMasker-open-* && "
-        "rm -v *.tar.* && "
-        "mv -v RepeatMasker* {output} && "
+        "rm *.tar.* && "
+        "mv RepeatMasker* {output} && "
         "cd {output} && grep -l -r '#!/u1' * | xargs -I '%' sed -i 's|/u1/local/bin/perl|/usr/bin/env perl|' % && "
         "cp RepeatMaskerConfig.tmpl RepeatMaskerConfig.pm && chmod -x RepeatMaskerConfig.pm && "
         'sed -i \'s|DEFAULT_SEARCH_ENGINE\s\+=.*|DEFAULT_SEARCH_ENGINE = "ncbi";|\' RepeatMaskerConfig.pm && '
         'sed -i \'s|TRF_PRGM\s\+=.*|TRF_PRGM = "' + "{input.TRF}" + '";|\' RepeatMaskerConfig.pm && '
         'sed -i \'s|RMBLAST_DIR\s\+=.*|RMBLAST_DIR = "' + "{input.RMBLAST}" + '/bin";|\' RepeatMaskerConfig.pm && '
-        "cp -v {input.REPBASE}/RepeatMaskerLib.embl Libraries/ ; "
+        "cp  {input.REPBASE}/RepeatMaskerLib.embl Libraries/ ; "
         "touch {output} && "
         "echo 'export PATH='`readlink -f {output}`':$PATH' >>" + CONFIG['base']['maker.bashrc'] + " && "
-        "cd / && rm -rv $TEMPDIR;"
+        "cd / && rm -rf $TEMPDIR;"
 
 
 #  Download and install Maker
@@ -183,10 +184,10 @@ rule maker_installation:
         "cd $TEMPDIR;"
         "wget"+CONFIG['maker_installation']['wget_options']+CONFIG['maker_installation']['maker_URL']+" && "
         "tar xzf maker* && "
-        "rm -v maker*.tgz && "
+        "rm maker*.tgz && "
         "touch maker && "
         "cp --recursive maker "+CONFIG["base"]["maker_installation_dir"] +" && "
-        "cd / && rm -rv $TEMPDIR;"
+        "cd / && rm -rf $TEMPDIR;"
         "cd "+CONFIG["base"]["maker_installation_dir"] +"maker/src && source " + CONFIG['base']['maker.bashrc'] + " && "
         "perl Build.PL &&"
         "./Build install"

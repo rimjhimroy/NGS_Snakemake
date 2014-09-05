@@ -36,7 +36,7 @@
 	"maker_installation": {
 		"maker_URL":                        "http://localhost/~jvh/maker_test.nobackup/maker-2.31.6.tgz",
 		"version":"2.31.6",
-		"wget_options":" -c --proxy=off ",
+		"wget_options":" -c --proxy=off --no-verbose ",
 		"augustus_URL":                     "http://localhost/~jvh/maker_test.nobackup/augustus.2.5.5.tar.gz",
 		"exonerate_URL":                    "http://localhost/~jvh/maker_test.nobackup/exonerate-2.2.0-x86_64.tar.gz",
 		"snap_URL":                         "http://localhost/~jvh/maker_test.nobackup/snap-2013-11-29.tar.gz",
