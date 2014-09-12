@@ -4,9 +4,22 @@ import json, os, inspect
 import configparser
 import io
 
+""" Recursive function to do a string format on each of the string values in the config. 
+    Full replace on a JSON does not work: it uses, like formatting, {} which results
+    in errors."""
+def replace_paths_in_json(conf, paths):
+    for item in conf:
+        if isinstance(conf[item], str): #is it a string value? 
+            conf[item] = conf[item].format(**paths) #use json to replace values
+        elif isinstance(conf[item], dict): # is this a json object (dict) ? 
+            replace_paths_in_json(conf[item], paths) # parse object
+
 # Get the config file:
-with open("config.json") as f:
-    CONFIG = json.load(f)
+with open("config.json") as conf:
+    with open("paths.json") as paths:
+        PATHS = json.load(paths)
+        CONFIG = json.load(conf)
+        replace_paths_in_json(CONFIG, PATHS)
 
 # Set some basic variables (snakemake doesn't always allow these calls directly in rules
 working_dir = CONFIG['base']['working_dir']
