@@ -4,7 +4,15 @@
 		"maker_dir":"{base_dir}bin/maker/bin/",
 		"maker_installation_dir":"{base_dir}bin/",
 		"maker_helpers_dir":"{base_dir}{maker_exe}",
-		"maker.bashrc":"{base_dir}{maker_exe}maker.bashrc"
+		"maker_bashrc":"{base_dir}{maker_exe}maker.bashrc",
+		"maker_perl":"{base_dir}bin/maker/src/",
+		"perl_install":"{home_dir}perl5/",
+		"perl_libs" : ["BioPerl", "DBI", "Error", "Error::Simple", "File::NFSLock", "File::Which", "Inline", "Perl::Unsafe::Signals", "Proc::Simple", 
+						"URI::Escape", "Bit::Vector", "Inline::C", "PerlIO::gzip", "forks", "forks::shared", "IO::All", "IO::Prompt", "DBD::SQLite"]
+		
+	},
+	"output":{
+			"protein_prefix":"PRI_"
 	},
 	"maker_opts":{
 		"genome":"{base_dir}data/dpp_contig.fasta",
@@ -45,7 +53,7 @@
 		"rmblast_URL":                      "{web_host}maker_test.nobackup/ncbi-rmblastn-2.2.28-x64-linux.tar.gz {web_host}maker_test.nobackup/ncbi-blast-2.2.28+-x64-linux.tar.gz",
 		"repeatmasker_URL":                 "{web_host}maker_test.nobackup/RepeatMasker-open-4-0-5.tar.gz",
 		"repeatmaskerlibraries_URL":        "{web_host}repbase.nobackup/repeatmaskerlibraries-20140131.tar.gz",
-		"repeatmaskerlibraries_URL_netrc":  "{base_dir}maker/.netrc"
+		"repeatmaskerlibraries_URL_netrc":  "{home_dir}/.netrc"
 	},
 		"maker_installation_production": {
 		"maker_URL":"{web_host}maker-2.31.6.tgz",
@@ -60,7 +68,7 @@
 		"repeatmasker_URL":"http://www.repeatmasker.org/RepeatMasker-open-4-0-5.tar.gz",
 		"repeatmaskerlibraries_URL":"http://assembly.ab.wurnet.nl/~jvh/repbase/repeatmaskerlibraries-20140131.tar.gz",
 		"repeatmaskerlibraries_URL_org":"http://www.girinst.org/server/RepBase/protected/repeatmaskerlibraries/repeatmaskerlibraries-20140131.tar.gz",
-		"repeatmaskerlibraries_URL_netrc":"{base_dir}maker/.netrc"
+		"repeatmaskerlibraries_URL_netrc":"{home_dir}/.netrc"
 	},
 	"jbrowse_installation":{
 	    "jbrowse_url":                      "{web_host}JBrowse-1.11.5.zip",

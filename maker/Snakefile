@@ -45,7 +45,10 @@ def read_maker_opts_ctl(json_section, ctl):
 """ maker doesn't give proper output, so we need our own flag file"""
 rule all:
     input: expand("{working_dir}/maker_done.txt", working_dir=working_dir),
-           expand("{working_dir}/uniprot", working_dir=working_dir)
+        expand("{working_dir}/predicted_proteins.faa", working_dir=working_dir),
+        expand("{working_dir}/concatenated.gff", working_dir=working_dir)
+        #expand("{working_dir}/gffs_renamed.txt", working_dir=working_dir)
+        #expand("{working_dir}/uniprot", working_dir=working_dir)
 
 """ use this rule to clean-up maker settings """
 rule clean_maker:
@@ -53,7 +56,10 @@ rule clean_maker:
 
 """ use this rule to clean-up all the data produced by maker """
 rule clean_data:
-    shell: "rm -rf {working_dir}/{maker_out}"
+    shell: "rm -rf {working_dir}/{maker_out} {working_dir}/concatenated.gff {working_dir}/predicted_proteins.faa {working_dir}/ids.map"
+
+rule clean_perl:
+    shell: "rm -rf " + CONFIG["base"]["perl_install"]
 
 # Install maker dependancies :
 
@@ -68,8 +74,8 @@ rule augustus_installation:
         "rm *.tar.*;"
         "mv augustus* {output};"
         "touch {output} && "
-        "echo 'export PATH='`readlink -f {output}/bin/`':$PATH' >>" + CONFIG['base']['maker.bashrc'] + ";"
-        "echo 'export AUGUSTUS_CONFIG_PATH='`readlink -f {output}/config/`  >>"+ CONFIG['base']['maker.bashrc'] + ";"
+        "echo 'export PATH='`readlink -f {output}/bin/`':$PATH' >>" + CONFIG['base']['maker_bashrc'] + ";"
+        "echo 'export AUGUSTUS_CONFIG_PATH='`readlink -f {output}/config/`  >>"+ CONFIG['base']['maker_bashrc'] + ";"
         "cd / && rmdir $TEMPDIR;"
 
 # Download and install Exonerate
@@ -83,7 +89,7 @@ rule exonerate_installation:
         "rm *.tar.*;"
         "mv exonerate* {output};"
         "touch {output} && "
-        "echo 'export PATH='`readlink -f {output}/bin/`':$PATH' >>" + CONFIG['base']['maker.bashrc'] + ";"
+        "echo 'export PATH='`readlink -f {output}/bin/`':$PATH' >>" + CONFIG['base']['maker_bashrc'] + ";"
         "cd / && rmdir $TEMPDIR;"
 
 # Download and install SNAP
@@ -98,8 +104,8 @@ rule snap_installation:
         "mv snap* {output};"
         "touch {output} && "
         "cd {output} && make;"
-        "echo 'export ZOE='`readlink -f {output}` >>" + CONFIG['base']['maker.bashrc'] + ";"
-        "echo 'export PATH='`readlink -f {output}`':$PATH' >>" + CONFIG['base']['maker.bashrc'] + ";"
+        "echo 'export ZOE='`readlink -f {output}` >>" + CONFIG['base']['maker_bashrc'] + ";"
+        "echo 'export PATH='`readlink -f {output}`':$PATH' >>" + CONFIG['base']['maker_bashrc'] + ";"
         "cd / && rmdir $TEMPDIR;"
 
 # Download and install TRF
@@ -112,7 +118,7 @@ rule trf_installation:
         "mv trf* trf && "
         "chmod ugo+x trf && "
         "touch {output} && "
-        "echo 'export PATH='`readlink -f {output}`':$PATH' >>" + CONFIG['base']['maker.bashrc'] + ";"
+        "echo 'export PATH='`readlink -f {output}`':$PATH' >>" + CONFIG['base']['maker_bashrc'] + ";"
 
 # Download and install BLAST+
 rule blast_plus_installation:
@@ -125,7 +131,7 @@ rule blast_plus_installation:
         "rm *.tar.* && "
         "mv ncbi* {output} && "
         "touch {output} && "
-        "echo 'export PATH='`readlink -f {output}/bin`':$PATH' >>" + CONFIG['base']['maker.bashrc'] + ";"
+        "echo 'export PATH='`readlink -f {output}/bin`':$PATH' >>" + CONFIG['base']['maker_bashrc'] + ";"
         "cd / && rmdir $TEMPDIR;"
 
 # Download and install RMBLAST plus corresponding BLAST+
@@ -177,10 +183,32 @@ rule repeatmasker_installation:
         'sed -i \'s|RMBLAST_DIR\s\+=.*|RMBLAST_DIR = "' + "{input.RMBLAST}" + '/bin";|\' RepeatMaskerConfig.pm && '
         "cp  {input.REPBASE}/RepeatMaskerLib.embl Libraries/ ; "
         "touch {output} && "
-        "echo 'export PATH='`readlink -f {output}`':$PATH' >>" + CONFIG['base']['maker.bashrc'] + " && "
+        "echo 'export PATH='`readlink -f {output}`':$PATH' >>" + CONFIG['base']['maker_bashrc'] + " && "
         "cd / && rm -rf $TEMPDIR;"
 
-
+rule perl_installation:
+    output: CONFIG["base"]["perl_install"] + "bin/cpanm"
+    shell: "mkdir -p " + CONFIG["base"]["perl_install"] + "bin && "
+            "cd "+ CONFIG["base"]["perl_install"] + "bin && "
+            "wget http://xrl.us/cpanm && "
+            "chmod +x cpanm && "
+            "locallib_LATEST=` curl -s ftp://ftp.cpan.org/pub/CPAN/authors/id/A/AP/APEIRON/ | awk '{{print $9}}' | grep --perl-regexp --ignore-case --only-matching \"local-lib.*.gz\" " 
+            " | sort --ignore-case --version-sort  | tail -1` && "
+            "wget ftp://ftp.cpan.org/pub/CPAN/authors//id/A/AP/APEIRON/${{locallib_LATEST}} && "
+            "tar -xvzf ${{locallib_LATEST}} && "
+            "cd $(basename `echo ${{locallib_LATEST}}` .tar.gz) && "
+            "perl Makefile.PL --bootstrap && "
+            "make test && make install && make clean && "
+            "echo 'eval $(perl -I$HOME/perl5/lib/perl5 -Mlocal::lib)' >> ~/.bashrc && "
+            "source ~/.bashrc"
+rule perl_libs:
+    input: rules.perl_installation.output
+    output: CONFIG["base"]["perl_install"] + "lib/done"
+    run: 
+        for lib in CONFIG["base"]["perl_libs"]:
+            shell(CONFIG["base"]["perl_install"] + "bin/cpanm " + lib) 
+        shell("touch " + CONFIG["base"]["perl_install"] + "lib/done")
+            
 #  Download and install Maker
 # TODO : Fix output handling, this is ugly
 
@@ -190,7 +218,8 @@ rule maker_installation:
         rules.blast_plus_installation.output,
         rules.snap_installation.output,
         rules.exonerate_installation.output,
-        rules.augustus_installation.output
+        rules.augustus_installation.output,
+        rules.perl_libs.output
     output: CONFIG["base"]["maker_installation_dir"]+"maker/bin/maker"
     shell:
         "TEMPDIR=`mktemp -d`;"
@@ -201,7 +230,7 @@ rule maker_installation:
         "touch maker && "
         "cp --recursive maker "+CONFIG["base"]["maker_installation_dir"] +" && "
         "cd / && rm -rf $TEMPDIR;"
-        "cd "+CONFIG["base"]["maker_installation_dir"] +"maker/src && source " + CONFIG['base']['maker.bashrc'] + " && "
+        "cd "+CONFIG["base"]["maker_installation_dir"] +"maker/src && source " + CONFIG['base']['maker_bashrc'] + " && "
         "perl Build.PL &&"
         "./Build install"
 
@@ -244,7 +273,7 @@ rule maker:
         MAKER=rules.maker_installation.output
     output: "{working_dir}/maker_done.txt"
     shell: 'cd {working_dir} && '
-           "source " + CONFIG['base']['maker.bashrc'] + " && "
+           "source " + CONFIG['base']['maker_bashrc'] + " && "
            '{input.MAKER} &&'
            'touch {working_dir}/maker_done.txt'
 
@@ -255,12 +284,54 @@ rule concatenate_gffs:
     shell: 'cd {working_dir} && '
            "MAKER_OUTPUT=`find . -type d -wholename '*maker.output'` && "
            "MAKER_PREFIX=`basename $MAKER_OUTPUT .maker.output` && "
-           "find $MAKER_OUTPUT -maxdepth 5 -type f -iname '*gff' | nl > contiglist.out "
+           "touch concatenated.gff && "
+           "find $MAKER_OUTPUT -maxdepth 5 -type f -iname '*gff' | xargs cat >> concatenated.gff "
 
+rule copy_gffs:
+    input: rules.maker.output
+    output: "{working_dir}/gffs"
+    shell: 'cd {working_dir} && '
+            "mkdir -p gffs && "
+            "MAKER_OUTPUT=`find . -type d -wholename '*maker.output'` && "
+            "MAKER_PREFIX=`basename $MAKER_OUTPUT .maker.output` && "
+            "find $MAKER_OUTPUT -maxdepth 5 -type f -iname '*gff' | xargs -I{} cp {} gffs"
+
+
+# Get all predicted proteins:
+rule get_predicted_proteins:
+    input: rules.maker.output
+    output: "{working_dir}/predicted_proteins.faa"
+    shell: "cd {working_dir} && "
+        "MAKER_OUTPUT=`find . -type d -wholename '*maker.output'` && "
+        "touch  predicted_proteins.faa && "
+        "find $MAKER_OUTPUT -type f -iname '*maker.proteins.fasta' | xargs cat >> predicted_proteins.faa"
+ 
+
+# pretty-print names from maker prediction
+rule create_id_mapping_file:
+    input: rules.concatenate_gffs.output
+    output: "{working_dir}/ids.map"
+    shell: "cd {working_dir} && "
+        "" + CONFIG['base']['maker_perl'] + "maker_map_ids --prefix '" + CONFIG['output']['protein_prefix'] + "' --justify 8 concatenated.gff > ids.map"
+
+rule rename_ids_gff:
+    input: rules.create_id_mapping_file.output,
+        rules.copy_gffs.output,
+        gff = glob_wildcards("{working_dir}/gffs/{gff}.gff")
+        
+    output: "{working_dir}/gffs/renamed{gff}.txt"
+    shell: "cd {working_dir} && "
+        "" + CONFIG['base']['maker_perl'] + "map_gff_ids ids.map {input.gff}.gff"
+
+
+#rule rename_proteins:
+#    input: rules.id_mapping_file,
+#        rules.get_predicted_proteins
+        
 rule install_uniprot:
     output: "{working_dir}/uniprot"
     shell:
-        "source " + CONFIG['base']['maker.bashrc'] + " && "
+        "source " + CONFIG['base']['maker_bashrc'] + " && "
         "TEMPDIR=/tmp/VLPB_maker/uniprot && "
         "cd $TEMPDIR && "
         "lftp -e 'mirror --parallel=4 --continue --use-pget=15 --no-recursion --verbose --dereference --exclude-glob='*.xml.gz' "+CONFIG['jbrowse_installation']['uniprot_url']+" && "
