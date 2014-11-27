@@ -13,14 +13,14 @@ PICARD_VERSION = subprocess.Popen(CONFIG["picardTools"]["path"] + " AddOrReplace
 
 # Download and install picardtools
 rule picardtools_installation:
-    output: CONFIG["picardTools"]["path"]
+    output: CONFIG["picardTools"]["path"] + "picard.jar"
     shell:
         "TEMPDIR=`mktemp -d`;"
         "cd $TEMPDIR;"
         "wget "+CONFIG['picardTools']['URL']+" -O picard.zip && "
         "unzip picard.zip && "
         "rm picard.zip && "
-        "mv  mv picard*/* " + CONFIG["picardTools"]["path"] + " &&"
+        "mv picard*/* " + CONFIG["picardTools"]["path"] + " &&"
         "touch " + CONFIG["picardTools"]["path"]+ "/* && "
         "rmdir picard* && "
         "cd / && rmdir $TEMPDIR;"
