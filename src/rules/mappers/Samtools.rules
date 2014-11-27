@@ -12,42 +12,67 @@ A configuration file like the following is expected in a global CONFIG variable:
 }
 """
 import subprocess, re
-SAMTOOLS_VERSION = re.compile("Version:(.*?)\n").search(subprocess.Popen("samtools", shell=True, stderr=subprocess.PIPE).stderr.read().decode("utf-8")).group(1).strip()
+SAMTOOLS_VERSION = re.compile("Version:(.*?)\n").search(subprocess.Popen(CONFIG["samtools"]["path"] + 'samtools', shell=True, stderr=subprocess.PIPE).stderr.read().decode("utf-8")).group(1).strip()
+
+# Download and install samtools
+rule samtools_installation:
+    output: CONFIG["samtools"]["path"] + 'samtools'
+    shell:
+        "TEMPDIR=`mktemp -d`;"
+        "cd $TEMPDIR;"
+        "git clone "+CONFIG['samtools']['URL']+" && "
+        "git clone "+CONFIG['htslib']['URL']+" && "
+        "cd samtools && "
+        "make && "
+        "mv samtools {output} &&"
+        "touch {output}/samtools && "
+        "cd / && rm -rf $TEMPDIR;"
 
 rule samToBam:
-    input: "mapped/{sample}.sam"
+    input:
+        SAMTOOLS=rules.samtools_installation.output,
+        BAM="mapped/{sample}.sam"
     output: "mapped/{sample}.bam"
     version: SAMTOOLS_VERSION
-    shell: "samtools view -bS {input[0]} > {output[0]}"
-     
+    shell: "{input.SAMTOOLS} view -bS {input.BAM} > {output}"
+
 rule indexBam:
-    input: "mapped/sorted.{sample}.bam"
+    input:
+        SAMTOOLS=rules.samtools_installation.output,
+        BAM="mapped/sorted.{sample}.bam"
     output: "mapped/{sample}.bam.idx"
     version: SAMTOOLS_VERSION
-    shell: "samtools index {input[0]}"
-     
+    shell: "{input.SAMTOOLS} index {input.BAM}"
+
 rule sortBam:
-    input: "mapped/{sample}.bam"
+    input:
+        SAMTOOLS=rules.samtools_installation.output,
+        BAM="mapped/{sample}.bam"
     output: "mapped/sorted.{sample}.bam"
     version: SAMTOOLS_VERSION
-    shell: "samtools sort -o {input[0]} {output[0]} > {output[0]}"
-        
+    shell: "{input.SAMTOOLS} sort -o {input.BAM} {output} > {output}"
+
 rule mergeBam:
-    input: 'expand(",".join("/processedbam/{sample}.bam", sample=SAMPLES)'
+    input:
+        SAMTOOLS=rules.samtools_installation.output,
+        BAM='expand(",".join("/processedbam/{sample}.bam", sample=SAMPLES)'
     output: "processedbam/allMerged.bam"
     version: SAMTOOLS_VERSION
-    shell: "samtools merge {output} {input}" 
+    shell: "{input.SAMTOOLS} merge {output} {input.BAM}"
 
 rule addMdTag:
-    input: 
-        bam="mapped/{sample}.bam",
-        reference=CONFIG["refGenome"]
+    input:
+        SAMTOOLS=rules.samtools_installation.output,
+        BAM="mapped/{sample}.bam",
+        REFERENCE=CONFIG["refGenome"]
     output: "mapped/md.{sample}.bam"
     version: SAMTOOLS_VERSION
-    shell: "samtools calmd {input.bam} {input.reference} > {output[0]}"
-    
+    shell: "{input.SAMTOOLS} calmd {input.BAM} {input.REFERENCE} > {output}"
+
 rule faidX:
-    input: "{prefix}.fasta"
+    input:
+        SAMTOOLS=rules.samtools_installation.output,
+        FASTA="{prefix}.fasta"
     output: "{prefix}.fasta.fai"
     version: SAMTOOLS_VERSION
-    shell: "samtools faidx {input[0]}"
+    shell: "{input.SAMTOOLS} faidx {input.FASTA}"
