@@ -8,7 +8,8 @@ Mapping with BWA.
 
 from qualityControl.files import BamFile
 import subprocess
-BWA_VERSION = re.compile("Version:(.*?)\n").search(subprocess.Popen(CONFIG["bwa"]["path"] + "bwa", shell=True, stderr=subprocess.PIPE).stderr.read().decode("utf-8")).group(1).strip()
+
+ruleorder: bwaMemPaired > bwaMemSingle
 
 # Download and install bwa
 rule bwa_installation:
@@ -35,7 +36,6 @@ rule bwaSampe:
     output: "mapped/bwaSampe.{prefix}.sam"
     params:
         optionalOpts = CONFIG["bwaSampe"]["optionalOpts"]
-    version: BWA_VERSION
     run:
         shell("{input.BWA} sampe {params.optionalOpts} {input.refGenome}  "
               "{input.forwardSai} {input.reversedSai} {input.forward} {input.reversed} > {output[0]}".format(params=params, input=input, output=output))
@@ -51,7 +51,6 @@ rule bwaSamse:
     output: "mapped/bwaSamse.{prefix}.sam"
     params:
         optionalOpts = CONFIG["bwaSamse"]["optionalOpts"]
-    version: BWA_VERSION
     run:
         shell("{input.BWA} samse {params.optionalOpts} {input.refGenome}  "
               "{input.readsSai} {input.reads} > {output[0]".format(params=params, input=input))
@@ -64,7 +63,6 @@ rule bwaAln:
         refGenome = CONFIG["refGenome"],
         refGenomeIndex = CONFIG["refGenome"] + ".pac"
     output: "mapped/{prefix}.sai"
-    version: BWA_VERSION
     params:
         optionalOpts = CONFIG["bwaAln"]["optionalOpts"]
     shell: "{input.BWA} aln -t {threads} {input.refGenome} {input.reads} > {output[0]}"
@@ -72,13 +70,9 @@ rule bwaAln:
 rule bwaIndex:
     input:
         BWA=rules.bwa_installation.output,
-        fasta = CONFIG["refGenome"],
-        bwa = CONFIG["bwaMem"]["path"]
+        fasta = CONFIG["refGenome"]
     output: CONFIG["refGenome"] + ".pac"
-    version: BWA_VERSION
     shell: "{input.BWA} index {input.fasta}"
-
-ruleorder: bwaMemPaired > bwaMemSingle
 
 rule bwaMemPaired:
     input:
@@ -89,7 +83,6 @@ rule bwaMemPaired:
         refGenomeIndex = CONFIG["refGenome"] + ".pac"
     output: "mapped/bwaMem.{sample}.sam"
     threads: 8
-    version: BWA_VERSION
     params:
         optionalOpts = CONFIG["bwaMem"]["optionalOpts"]
     shell: "{input.BWA} mem -t {threads} {params.optionalOpts} {input.refGenome} {input.forward} {input.reversed} > {output[0]}"
@@ -104,5 +97,4 @@ rule bwaMemSingle:
     threads: 8
     params:
         optionalOpts = CONFIG["bwaMem"]["optionalOpts"]
-    version: BWA_VERSION
     shell: "{input.BWA} mem -t {threads} {input.refGenome} {input.reads} > {output[0]}"
