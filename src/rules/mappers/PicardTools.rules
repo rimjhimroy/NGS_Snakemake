@@ -9,29 +9,49 @@ Required JSON:
 
 """
 import subprocess
-PICARD_VERSION = subprocess.Popen(CONFIG["picardTools"]["path"] + "/AddOrReplaceReadGroups.jar --version", shell=True, stderr=subprocess.PIPE).stderr.read().decode("utf-8").split("(")[0]
+PICARD_VERSION = subprocess.Popen(CONFIG["picardTools"]["path"] + " AddOrReplaceReadGroups --version", shell=True, stderr=subprocess.PIPE).stderr.read().decode("utf-8").split("(")[0]
+
+# Download and install picardtools
+rule picardtools_installation:
+    output: CONFIG["picardTools"]["path"]
+    shell:
+        "TEMPDIR=`mktemp -d`;"
+        "cd $TEMPDIR;"
+        "wget "+CONFIG['picardTools']['URL']+" -O picard.zip && "
+        "unzip picard.zip && "
+        "rm picard.zip && "
+        "mv  mv picard*/* CONFIG["picardTools"]["path"] &&"
+        "touch CONFIG["picardTools"]["path"]/* && "
+        "rmdir picard* && "
+        "cd / && rmdir $TEMPDIR;"
 
 rule addHeaderline:
-    input: "mapped/{sample}.bam"
-    params: 
+    input:
+        PICARD=rules.picardtools_installation.output,
+        BAM="mapped/{sample}.bam"
+    params:
         path=CONFIG["picardTools"]["path"]
     output: "mapped/headered.{sample}.bam"
     version: PICARD_VERSION
-    shell: "java -jar {params.path}/AddOrReplaceReadGroups.jar I={input[0]} VALIDATION_STRINGENCY=SILENT O={output[0]} LB={wildcards.sample} PL=illumina PU=lane SM={wildcards.sample}"
-    
+    shell: "java -jar {input.PICARD} AddOrReplaceReadGroups INPUT={input.BAM} VALIDATION_STRINGENCY=SILENT OUTPUT={output} LB={wildcards.sample} PL=illumina PU=lane SM={wildcards.sample}"
+
 rule removeDuplicates:
-    input: "mapped/sorted.{sample}.bam"
-    output: "mapped/noDup.sorted.{sample}.bam"  
-    params: 
+    input:
+        PICARD=rules.picardtools_installation.output,
+        BAM="mapped/sorted.{sample}.bam"
+    output: "mapped/noDup.sorted.{sample}.bam"
+    params:
         path=CONFIG["picardTools"]["path"]
     version: PICARD_VERSION
-    shell: "java -jar {params.path}MarkDuplicates.jar INPUT={input[0]} ASSUME_SORTED=true VALIDATION_STRINGENCY=SILENT OUTPUT={output[0]} REMOVE_DUPLICATES=true METRICS_FILE=/dev/null"
- 
+    shell: "java -jar {input.PICARD} MarkDuplicates INPUT={input.BAM} ASSUME_SORTED=true VALIDATION_STRINGENCY=SILENT OUTPUT={output} REMOVE_DUPLICATES=true METRICS_FILE=/dev/null"
+
 rule AddRGtag:
-    input: "mapped/{sample}.bam"
+    input:
+        PICARD=rules.picardtools_installation.output,
+        BAM="mapped/{sample}.bam"
     output: "processedbam/RG.{sample}.bam"
     params:
         path=CONFIG["picardTools"]["path"]
     version: PICARD_VERSION
-    shell: "java -jar {params.path}/AddOrReplaceReadGroups.jar INPUT={input[0]} RGID={input[0]} RGLB=ga RGPL=illumina RGPU=unit RGSM={input[0]} OUTPUT={output[0]}"
+    shell: "java -jar {input.PICARD} AddOrReplaceReadGroups INPUT={input.BAM} RGID={input} RGLB=ga RGPL=illumina RGPU=unit RGSM={input.BAM} OUTPUT={output}"
 
