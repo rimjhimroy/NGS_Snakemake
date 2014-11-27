@@ -1,25 +1,25 @@
 {
-	"maxMem": {
+	"maxMem":{
 		"type": "number",
 		"description ": "The maximum memory to use (kb), used for the WGS assembler memory calculations only",
 		"required": true
-	}
-	"kmerSize": {
+	},
+	"kmerSize":{
 		"type": "number",
 		"description ": "The kmer size to use in some preprocessing steps and in some assemblers",
 		"required": true
-	}
-	"illuminaAdapters": {
+	},
+	"illuminaAdapters":{
 		"type": "string",
 		"description ": "Path to the illumina adapter file in fasta format",
 		"required": true
-	}
-	"kmerSize": {
+	},
+	"kmerSize":{
 		"type": "number",
 		"description ": "The kmer size to use in some preprocessing steps and in some assemblers",
 		"required": true
-	}
-	"libraries":[
+	},
+	"libraries":{
 		"reads": {
 			"type": "array",
 			"description ": "Path to the illumina reads in fasta format, one forward, may contain a reversed",
@@ -30,29 +30,29 @@
 			"description ": "The type of data, mp for matepair, pe for paired end, u for unpaired",
 			"required": true
 		},
-		"insertSize"{
+		"insertSize":{
 			"type": "number",
 			"description ": "The insert size of this library, only required if type is mp or pe",
 			"required": true
 		},
-		"insertSizeSd"{
+		"insertSizeSd":{
 			"type": "number",
 			"description ": "The standard deviation of the insert size of this library, only required if type is mp or pe",
 			"required": true
 		},
-		"readlen"{
+		"readlen":{
 			"type": "number",
 			"description ": "The sequence length of the reads",
 			"required": true
 		},
 		"platform" :{
-			"type": {"enum": ["illumina","pacbio","454"]}
+			"type": {"enum": ["illumina","pacbio","454"]},
 			"description ": "The sequencing platform of the assembler reads of this library",
 			"required": true
-		}		
-	],
+		}
+	},
 	"options":{
-		"fastqMcf"{
+		"fastqMcf":{
 			"dupLen":{
 				"type": "number",
 				"description ": "The minimum number of overlapping bases starting at the front",
@@ -65,8 +65,6 @@
 		"trimmomatic":{
 			"TODO": "describe required arguments",
 			"additionalProperties": true
-		},
-			
+		}
 	}
-	
-}  
+}
