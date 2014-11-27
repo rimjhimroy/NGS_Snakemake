@@ -1,10 +1,14 @@
 """
-#edited workflow 
+#edited workflow
 
 """
 import json, os, inspect, sys
 
 ruleDir = os.path.dirname(inspect.getframeinfo(inspect.currentframe()).filename) + "/../../../rules/"
+
+# Add qualityControl to pythonpath
+
+sys.path.append(os.path.dirname(inspect.getframeinfo(inspect.currentframe()).filename)+ "/../../../")
 
 with open("config.json") as f:
     CONFIG = json.load(f)
@@ -24,17 +28,17 @@ include: ruleDir + "variantCalling/Freebayes.rules"
 SAMPLES=CONFIG["samples"]
 
 rule all:
-    #input: expand("processed/trim.{dataset}.fastq", samples=SAMPLES)
+    #input: expand("processed/trim.{samples}.fastq", samples=SAMPLES)
     #input: expand("mapped/bwaMem.{samples}.sam", samples=SAMPLES)
     #input: expand("processedbam/RG.noDup.sorted.bwaMem.{samples}.bam", samples=SAMPLES)
-    #input: expand("variantCalling/fb.{sample}.vcf", samples=SAMPLES) 
+    #input: expand("variantCalling/fb.{sample}.vcf", samples=SAMPLES)
     input: expand("variantCalling/fb.RG.noDup.sorted.bwaMem.{samples}.vcf", samples=SAMPLES)
                                     #RG.noDup.sorted.bwaMem.STsub_sample1.bam
 
 #DATASETS,=glob_wildcards("./processed/{sample}.fastq")
 #rule all:
 #	input: "mapped/bwaMem.{prefix}.sam"
-#	input: expand("./mapped/bwaMem.{sample}.sam", dataset=DATASETS)	
+#	input: expand("./mapped/bwaMem.{sample}.sam", dataset=DATASETS)
 #	input: CONFIG["refGenome"] + ".pac"
 
 
