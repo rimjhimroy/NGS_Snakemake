@@ -5,9 +5,16 @@
 The minimum JSON for executing the Haplotyping:
 {
     "freebayes":{
-        "path":["/path/to/freebayes"],
-	"
-        },
+          "path": "/media/bulk_01/programs/freebayes/bin/",
+          "optionalOpts":{
+               "--ploidy":4,
+               "--read-indel-limit":3,
+               "--min-mapping-quality":30,
+               "--min-base-quality":13,
+               "--theta":0.01,
+               "--min-alternate-count":4,
+               "--min-alternate-fraction":0.15
+           }
     "vcfUtils":{
         "path":"/path/to/vcfUtils.pl",
         "optionalOpts":""
@@ -16,22 +23,34 @@ The minimum JSON for executing the Haplotyping:
         "referenceGenome":"/path/to/referenceGenome.fasta"
     }
 }
+
+
+
+
 """
 from collections import Iterable, namedtuple
 import subprocess, re
 #FREEBAYES_VERSION = re.compile("Version:(.*?)\n").search(subprocess.Popen(CONFIG["freebayes"]["path"] + "freebayes", shell=True, stderr=subprocess.PIPE).stderr.read().decode("utf-8")).group(1).strip()
+items = []
+items.append("--ploidy %s"%(CONFIG["freebayes"]["optionalOpts"]["--ploidy"]))
+items.append("--read-indel-limit %s"%(CONFIG["freebayes"]["optionalOpts"]["--read-indel-limit"]))
+items.append("--min-mapping-quality %s"%(CONFIG["freebayes"]["optionalOpts"]["--min-mapping-quality"]))
+items.append("--min-base-quality %s"%(CONFIG["freebayes"]["optionalOpts"]["--min-base-quality"]))
+items.append("--theta %s"%(CONFIG["freebayes"]["optionalOpts"]["--theta"]))
+items.append("--min-alternate-count %s"%(CONFIG["freebayes"]["optionalOpts"]["--min-alternate-count"]))
+items.append("--min-alternate-fraction %s"%(CONFIG["freebayes"]["optionalOpts"]["--min-alternate-fraction"]))
 
-FreebayesOpts = collections.namedtuple("FreebayesOpts", CONFIG["freebayes"]["optionalOpts"].keys())
-freebayesOpts = FreebayesOpts(**CONFIG["freebayes"]["optionalOpts"])
+param_str = " ".join(items)
+parameters = param_str
 
 rule FreebayesCalling:
     input: 
-        inFile = "processedbam/{sample}.bam",
+        inFile = "processedbam/{prefix}.bam",
         path = CONFIG["freebayes"]["path"],
-	refGenome = CONFIG[refGenome]
-    output: "variantCalling/fb.{sample}.vcf"
+	refGenome = CONFIG["refGenome"]
+    output: "variantCalling/fb.{prefix}.vcf"
     #version: FREEBAYES_VERSION
-    shell: ("{input.path}freebayes -f {input.refGenome} -b {input.inFile} -v {output} {freebayesOpts}")
+    shell: ("{input.path}freebayes -f {input.refGenome} -b {input.inFile} -v {output} {parameters} > {output}")
     
 """
 #TODO: work on SNPfiltering
