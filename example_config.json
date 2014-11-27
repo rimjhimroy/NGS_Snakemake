@@ -1,4 +1,5 @@
 {
+   "samples": ["ST_sample001"],
    "refGenome":"/media/scratchpad_01/kaauw001/VLPB/test_pipeline/RefGenome/ST4.03ch06.fasta",
    "illuminaAdapters":"/tmp/SnakeMakeVLPB/bin/Trimmomatic-0.32/adapters/TruSeq2-PE.fa",
    "gffFile":"/media/scratchpad_01/kaauw001/references/ITAG2.3_gene_models.gff3",
