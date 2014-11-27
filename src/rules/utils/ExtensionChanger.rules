@@ -18,6 +18,6 @@ rule fnaToFasta:
     shell: "ln -s {input[0]} {output[0]}"
     
 rule fqToFastq:
-    input: "{prefix}.fq"
-    output: "{prefix}.fastq"
+    input: "raw_reads/{prefix}.fq"
+    output: "raw_reads/{prefix}.fastq"
     shell: "ln -s {input[0]} {output[0]}"

@@ -1,0 +1,54 @@
+"""
+@author: Martijn/Danny
+@version: 0.1
+
+The minimum JSON for executing the Haplotyping:
+{
+    "freebayes":{
+        "path":["/path/to/freebayes"],
+	"
+        },
+    "vcfUtils":{
+        "path":"/path/to/vcfUtils.pl",
+        "optionalOpts":""
+        },
+    "mapping":{
+        "referenceGenome":"/path/to/referenceGenome.fasta"
+    }
+}
+"""
+from collections import Iterable, namedtuple
+import subprocess, re
+#FREEBAYES_VERSION = re.compile("Version:(.*?)\n").search(subprocess.Popen(CONFIG["freebayes"]["path"] + "freebayes", shell=True, stderr=subprocess.PIPE).stderr.read().decode("utf-8")).group(1).strip()
+
+FreebayesOpts = collections.namedtuple("FreebayesOpts", CONFIG["freebayes"]["optionalOpts"].keys())
+freebayesOpts = FreebayesOpts(**CONFIG["freebayes"]["optionalOpts"])
+
+rule FreebayesCalling:
+    input: 
+        inFile = "processedbam/{sample}.bam",
+        path = CONFIG["freebayes"]["path"],
+	refGenome = CONFIG[refGenome]
+    output: "variantCalling/fb.{sample}.vcf"
+    #version: FREEBAYES_VERSION
+    shell: ("{input.path}freebayes -f {input.refGenome} -b {input.inFile} -v {output} {freebayesOpts}")
+    
+"""
+#TODO: work on SNPfiltering
+
+rule bcftoolsView:
+    input: "variantCalling/{prefix}.mpileup"
+    output: "variantCalling/{prefix}.vcf"
+    #version: SAMTOOLS_VERSION
+    shell: "bcftools view -vcg {input[0]} > {output[0]}"
+
+rule filterVcf:
+    input: 
+       inFile = "{prefix}.vcf",
+       path = CONFIG["freebayes"]["path"]
+    output: "variantCalling/filtered.{prefix}.vcf"
+    params: 
+        path=CONFIG["options"]["vcfUtils"]["path"],
+        optionalOpts=CONFIG["options"]["vcfUtils"]["optionalOpts"]
+    shell: "perl {params.path} varFilter {params.optionalOpts} {input[0]} > {output[0]}"
+"""

@@ -1,14 +1,38 @@
 """
+#edited workflow 
 
 """
-import json, os, inspect
+import json, os, inspect, sys
 
 ruleDir = os.path.dirname(inspect.getframeinfo(inspect.currentframe()).filename) + "/../../../rules/"
 
 with open("config.json") as f:
     CONFIG = json.load(f)
 
-include: ruleDir + "/mappers/Bwa.rules"
+include: ruleDir + "utils/Unzip.rules"
+include: ruleDir + "utils/ExtensionChanger.rules"
+include: ruleDir + "mappers/Bwa.rules"
+include: ruleDir + "fastqProcessing/Trimmomatic.rules"
+include: ruleDir + "mappers/PicardTools.rules"
+include: ruleDir + "mappers/Samtools.rules"
+#include: ruleDir + "variantCalling/Freebayes.rules"
+
+#rule all:
+#    input: "report/report.xpdf"
+
+SAMPLES,=glob_wildcards("raw_reads/{sample}_1.fastq.gz")
 
 rule all:
-    input: "report/report.xpdf"
+    #input: expand("processed/trim.{dataset}.fastq", samples=SAMPLES)
+    #input: expand("mapped/bwaMem.{samples}.sam", samples=SAMPLES)
+    input: expand("processedbam/RG.noDup.sorted.bwaMem.{samples}.bam", samples=SAMPLES)
+    #input: expand("variantCalling/fb.{sample}.vcf", samples=SAMPLES) 
+
+
+#DATASETS,=glob_wildcards("./processed/{sample}.fastq")
+#rule all:
+#	input: "mapped/bwaMem.{prefix}.sam"
+#	input: expand("./mapped/bwaMem.{sample}.sam", dataset=DATASETS)	
+#	input: CONFIG["refGenome"] + ".pac"
+
+
