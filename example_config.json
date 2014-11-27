@@ -16,7 +16,6 @@
       "optionalOpts":""
    },
    "bwaMem":{
-      "path":"/tmp/SnakeMakeVLPB/bin/bwa-0.7.7/",
       "optionalOpts":"-M"
    },
    "java":{
