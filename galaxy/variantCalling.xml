@@ -1,0 +1,19 @@
+<tool id="variantCalling" name="Variant Calling" version="0.0.1">
+  <description>Snakemake pipeline</description>
+  <parallelism method="basic"></parallelism>
+  <command>
+    snakemake --snakefile "$location" --directory "$working_directory" > "$out"
+  </command>
+  <requirements>
+    <requirement type="package">snakemake</requirement>
+  </requirements>
+  <inputs>
+    <param name="location" type="text" size="100" label="Workflow location" help="" optional="false" value="/home/sven/git/SnakeMakeVlpb/src/worksflows/variantCalling/mapping/bwaTest" />
+    <param name="working_directory"  size="100" type="text" label="Working directory" help="" optional="false" value="/tmp" />
+  </inputs>
+  <outputs>
+	<data name="out" format="txt" />
+<!--	<data name="error" format="txt" /> -->
+  </outputs>
+  <help>Variant calling pipeline: trimmomatic, bwa, samtools and picardtools</help>
+</tool>
