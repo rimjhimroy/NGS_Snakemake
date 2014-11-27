@@ -20,8 +20,8 @@ rule picardtools_installation:
         "wget "+CONFIG['picardTools']['URL']+" -O picard.zip && "
         "unzip picard.zip && "
         "rm picard.zip && "
-        "mv  mv picard*/* CONFIG["picardTools"]["path"] &&"
-        "touch CONFIG["picardTools"]["path"]/* && "
+        "mv  mv picard*/* " + CONFIG["picardTools"]["path"] + " &&"
+        "touch " + CONFIG["picardTools"]["path"]+ "/* && "
         "rmdir picard* && "
         "cd / && rmdir $TEMPDIR;"
 
