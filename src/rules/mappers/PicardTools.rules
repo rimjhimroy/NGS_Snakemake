@@ -9,7 +9,6 @@ Required JSON:
 
 """
 import subprocess
-PICARD_VERSION = subprocess.Popen(CONFIG["picardTools"]["path"] + " AddOrReplaceReadGroups --version", shell=True, stderr=subprocess.PIPE).stderr.read().decode("utf-8").split("(")[0]
 
 # Download and install picardtools
 rule picardtools_installation:
@@ -32,7 +31,6 @@ rule addHeaderline:
     params:
         path=CONFIG["picardTools"]["path"]
     output: "mapped/headered.{sample}.bam"
-    version: PICARD_VERSION
     shell: "java -jar {input.PICARD} AddOrReplaceReadGroups INPUT={input.BAM} VALIDATION_STRINGENCY=SILENT OUTPUT={output} LB={wildcards.sample} PL=illumina PU=lane SM={wildcards.sample}"
 
 rule removeDuplicates:
@@ -42,7 +40,6 @@ rule removeDuplicates:
     output: "mapped/noDup.sorted.{sample}.bam"
     params:
         path=CONFIG["picardTools"]["path"]
-    version: PICARD_VERSION
     shell: "java -jar {input.PICARD} MarkDuplicates INPUT={input.BAM} ASSUME_SORTED=true VALIDATION_STRINGENCY=SILENT OUTPUT={output} REMOVE_DUPLICATES=true METRICS_FILE=/dev/null"
 
 rule AddRGtag:
@@ -52,6 +49,5 @@ rule AddRGtag:
     output: "processedbam/RG.{sample}.bam"
     params:
         path=CONFIG["picardTools"]["path"]
-    version: PICARD_VERSION
-    shell: "java -jar {input.PICARD} AddOrReplaceReadGroups INPUT={input.BAM} RGID={input} RGLB=ga RGPL=illumina RGPU=unit RGSM={input.BAM} OUTPUT={output}"
+    shell: "java -jar {input.PICARD} AddOrReplaceReadGroups INPUT={input.BAM} RGID={input.BAM} RGLB=ga RGPL=illumina RGPU=unit RGSM={input.BAM} OUTPUT={output}"
 
