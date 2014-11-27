@@ -56,7 +56,8 @@
       "avgMinQual":15,
       "minReadLen":36,
       "phred":"-phred33",
-      "URL" : "http://www.usadellab.org/cms/uploads/supplementary/Trimmomatic/Trimmomatic-0.32.zip"
+      "URL" : "http://www.usadellab.org/cms/uploads/supplementary/Trimmomatic/Trimmomatic-0.32.zip",
+      "path":"/tmp/SnakeMakeVLPB/bin/Trimmomatic-0.32/"
    },
    "samtools":{
       "path":"/tmp/SnakeMakeVLPB/bin/samtools/",
