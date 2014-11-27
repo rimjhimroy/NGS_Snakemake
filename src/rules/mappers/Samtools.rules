@@ -24,7 +24,7 @@ rule samtools_installation:
         "cd samtools && "
         "make && "
         "mv samtools {output} &&"
-        "touch {output}/samtools && "
+        "touch {output} && "
         "cd / && rm -rf $TEMPDIR;"
 
 rule samToBam:
