@@ -21,7 +21,7 @@ rule bwa_installation:
         "make && "
         "mv bwa {output} &&"
         "touch {output} && "
-        "cd / && rmdir $TEMPDIR;"
+        "cd / && rm -rf $TEMPDIR;"
 
 rule bwaSampe:
     input:
