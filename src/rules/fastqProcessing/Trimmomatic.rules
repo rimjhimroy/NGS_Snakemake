@@ -42,13 +42,13 @@ ruleorder: trimmomaticPaired > trimmomaticSingle
 
 rule trimmomaticPaired:
     input:
-        forward = "preprocessing/{sample}_1.fastq",
-        reversed = "preprocessing/{sample}_2.fastq"
+        forward = "raw_reads/{sample}_1.fastq",
+        reversed = "raw_reads/{sample}_2.fastq"
     output:
-        forward = "preprocessing/trim.{sample}_1.fastq",
-        reversed = "preprocessing/trim.{sample}_2.fastq",
-        forwardUnpaired = "preprocessing/trim.{sample}_unpaired_1.fastq",
-        reversedUnpaired = "preprocessing/trim.{sample}_unpaired_2.fastq"
+        forward = "processed/trim.{sample}_1.fastq",
+        reversed = "processed/trim.{sample}_2.fastq",
+        forwardUnpaired = "processed/trim.{sample}_unpaired_1.fastq",
+        reversedUnpaired = "processed/trim.{sample}_unpaired_2.fastq"
     threads: 999
     run:
         TrimOpts = collections.namedtuple("TrimOpts", CONFIG["trimmomatic"].keys())
@@ -69,8 +69,8 @@ rule trimmomaticPaired:
         FastqFile.FastqFile(output.forward, output.reversed).isValid(dna=True)
 
 rule trimmomaticSingle:
-    input: "preprocessing/{sample}.fastq"
-    output: "preprocessing/trim.{sample}.fastq"
+    input: "processed/{sample}.fastq"
+    output: "processed/trim.{sample}.fastq"
     threads: 999
     run:
         TrimOpts = collections.namedtuple("TrimOpts", CONFIG["trimmomatic"].keys())

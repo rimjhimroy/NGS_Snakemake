@@ -1,0 +1,69 @@
+{
+     "bwa":{
+          "path" : "/media/bulk_01/programs/bwa-0.7.7/"
+          },
+     "bwaSampe":{
+	"optionalOpts" : ""
+          },
+     "bwaSamse":{
+        "optionalOpts" : ""
+          },
+     "bwaAln":{
+        "optionalOpts" : ""
+          },
+
+     "bwaMem":{
+          "path" : "/media/bulk_01/programs/bwa-0.7.7/",
+          "optionalOpts" : "-M"
+          },
+
+     "gffFile": "/media/scratchpad_01/kaauw001/references/ITAG2.3_gene_models.gff3",
+
+     "java":{ 
+          "memUsage":"-Xmx30g"
+          },
+     
+     "beagle":{
+          "path":"/media/bulk_01/users/finke002/bin/beagle.jar"
+          },
+
+     "gatk":{
+          "path":"/media/bulk_01/users/finke002/bin/GenomeAnalysisTK-2.8-1-g932cd3a/GenomeAnalysisTK.jar"
+          },
+
+     "picardTools":{
+          "path":"/media/bulk_01/programs/picard-tools-1.90/"
+          },
+     
+     "refGenome": "/media/scratchpad_01/kaauw001/VLPB/test_pipeline/RefGenome/ST4.03ch06.fasta",
+
+     "freebayes":{
+          "path": "/media/bulk_01/programs/freebayes/bin/",
+          "optionalOpts":{
+               "--ploidy":4,
+               "--read-indel-limit":3,
+               "--min-mapping-quality":30,
+               "--min-base-quality":13,
+               "--theta":0.01,
+               "--min-alternate-count":4,
+               "--min-alternate-fraction":0.15
+               }
+          },
+     "illuminaAdapters": "/media/bulk_01/users/kaauw001/programs/Trimmomatic-0.32/adapters/TruSeq2-PE.fa",
+     "trimmomatic":{
+        "jar": "/media/bulk_01/users/kaauw001/programs/Trimmomatic-0.32/trimmomatic-0.32.jar",
+        "seedMisMatches": 2,
+        "palindromeClipTreshold": 30,
+        "simpleClipThreshhold": 10,
+        "LeadMinTrimQual": 3,
+        "TrailMinTrimQual": 3,
+        "windowSize": 4,
+        "avgMinQual": 15,
+        "minReadLen": 36,
+        "phred" : "-phred33"
+    }
+
+     
+
+
+}

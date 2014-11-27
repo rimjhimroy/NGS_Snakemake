@@ -32,10 +32,16 @@ rule sortBam:
     version: SAMTOOLS_VERSION
     shell: "samtools sort -o {input[0]} {output[0]} > {output[0]}"
         
+rule mergeBam:
+    input: 'expand(",".join("/processedbam/{sample}.bam", sample=SAMPLES)'
+    output: "processedbam/allMerged.bam"
+    version: SAMTOOLS_VERSION
+    shell: "samtools merge {output} {input}" 
+
 rule addMdTag:
     input: 
         bam="mapped/{sample}.bam",
-        reference=CONFIG["mapping"]["referenceGenome"]
+        reference=CONFIG["refGenome"]
     output: "mapped/md.{sample}.bam"
     version: SAMTOOLS_VERSION
     shell: "samtools calmd {input.bam} {input.reference} > {output[0]}"

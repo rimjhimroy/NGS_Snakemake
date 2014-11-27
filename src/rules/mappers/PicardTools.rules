@@ -2,29 +2,36 @@
 
 Required JSON:
 {
-    "options":{
-        "picardTools":{
-            "path":"/path/to/picardtools"
-        }
+    "picardTools":{
+        "path":"/path/to/picardtools"
     }
 }
+
 """
 import subprocess
-PICARD_VERSION = subprocess.Popen(CONFIG["options"]["picardTools"]["path"] + "/AddOrReplaceReadGroups.jar --version", shell=True, stderr=subprocess.PIPE).stderr.read().decode("utf-8").split("(")[0]
+PICARD_VERSION = subprocess.Popen(CONFIG["picardTools"]["path"] + "/AddOrReplaceReadGroups.jar --version", shell=True, stderr=subprocess.PIPE).stderr.read().decode("utf-8").split("(")[0]
 
 rule addHeaderline:
     input: "mapped/{sample}.bam"
     params: 
-        path=CONFIG["options"]["picardTools"]["path"]
+        path=CONFIG["picardTools"]["path"]
     output: "mapped/headered.{sample}.bam"
     version: PICARD_VERSION
     shell: "java -jar {params.path}/AddOrReplaceReadGroups.jar I={input[0]} VALIDATION_STRINGENCY=SILENT O={output[0]} LB={wildcards.sample} PL=illumina PU=lane SM={wildcards.sample}"
     
 rule removeDuplicates:
-    input: "mapped/{sample}.bam"
-    output: "mapped/noDup.{sample}.bam"  
+    input: "mapped/sorted.{sample}.bam"
+    output: "mapped/noDup.sorted.{sample}.bam"  
     params: 
-        path=CONFIG["options"]["picardTools"]["path"]
+        path=CONFIG["picardTools"]["path"]
     version: PICARD_VERSION
-    shell: "java -jar {params.path}/MarkDuplicates.jar INPUT={input[0]} VALIDATION_STRINGENCY=SILENT OUTPUT={output[0]} REMOVE_DUPLICATES=true METRICS_FILE=/dev/null"
+    shell: "java -jar {params.path}MarkDuplicates.jar INPUT={input[0]} ASSUME_SORTED=true VALIDATION_STRINGENCY=SILENT OUTPUT={output[0]} REMOVE_DUPLICATES=true METRICS_FILE=/dev/null"
  
+rule AddRGtag:
+    input: "mapped/{sample}.bam"
+    output: "processedbam/RG.{sample}.bam"
+    params:
+        path=CONFIG["picardTools"]["path"]
+    version: PICARD_VERSION
+    shell: "java -jar {params.path}/AddOrReplaceReadGroups.jar INPUT={input[0]} RGID={input[0]} RGLB=ga RGPL=illumina RGPU=unit RGSM={input[0]} OUTPUT={output[0]}"
+

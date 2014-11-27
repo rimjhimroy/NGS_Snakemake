@@ -8,13 +8,12 @@ Mapping with BWA.
 
 from qualityControl.files import BamFile
 import subprocess
-BWA_VERSION = re.compile("Version:(.*?)\n").search(subprocess.Popen("bwa", shell=True, stderr=subprocess.PIPE).stderr.read().decode("utf-8")).group(1).strip()
-
+BWA_VERSION = re.compile("Version:(.*?)\n").search(subprocess.Popen(CONFIG["bwa"]["path"] + "bwa", shell=True, stderr=subprocess.PIPE).stderr.read().decode("utf-8")).group(1).strip()
 
 rule bwaSampe:
     input: 
-        forward = "preprocessing/{prefix}_1.fastq",
-        reversed = "preprocessing/{prefix}_2.fastq",
+        forward = "processed/{prefix}_1.fastq",
+        reversed = "processed/{prefix}_2.fastq",
         forwardSai = "mapped/{prefix}_1.sai",
         reversedSai = "mapped/{prefix}_2.sai",
         refGenome = CONFIG["refGenome"],
@@ -30,7 +29,7 @@ rule bwaSampe:
 
 rule bwaSamse:
     input: 
-        reads = "preprocessing/{prefix}.fastq",
+        reads = "processed/{prefix}.fastq",
         readsSai = "mapped/{prefix}.sai",
         refGenome = CONFIG["refGenome"],
         refGenomeIndex = CONFIG["refGenome"] + ".pac"
@@ -45,7 +44,7 @@ rule bwaSamse:
         
 rule bwaAln:
     input:
-        reads = "preprocessing/{prefix}.fastq",
+        reads = "processed/{prefix}.fastq",
         refGenome = CONFIG["refGenome"],
         refGenomeIndex = CONFIG["refGenome"] + ".pac"
     output: "mapped/{prefix}.sai"
@@ -55,28 +54,32 @@ rule bwaAln:
     shell: "bwa aln -t {threads} {input.refGenome} {input.reads} > {output[0]}"
     
 rule bwaIndex:
-    input: "{prefix}.fasta"
-    output: "{prefix}.fasta.pac"
+    input: 
+        fasta = CONFIG["refGenome"],
+        bwa = CONFIG["bwaMem"]["path"]	
+    output: CONFIG["refGenome"] + ".pac"
     version: BWA_VERSION
-    shell: "bwa index {input[0]}"
+    shell: "{input.bwa}bwa index {input.fasta}"
     
+ruleorder: bwaMemPaired > bwaMemSingle
+
 rule bwaMemPaired:
     input:
-        forward = "preprocessing/{prefix}_1.fastq",
-        reversed = "preprocessing/{prefix}_2.fastq",
+        forward = "processed/trim.{sample}_1.fastq",
+        reversed = "processed/trim.{sample}_2.fastq",
         refGenome = CONFIG["refGenome"],
-        refGenomeIndex = CONFIG["refGenome"] + ".pac"
-    output: "mapped/bwaMem.{prefix}.sam"
+        refGenomeIndex = CONFIG["refGenome"] + ".pac",
+	bwa = CONFIG["bwaMem"]["path"]
+    output: "mapped/bwaMem.{sample}.sam"
     threads: 8
     version: BWA_VERSION
     params:
         optionalOpts = CONFIG["bwaMem"]["optionalOpts"]
-    run:
-        shell("bwa mem -t {threads} {input.refGenome} {input.forward} {input.reversed} > {output[0]}") 
-        
+    shell: "{input.bwa}bwa mem -t {threads} {params.optionalOpts} {input.refGenome} {input.forward} {input.reversed} > {output[0]}"
+       
 rule bwaMemSingle:
     input:
-        reads = "preprocessing/{prefix}.fastq",
+        reads = "processed/{prefix}.fastq",
         refGenome = CONFIG["refGenome"],
         refGenomeIndex = CONFIG["refGenome"] + ".pac"
     output: "mapped/bwaMem.{prefix}.sam"
@@ -84,5 +87,4 @@ rule bwaMemSingle:
     params:
         optionalOpts = CONFIG["bwaMem"]["optionalOpts"]
     version: BWA_VERSION
-    run:
-        shell("bwa mem -t {threads} {input.refGenome} {input.reads} > {output[0]}") 
+    shell: "bwa mem -t {threads} {input.refGenome} {input.reads} > {output[0]}"
