@@ -1,10 +1,10 @@
 {
-   "samples": ["ST_sample001"],
-   "refGenome":"/home/haars001/scratch/projects/VLPB/test/ST4.03ch05.fasta",
-   "illuminaAdapters":"/tmp/SnakeMakeVLPB/bin/Trimmomatic-0.32/adapters/TruSeq2-PE.fa",
-   "gffFile":"/home/haars001/scratch/projects/VLPB/test/ST4.03ch05_genes.gff",
+   "samples": ["ST_sample001","ST_sample002"],
+   "refGenome":"refgenome/ST4.03ch05.fasta",
+   "illuminaAdapters":"bin/Trimmomatic-0.32/adapters/TruSeq2-PE.fa",
+   "gffFile":"refgenome/ST4.03ch05_genes.gff",
    "bwa":{
-      "path":"/tmp/SnakeMakeVLPB/bin/bwa-0.7.7/",
+      "path":"bin/bwa-0.7.7/",
       "URL" : "https://github.com/lh3/bwa.git"
    },
    "bwaSampe":{
@@ -23,18 +23,18 @@
       "memUsage":"-Xmx30g"
    },
    "beagle":{
-      "path":"/tmp/SnakeMakeVLPB/bin/beagle.jar",
+      "path":"bin/beagle.jar",
       "URL" : "http://faculty.washington.edu/browning/beagle/beagle.r1398.jar"
    },
    "gatk":{
       "path":"/media/bulk_01/users/finke002/bin/GenomeAnalysisTK-2.8-1-g932cd3a/GenomeAnalysisTK.jar"
    },
    "picardTools":{
-      "path":"/tmp/SnakeMakeVLPB/bin/picard-tools/",
+      "path":"bin/picard-tools/",
       "URL" : "https://github.com/broadinstitute/picard/releases/download/1.125/picard-tools-1.125.zip"
    },
    "freebayes":{
-      "path":"/tmp/SnakeMakeVLPB/bin/freebayes/bin/",
+      "path":"bin/freebayes/bin/",
       "optionalOpts":{
          "--ploidy":4,
          "--read-indel-limit":3,
@@ -47,7 +47,7 @@
       "URL" : "git://github.com/ekg/freebayes.git"
    },
    "trimmomatic":{
-      "jar":"/tmp/SnakeMakeVLPB/bin/Trimmomatic-0.32/trimmomatic-0.32.jar",
+      "jar":"bin/Trimmomatic-0.32/trimmomatic-0.32.jar",
       "seedMisMatches":2,
       "palindromeClipTreshold":30,
       "simpleClipThreshhold":10,
@@ -58,10 +58,10 @@
       "minReadLen":36,
       "phred":"-phred33",
       "URL" : "http://www.usadellab.org/cms/uploads/supplementary/Trimmomatic/Trimmomatic-0.32.zip",
-      "path":"/tmp/SnakeMakeVLPB/bin/Trimmomatic-0.32/"
+      "path":"bin/Trimmomatic-0.32/"
    },
    "samtools":{
-      "path":"/tmp/SnakeMakeVLPB/bin/samtools/",
+      "path":"bin/samtools/",
       "URL" : "https://github.com/samtools/samtools.git"
    },
    "htslib":{
