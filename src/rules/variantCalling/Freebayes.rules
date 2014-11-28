@@ -60,6 +60,7 @@ rule FreebayesCalling:
     input:
         FREEBAYES=rules.freebayes_installation.output,
         BAM = "processedbam/{prefix}.bam",
+        BAI = "processedbam/{prefix}.bam.bai",
         REFGENOME = CONFIG["refGenome"],
         REFGENOMEINDEX = CONFIG["refGenome"] + '.fai'
     output: "variantCalling/fb.{prefix}.vcf"
