@@ -37,8 +37,8 @@ rule samToBam:
 rule indexBam:
     input:
         SAMTOOLS=rules.samtools_installation.output,
-        BAM="mapped/sorted.{sample}.bam"
-    output: "mapped/{sample}.bam.bai"
+        BAM="{prefix}.bam"
+    output: "{prefix}.bam.bai"
     shell: "{input.SAMTOOLS} index {input.BAM}"
 
 rule sortBam:
