@@ -33,7 +33,7 @@ rule bwaSampe:
         reversedSai = "mapped/{prefix}_2.sai",
         refGenome = CONFIG["refGenome"],
         refGenomeIndex = CONFIG["refGenome"] + ".pac"
-    output: "mapped/bwaSampe.{prefix}.sam"
+    output: temp("mapped/bwaSampe.{prefix}.sam")
     params:
         optionalOpts = CONFIG["bwaSampe"]["optionalOpts"]
     run:
@@ -48,7 +48,7 @@ rule bwaSamse:
         readsSai = "mapped/{prefix}.sai",
         refGenome = CONFIG["refGenome"],
         refGenomeIndex = CONFIG["refGenome"] + ".pac"
-    output: "mapped/bwaSamse.{prefix}.sam"
+    output: temp("mapped/bwaSamse.{prefix}.sam")
     params:
         optionalOpts = CONFIG["bwaSamse"]["optionalOpts"]
     run:
@@ -81,7 +81,7 @@ rule bwaMemPaired:
         reversed = "processed/trim.{sample}_2.fastq",
         refGenome = CONFIG["refGenome"],
         refGenomeIndex = CONFIG["refGenome"] + ".pac"
-    output: "mapped/bwaMem.{sample}.sam"
+    output: temp("mapped/bwaMem.{sample}.sam")
     threads: 8
     params:
         optionalOpts = CONFIG["bwaMem"]["optionalOpts"]
@@ -93,7 +93,7 @@ rule bwaMemSingle:
         reads = "processed/{prefix}.fastq",
         refGenome = CONFIG["refGenome"],
         refGenomeIndex = CONFIG["refGenome"] + ".pac"
-    output: "mapped/bwaMem.{prefix}.sam"
+    output: temp("mapped/bwaMem.{prefix}.sam")
     threads: 8
     params:
         optionalOpts = CONFIG["bwaMem"]["optionalOpts"]

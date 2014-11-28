@@ -31,7 +31,7 @@ rule samToBam:
     input:
         SAMTOOLS=rules.samtools_installation.output,
         BAM="mapped/{sample}.sam"
-    output: "mapped/{sample}.bam"
+    output: temp("mapped/{sample}.bam")
     shell: "{input.SAMTOOLS} view -bS {input.BAM} > {output}"
 
 rule indexBam:
