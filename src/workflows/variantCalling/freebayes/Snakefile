@@ -24,8 +24,14 @@ include: ruleDir + "variantCalling/Freebayes.rules"
 #rule all:
 #    input: "report/report.xpdf"
 
+
+"""Now see if we have any command line overrides: """
+for key in config:
+    CONFIG[key] = config[key]
+
 #SAMPLES,=glob_wildcards("raw_reads/{sample}_1.fastq.gz")
 SAMPLES=CONFIG["samples"]
+
 
 rule all:
     #input: expand("processed/trim.{samples}.fastq", samples=SAMPLES)

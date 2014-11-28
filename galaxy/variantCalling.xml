@@ -2,7 +2,7 @@
   <description>Snakemake pipeline</description>
   <parallelism method="basic"></parallelism>
   <command>
-    snakemake --snakefile "$location" --directory "$working_directory" > "$out"
+    snakemake --snakefile "$location" --directory "$working_directory" --config samples="['$samples']" refGenome="$refGenome" gff="$gffFile" > "$out"
   </command>
   <requirements>
     <requirement type="package">snakemake</requirement>
@@ -10,6 +10,9 @@
   <inputs>
     <param name="location" type="text" size="100" label="Workflow location" help="" optional="false" value="/home/sven/git/SnakeMakeVlpb/src/workflows/variantCalling/allelicDiversity/Snakefile" />
     <param name="working_directory"  size="100" type="text" label="Working directory" help="" optional="false" value="/tmp" />
+    <param name="samples"  size="100" type="text" label="Samples" help="" optional="false" value="" />
+    <param name="refGenome"  size="100" type="text" label="Reference genome" help="" optional="false" value="" />
+    <param name="gffFile"  size="100" type="text" label="Reference genome gff file" help="" optional="false" value="/tmp" />
   </inputs>
   <outputs>
 	<data name="out" format="txt" />
