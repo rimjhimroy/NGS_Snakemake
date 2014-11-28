@@ -43,15 +43,28 @@ items.append("--min-alternate-fraction %s"%(CONFIG["freebayes"]["optionalOpts"][
 param_str = " ".join(items)
 parameters = param_str
 
+rule freebayes_installation:
+    output: CONFIG["freebayes"]["path"] + 'freebayes'
+    threads: 20
+    shell:
+        "TEMPDIR=`mktemp -d`;"
+        "cd $TEMPDIR;"
+        "git clone --recursive " + CONFIG['freebayes']['URL'] +  " && "
+        "cd freebayes && "
+        "make -j {threads} && "
+        "mv bin/freebayes bin/bamleftalign " + CONFIG["freebayes"]["path"] + " &&"
+        "touch {output} && "
+        "cd / && rm -rf $TEMPDIR;"
+
 rule FreebayesCalling:
-    input: 
-        inFile = "processedbam/{prefix}.bam",
-        path = CONFIG["freebayes"]["path"],
-	refGenome = CONFIG["refGenome"]
+    input:
+        FREEBAYES=rules.freebayes_installation.output,
+        BAM = "processedbam/{prefix}.bam",
+        REFGENOME = CONFIG["refGenome"]
     output: "variantCalling/fb.{prefix}.vcf"
     #version: FREEBAYES_VERSION
-    shell: ("{input.path}freebayes -f {input.refGenome} -b {input.inFile} -v {output} {parameters} > {output}")
-    
+    shell: ("{input.FREEBAYES} -f {input.REFGENOME} -b {input.BAM} -v {output} {parameters} > {output}")
+
 """
 #TODO: work on SNPfiltering
 
@@ -62,11 +75,11 @@ rule bcftoolsView:
     shell: "bcftools view -vcg {input[0]} > {output[0]}"
 
 rule filterVcf:
-    input: 
+    input:
        inFile = "{prefix}.vcf",
        path = CONFIG["freebayes"]["path"]
     output: "variantCalling/filtered.{prefix}.vcf"
-    params: 
+    params:
         path=CONFIG["options"]["vcfUtils"]["path"],
         optionalOpts=CONFIG["options"]["vcfUtils"]["optionalOpts"]
     shell: "perl {params.path} varFilter {params.optionalOpts} {input[0]} > {output[0]}"
