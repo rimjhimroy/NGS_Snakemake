@@ -1,22 +1,110 @@
-<tool id="variantCalling" name="Variant Calling" version="0.0.1">
+<tool id="variantCalling" name="Variant Calling" version="0.8.3">
   <description>Snakemake pipeline</description>
   <parallelism method="basic"></parallelism>
   <command>
-    snakemake --snakefile "$location" --directory "$working_directory" --config samples="['$samples']" refGenome="$refGenome" gff="$gffFile" > "$out"
+  		snakemake --snakefile /home/sven/git/SnakeMakeVlpb/src/workflows/variantCalling/freebayes/Snakefile --config json="$json" samples="['GALAXY_SAMPLE']" refGenome="$refGenome" gff="$gffFile" GALAXY_OUTPUT="$out" forward="$forward" reverse="$reverse"
   </command>
+      
   <requirements>
     <requirement type="package">snakemake</requirement>
   </requirements>
   <inputs>
-    <param name="location" type="text" size="100" label="Workflow location" help="" optional="false" value="/home/sven/git/SnakeMakeVlpb/src/workflows/variantCalling/allelicDiversity/Snakefile" />
-    <param name="working_directory"  size="100" type="text" label="Working directory" help="" optional="false" value="/tmp" />
-    <param name="samples"  size="100" type="text" label="Samples" help="" optional="false" value="" />
-    <param name="refGenome"  size="100" type="text" label="Reference genome" help="" optional="false" value="" />
-    <param name="gffFile"  size="100" type="text" label="Reference genome gff file" help="" optional="false" value="/tmp" />
+    <param format="fastq" type="data" name="forward" label="Forward reads" help=""/>
+    <param format="fastq" type="data" name="reverse" label="Reverse reads" help=""/>
+    <param format="fasta" type="data" name="refGenome" label="Reference genome" help=""/>
+    <param format="gff" type="data" name="gffFile" label="Reference genome gff" help=""/>
+  <!-- 
+    <param name="samples"  size="100" type="text" label="Sample name" help="" optional="false" value="sample001" />
+    <param name="forward"  type="select" label="Forward reads" help="" dynamic_options='get_directory_files("/media/sven/extData/sven/VLPB/raw_reads","*_1.*.gz")' />
+    <param name="reverse"  type="select" label="Reverse reads" help="" dynamic_options='get_directory_files("/media/sven/extData/sven/VLPB/raw_reads","*_2.*.gz")' />
+    <param name="refGenome"  type="select" label="Reference genome" help="" dynamic_options='get_directory_files("/media/sven/extData/sven/VLPB/refgenome","*.fasta")' />
+    <param name="gffFile" type="select" label="Reference genome gff" dynamic_options='get_directory_files("/media/sven/extData/sven/VLPB/refgenomeGFF","*.gff")'/>
+     -->
   </inputs>
   <outputs>
-	<data name="out" format="txt" />
+	<data name="out" file="out.vcf" format="vcf" />
 <!--	<data name="error" format="txt" /> -->
   </outputs>
+  <stdio>
+  	<exit_code range="0" level="log" description="Snakemake pipeline output"/>
+  	<exit_code range="1:" level="fatal" description="Snakemake pipeline output error"/>
+  </stdio>
+  
+   <configfiles>
+    <configfile name="json">
+{
+   "samples": [],
+   "refGenome":"",
+   "illuminaAdapters":"/tmp/VLPB/bin/trimmomatic/adapters/TruSeq2-PE.fa",
+   "gffFile":"refgenome/ST4.03ch05_genes.gff",
+   "bwa":{
+      "path":"/tmp/VLPB/bin/bwa/",
+      "URL" : "https://github.com/lh3/bwa.git"
+   },
+   "bwaSampe":{
+      "optionalOpts":""
+   },
+   "bwaSamse":{
+      "optionalOpts":""
+   },
+   "bwaAln":{
+      "optionalOpts":""
+   },
+   "bwaMem":{
+      "optionalOpts":"-M"
+   },
+   "java":{
+      "memUsage":"-Xmx30g"
+   },
+   "beagle":{
+      "path":"/tmp/VLPB/bin/beagle.jar",
+      "URL" : "http://faculty.washington.edu/browning/beagle/beagle.r1398.jar"
+   },
+   "gatk":{
+      "path":"/media/bulk_01/users/finke002/bin/GenomeAnalysisTK-2.8-1-g932cd3a/GenomeAnalysisTK.jar"
+   },
+   "picardTools":{
+      "path":"/tmp/VLPB/bin/picard-tools/",
+      "URL" : "https://github.com/broadinstitute/picard/releases/download/1.125/picard-tools-1.125.zip"
+   },
+   "freebayes":{
+      "path":"/tmp/VLPB/bin/freebayes/",
+      "optionalOpts":{
+         "--ploidy":4,
+         "--read-indel-limit":3,
+         "--min-mapping-quality":30,
+         "--min-base-quality":13,
+         "--theta":0.01,
+         "--min-alternate-count":4,
+         "--min-alternate-fraction":0.15
+      },
+      "URL" : "git://github.com/ekg/freebayes.git"
+   },
+   "trimmomatic":{
+      "jar":"/tmp/VLPB/bin/trimmomatic/trimmomatic-0.32.jar",
+      "seedMisMatches":2,
+      "palindromeClipTreshold":30,
+      "simpleClipThreshhold":10,
+      "LeadMinTrimQual":3,
+      "TrailMinTrimQual":3,
+      "windowSize":4,
+      "avgMinQual":15,
+      "minReadLen":36,
+      "phred":"-phred33",
+      "URL" : "http://www.usadellab.org/cms/uploads/supplementary/Trimmomatic/Trimmomatic-0.32.zip",
+      "path":"/tmp/VLPB/bin/trimmomatic/"
+   },
+   "samtools":{
+      "path":"/tmp/VLPB/bin/samtools/",
+      "URL" : "https://github.com/samtools/samtools.git"
+   },
+   "htslib":{
+      "URL" : "https://github.com/samtools/htslib.git"
+   }
+}
+    
+    </configfile>
+    </configfiles>
+   <code file="utils.py"/> 
   <help>Variant calling pipeline: trimmomatic, bwa, samtools and picardtools</help>
 </tool>
