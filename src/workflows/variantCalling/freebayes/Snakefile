@@ -14,6 +14,7 @@ sys.path.append(os.path.dirname(inspect.getframeinfo(inspect.currentframe()).fil
 current_path = os.getcwd()
 json_file = "config.json"
 """The following lines are necessary to connect snakemake to galaxy"""
+
 if "GALAXY_OUTPUT" in config: #The output from galaxy has name. When not present, this is normal snakemake run
     json_file = config["json"]
     current_path = '/'.join(json_file.split("/")[:-1]) + "/" # found out where we are
@@ -32,12 +33,20 @@ if "GALAXY_OUTPUT" in config: #The output from galaxy has name. When not present
 
 workdir: current_path
 
-
 with open(json_file) as f:
     CONFIG = json.load(f)
+    
 """Now see if we have any command line overrides (usually from galaxy plugin): """
-for key in config:
-    CONFIG[key] = config[key]
+def replace_items_config(config, CONFIG):
+    for key in config:
+        if isinstance(config[key], str): #is it a string value? 
+            CONFIG[key] = config[key]
+        elif isinstance(config[key], dict): # is this a json object (dict) ? 
+            replace_items_config(config[key], CONFIG[key])
+        else: # we don't do lists, just copy them!
+            CONFIG[key] = config[key]
+            
+replace_items_config(config, CONFIG)
 
 
 include: ruleDir + "utils/Unzip.rules"

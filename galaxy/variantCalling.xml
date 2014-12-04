@@ -2,7 +2,7 @@
   <description>Snakemake pipeline</description>
   <parallelism method="basic"></parallelism>
   <command>
-  		snakemake --snakefile /home/sven/git/SnakeMakeVlpb/src/workflows/variantCalling/freebayes/Snakefile --config json="$json" samples="['GALAXY_SAMPLE']" refGenome="$refGenome" gff="$gffFile" GALAXY_OUTPUT="$out" forward="$forward" reverse="$reverse"
+  		snakemake --snakefile /home/sven/git/SnakeMakeVlpb/src/workflows/variantCalling/freebayes/Snakefile --config json="$json" freebayes="{'optionalOpts': {'--min-alternate-fraction':'$min_alternate_fraction'}}" samples="['GALAXY_SAMPLE']" refGenome="$refGenome" gff="$gffFile" GALAXY_OUTPUT="$out" forward="$forward" reverse="$reverse"
   </command>
       
   <requirements>
@@ -13,6 +13,15 @@
     <param format="fastq" type="data" name="reverse" label="Reverse reads" help=""/>
     <param format="fasta" type="data" name="refGenome" label="Reference genome" help=""/>
     <param format="gff" type="data" name="gffFile" label="Reference genome gff" help=""/>
+	<param type="select" name="min_alternate_fraction" label="Freebayes minimum alternate fraction">
+		<option value="0.17">0.17</option>
+		<option value="0.16">0.16</option>
+		<option value="0.15" selected="true">0.15</option>
+		<option value="0.14">0.14</option>
+		<option value="0.13">0.13</option>
+		<option value="0.12">0.12</option>
+		<option value="0.11">0.11</option>
+	</param> 
   <!-- 
     <param name="samples"  size="100" type="text" label="Sample name" help="" optional="false" value="sample001" />
     <param name="forward"  type="select" label="Forward reads" help="" dynamic_options='get_directory_files("/media/sven/extData/sven/VLPB/raw_reads","*_1.*.gz")' />
