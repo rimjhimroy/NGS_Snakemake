@@ -15,7 +15,7 @@ current_path = os.getcwd()
 json_file = "config.json"
 """The following lines are necessary to connect snakemake to galaxy"""
 
-if "GALAXY_OUTPUT" in config: #The output from galaxy has name. When not present, this is normal snakemake run
+if 'config' in globals() and "GALAXY_OUTPUT" in config: #The output from galaxy has name. When not present, this is normal snakemake run
     json_file = config["json"]
     current_path = '/'.join(json_file.split("/")[:-1]) + "/" # found out where we are
     try: #setup data from galaxy as required by the pipeline 
@@ -46,8 +46,10 @@ def replace_items_config(config, CONFIG):
         else: # we don't do lists, just copy them!
             CONFIG[key] = config[key]
             
-replace_items_config(config, CONFIG)
-
+try: #will work only when called from galaxy             
+    replace_items_config(config, CONFIG)
+except:
+    pass 
 
 include: ruleDir + "utils/Unzip.rules"
 include: ruleDir + "utils/ExtensionChanger.rules"
