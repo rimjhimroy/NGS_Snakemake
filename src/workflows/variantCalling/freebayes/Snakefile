@@ -79,6 +79,7 @@ rule all:
         if "GALAXY_OUTPUT" in CONFIG:
             for s in SAMPLES:
                 os.rename(current_path + "variantCalling/fb.RG.noDup.sorted.bwaMem.{0}.vcf".format(s), CONFIG["GALAXY_OUTPUT"])
+                os.rename(current_path + "processedbam/RG.noDup.sorted.bwaMem.{0}.bam".format(s), CONFIG["GALAXY_BAM"])
 
 #DATASETS,=glob_wildcards("./processed/{sample}.fastq")
 #rule all:
