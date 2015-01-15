@@ -1,3 +1,4 @@
-import json
+import os
 
-VLBP_LIB = json.load(open("config.json"))
+global VLPB_LIB_PATH
+VLPB_LIB_PATH = os.path.dirname(os.path.realpath(__file__)) + "/src/"
