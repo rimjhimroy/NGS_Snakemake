@@ -24,13 +24,13 @@ for sample in CONFIG["libraries"]:
 ruleDir = VLPB_LIB_PATH + "rules/"
 
 #Preprocessing     
-include: ruleDir + "fastqProcessing/Trimmomatic.rules"
-include: ruleDir + "fastqProcessing/Quake.rules"
-include: ruleDir + "fastqProcessing/FastqMcf.rules"
-include: ruleDir + "fastqProcessing/ContaminationFiltering.rules"
+include: ruleDir + "fastqProcessors/Trimmomatic.rules"
+include: ruleDir + "fastqProcessors/Quake.rules"
+include: ruleDir + "fastqProcessors/FastqMcf.rules"
+include: ruleDir + "fastqProcessors/ContaminationFiltering.rules"
 
 #Assembly
-include: ruleDir + "assembly/Wgs.rules"
+include: ruleDir + "assemblers/Wgs.rules"
 
 rule all:
     input: "assembly/wgs.contigs.fasta"
