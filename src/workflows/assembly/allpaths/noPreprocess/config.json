@@ -14,5 +14,33 @@
             "optionalOpts": ""
         },
         "optionalOpts": "FF_MAX_STRETCH=5"
+    },
+    "samples": {
+        "Staphylococcus aureus (SRS004751,SRS004751)": {
+            "SRR022868": {
+                "readsets": {
+                        "1": [
+                                "/home/haars001/scratch/projects/VLPB/test_data/Staphylococcus_aureus/Data.original/frag_1.fastq.gz",
+                                "/home/haars001/scratch/projects/VLPB/test_data/Staphylococcus_aureus/Data.original/frag_2.fastq.gz"
+                                ]
+                        },
+                "type": "pe",
+                "insertSize": "180",
+                "insertSizeStDev": "",
+                "platform": "illumina"
+            },
+            "SRR022865": {
+                "readsets": {
+                        "1": [
+                                "/home/haars001/scratch/projects/VLPB/test_data/Staphylococcus_aureus/Data.original/shortjump_1.fastq.gz",
+                                "/home/haars001/scratch/projects/VLPB/test_data/Staphylococcus_aureus/Data.original/shortjump_2.fastq.gz"
+                                ]
+                        },
+                "type": "mp",
+                "insertSize": "",
+                "insertSizeStDev": "",
+                "platform": "illumina"
+            }
+        }
     }
 }
