@@ -1,6 +1,6 @@
 {
     "gffFile":"/path/to/gffFile",
-	"refGenome":"/path/to/referenceGenome.fasta"
+	"refGenome":"/path/to/referenceGenome.fasta",
     "options":{
         "java":{
             "memUsage":"-Xmx30g"

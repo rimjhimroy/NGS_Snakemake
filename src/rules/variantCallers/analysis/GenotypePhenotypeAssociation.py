@@ -1,70 +1,18 @@
-"""
-@author: Jetse
-@version: 0.1
-
-The genotype phenotype association rules contain rules for calculating the genotype phenotype association. 
-This association indicates the chance whether a gene is involved in a given phenotype. These rules calculate 
-this genotype phenotype association by combining a gff file with genes with a vcf file with SNPs and a
-phenotype file with the known phenotypes. 
-"""
-###############
-##  Imports  ##
-###############
-import xlrd, csv, os
-import numpy
-from scipy import stats
-from rules.variantCalling.analysis import Readers
-from rules.utils import ChromosomeGetter
-
-#############
-##  Rules  ##
-#############
-#Convert the first page of an excel-sheet to csv format
-rule xlsToCsv:
-    input: "{prefix}.xls"
-    output: "{prefix}.csv"
-    run:   
-        with xlrd.open_workbook(input[0]) as wb:
-            with open(output[0],"w") as outFile:
-                sheet = wb.sheet_by_index(0)
-                csvWriter = csv.writer(outFile, csv.excel_tab)
-                for row in range(sheet.nrows):
-                    csvWriter.writerow(sheet.row_values(row))
-
-#Merge all genotype phenotype association files per chromosome to one large csv file by concatenating them all
-rule mergeCsv:
-    input: 
-        index = CONFIG["mapping"]["referenceGenome"] + ".fai",
-        chroms = expand("variantCalling/phased.{chrom}_{{prefix}}.genotypePhenotypeAssociation.csv",chrom=ChromosomeGetter.getChromosomes(CONFIG["mapping"]["referenceGenome"] + ".fai"))
-    output: "variantCalling/all.phased.{prefix}.genotypePhenotypeAssociation.csv"
-    shell: "cat {input.chroms} > {output[0]}"
-
-#The rule which executes the actual genotype-phenotype association script.        
-rule genotypePhenotypeAssociation:
-    input: 
-        vcfFile = "variantCalling/snps.{chrom}_phased.snps.{prefix}.vcf",
-        phenotypeFile = os.path.splitext(CONFIG["phenotypeFile"])[0] + ".csv"
-    output: "variantCalling/phased.{chrom}_{prefix}.genotypePhenotypeAssociation.csv"
-    params:
-        gffFile = CONFIG["gffFile"]
-    run:
-        LociFinder().findLoci(input.vcfFile, wildcards.chrom, input.phenotypeFile, params.gffFile, output[0])
-
 ###############
 ##  Classes  ##
 ###############
 class LociFinder(object):
     """
-    The class LociFinder combines the gff file with the vcf file and the phenotype file. All differen t haplotypes 
+    The class LociFinder combines the gff file with the vcf file and the phenotype file. All differen t haplotypes
     per gene are reconstructed (only on positions where at least one sample has a SNP). In the end for each gene
     a p-value is calculated with the t-test to indicate the chance of being involved in a phenotype. If multiple
-    phenotypes are described in the phenotype file, the chance of each phenotype will be calculated independent.  
+    phenotypes are described in the phenotype file, the chance of each phenotype will be calculated independent.
     """
     def findLoci(self, vcfFile, chrom, phenotypeFile, gffFile, outputFile):
         """
         findLoci is the main method of the calculation of which genes are involved in a phenotype. First the phenotype
         file is read, then for each phenotype the gff file is read and haplotypes are constructed from the vcf files.
-        After this a method is called to calculate the chance of being involved in a phenotype. In the end each chance is 
+        After this a method is called to calculate the chance of being involved in a phenotype. In the end each chance is
         written to a csv file with one p-value for each gene.
         """
         phenReader = Readers.PhenotypeReader()
@@ -72,14 +20,14 @@ class LociFinder(object):
         for phenotype in  phenReader.phenotypes:
             gffReader = Readers.GffReader(chrom=chrom)
             gffReader.readFile(gffFile)
-            phenotype.contigs = gffReader.contigs 
-            
+            phenotype.contigs = gffReader.contigs
+
             vcfReader = Readers.VcfReader(phenotype.contigs.values())
             vcfReader.readFile(vcfFile)
-            
+
             pVals = self.findLociInPheno(phenotype)
             self.writePvaluesToFile(pVals, outputFile)
-    
+
     def writePvaluesToFile(self, pVals, outFile):
         """
         This method writes a dictionary of p-values to a given file
@@ -87,7 +35,7 @@ class LociFinder(object):
         with open(outFile, "w") as outWriter:
             for (contig, pVal) in pVals.items():
                 outWriter.write(contig + "\t" + str(pVal[1]) + "\n")
-        
+
     def findLociInPheno(self, phenotype):
         """
         This method creates the output needed for the f_oneway test of the scipy module, and executes this method.

@@ -1,37 +1,3 @@
-"""
-@author: Jetse
-@version: 0.1
-
-
-"""
-
-###############
-##  Imports  ##
-###############
-from rules.variantCalling.analysis import Readers 
-from rules.variantCalling.analysis.model import Contig
-from rules.utils import ChromosomeGetter
-
-#############
-##  Rules  ##
-#############
-rule allelicDiversityPerChrom:
-    input: "variantCalling/snps.{chrom}_phased.snps.{prefix}.vcf"
-    output: "variantCalling/phased.{chrom}_{prefix}.allelicDiversity.csv"
-    params:
-        gffFile = CONFIG["gffFile"]
-    run:
-        AllelicDiversity().getAllelicDiversity(input[0], wildcards.chrom, output[0], params.gffFile)
-
-rule mergeCsv:
-    input: 
-        index = CONFIG["mapping"]["referenceGenome"] + ".fai",
-        chroms = expand("variantCalling/phased.{chrom}_{{prefix}}.allelicDiversity.csv",chrom=ChromosomeGetter.getChromosomes(CONFIG["mapping"]["referenceGenome"] + ".fai"))
-    output: "variantCalling/all.phased.{prefix}.allelicDiversity.csv"
-    shell: "cat {input.chroms} > {output[0]}"
-
-
-
 ###############
 ##  Classes  ##
 ###############
@@ -41,10 +7,10 @@ class AllelicDiversity():
     """
     def _getAllHaplotypesByAccession(self, contigs):
         """The method getAllHaplotypesByAccession retrieves creates a dictionary with the accession as key and the haplotype as value
-        
+
         :param contigs: The contigs to get the haplotypes from
         :type contigs: an list of :py:class:`Contig.Contig` instances
-        
+
         """
         allHaplotypes = {}
         for key in contigs:
@@ -53,17 +19,17 @@ class AllelicDiversity():
                 for haplotype,accessions in contigs[key].haplotypes.items():
                     for accession in accessions:
                         if accession in haplotypes:
-                            haplotypes[accession].append(haplotype)   
+                            haplotypes[accession].append(haplotype)
                         else:
                             haplotypes[accession] = [haplotype]
                 allHaplotypes[key] = haplotypes
-                
+
         return allHaplotypes
-    
+
     def _parseFiles(self, chrom, gffFile, vcfFile):
         """
         The method parseFiles creates the reader objects to parse all files.
-        
+
         :param chrom: The chromosome to parse
         :type chrom: str
         """
@@ -75,11 +41,11 @@ class AllelicDiversity():
         vcfReader = Readers.VcfReader(allContigs.values())
         vcfReader.readFile(vcfFile)
         return allContigs
-        
+
     def getAllelicDiversity(self, vcfFile, chrom, outputFile, gffFile):
         """
         The method getAllelicDiversity calculates the allelic diversity and writes the output to a file.
-        
+
         """
         print("calculating allelic diversity of " + vcfFile)
         try:

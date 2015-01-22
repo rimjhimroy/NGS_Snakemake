@@ -1,0 +1,33 @@
+"""
+@author: Jetse
+@version: 0.1
+
+
+"""
+
+###############
+##  Imports  ##
+###############
+from rules.variantCalling.analysis import Readers
+from rules.variantCalling.analysis.model import Contig
+from rules.utils import ChromosomeGetter
+
+import AllelicDiversity
+
+#############
+##  Rules  ##
+#############
+rule allelicDiversityPerChrom:
+    input: "variantCalling/snps.{chrom}_phased.snps.{prefix}.vcf"
+    output: "variantCalling/phased.{chrom}_{prefix}.allelicDiversity.csv"
+    params:
+        gffFile = CONFIG["gffFile"]
+    run:
+        AllelicDiversity().getAllelicDiversity(input[0], wildcards.chrom, output[0], params.gffFile)
+
+rule mergeCsv:
+    input:
+        index = CONFIG["mapping"]["referenceGenome"] + ".fai",
+        chroms = expand("variantCalling/phased.{chrom}_{{prefix}}.allelicDiversity.csv",chrom=ChromosomeGetter.getChromosomes(CONFIG["mapping"]["referenceGenome"] + ".fai"))
+    output: "variantCalling/all.phased.{prefix}.allelicDiversity.csv"
+    shell: "cat {input.chroms} > {output[0]}"

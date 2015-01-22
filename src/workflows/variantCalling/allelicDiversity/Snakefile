@@ -7,6 +7,10 @@ import json, os, sys, inspect
 with open("config.json") as f:
     CONFIG = json.load(f)
 
+"""Now see if we have any command line overrides: """
+for key in config:
+    CONFIG[key] = config[key]
+
 if "outputDir" in CONFIG:
     workdir: CONFIG["outputDir"]
 

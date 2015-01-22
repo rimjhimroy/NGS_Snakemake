@@ -1,0 +1,92 @@
+"""
+@author: Jetse
+@version: 0.1
+
+The Assembly validation ruleset contains all rules and functions to calculate the following statistics of an assembly:
+-
+-
+-
+-
+"""
+import os, subprocess
+
+from rules.qualityControl.latex import LaTeX
+from rules.qualityControl import GenblastParser
+from Bio import SeqIO
+
+import AssemblyValidation
+
+rule cegma:
+    input: CONFIG["assemblyControl"]["fasta"]
+    output: "qualityControl/cegma.completeness_report"
+    shell: "cegma -g {input} -o qualityControl/cegma"
+
+rule genBlastA:
+    input:
+        genes = lambda wildcards: CONFIG["assemblyControl"]["genes"][wildcards.proteinIndex],
+        refGenome = CONFIG["assemblyControl"]["fasta"]
+    output: "qualityControl/{proteinIndex}.gbo"
+    run:
+        shell("ln -s {input.refGenome}")
+        basename = os.path.basename(input.refGenome)
+        shell("genBlastA -q {input.genes} -t {refGenome} -o {output[0]}".format(input = input, refGenome = basename, output = output))
+
+rule assemblyControl:
+    input:
+        dnaBam = CONFIG["assemblyControl"]["DNA"],
+        cegma = "qualityControl/cegma.completeness_report",
+        rna = CONFIG["assemblyControl"]["RNA"],
+        cegmaLike = CONFIG["assemblyControl"]["cegma"],
+        snps = CONFIG["assemblyControl"]["snps"],
+        assembly = CONFIG["assemblyControl"]["fasta"],
+        a50Plot = "report/a50Plot.png"
+    output: "report/report.tex"
+    run:
+        contigLengths = getContigStats(input.assembly)
+        [n50Index, n50] = calculateN(50, contigLengths[0],contigLengths[1])
+        [n90Index, n90] = calculateN(90, contigLengths[0],contigLengths[1])
+        if input.dnaBam != "":
+            dnaMappingStats = getMappingPerc(input.dnaBam)
+        if input.snps == "":
+            [errorRate, snpDensity] = getSnpDensity(input.snps, contigLengths[1])
+        else:
+            [errorRate, snpDensity] = [None, None]
+        if input.rna == "":
+            rnaMappingPerc = None
+        else:
+            rnaMappingPerc = getMappingPerc(input.rna)
+        otherCegmaScores = {}
+        for file in input.cegmaLike:
+            gb = GenblastParser.GenblastParser(file)
+            otherCegmaScores[os.path.basename(os.path.splitext(file)[0])] = [gb.full, gb.partial]
+
+        getLaTeXReport(input.assembly,
+                       output[0],
+                       len(contigLengths[0]),
+                       contigLengths[1],
+                       contigLengths[2],
+                       contigLengths[0][0],
+                       n50Index, n50,
+                       n90Index, n90,
+                       input.a50Plot,
+                       cegmaScore=getCegmaStatistics(input.cegma),
+                       dnaMappingStats=dnaMappingStats,
+                       errorRate=errorRate,
+                       snpDensity=snpDensity,
+                       rnaMappingStats=rnaMappingPerc,
+                       otherCegmaScores=otherCegmaScores
+                       )
+
+
+rule a50Plot:
+    input: CONFIG["assemblyControl"]["fasta"]
+    output: "report/a50Plot.png"
+    params:
+        location = os.path.dirname(inspect.getframeinfo(inspect.currentframe()).filename) + "/a50plot.R"
+    shell: "Rscript {params.location} {input[0]} {output[0]}"
+
+
+rule latexReport:
+    input: "report/{prefix}.tex"
+    output: "report/{prefix}.pdf"
+    shell: "pdflatex -interaction=nonstopmode -output-directory=report/ {input[0]}"

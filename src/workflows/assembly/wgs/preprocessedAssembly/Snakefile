@@ -3,6 +3,9 @@
 """
 
 import json, os, inspect
+
+### Get lib configuration
+from SnakeMakeVlpb import VLPB_LIB_PATH
  
 with open("config.json") as f:
     CONFIG = json.load(f)
@@ -18,16 +21,16 @@ for sample in CONFIG["libraries"]:
         except FileExistsError:
             pass
 
-ruleDir = os.path.dirname(inspect.getframeinfo(inspect.currentframe()).filename) + "/../../../../rules/"
+ruleDir = VLPB_LIB_PATH + "rules/"
 
 #Preprocessing     
-include: ruleDir + "fastqProcessing/Trimmomatic.rules"
-include: ruleDir + "fastqProcessing/Quake.rules"
-include: ruleDir + "fastqProcessing/FastqMcf.rules"
-include: ruleDir + "fastqProcessing/ContaminationFiltering.rules"
+include: ruleDir + "fastqProcessors/Trimmomatic.rules"
+include: ruleDir + "fastqProcessors/Quake.rules"
+include: ruleDir + "fastqProcessors/FastqMcf.rules"
+include: ruleDir + "fastqProcessors/ContaminationFiltering.rules"
 
 #Assembly
-include: ruleDir + "assembly/Wgs.rules"
+include: ruleDir + "assemblers/Wgs.rules"
 
 rule all:
     input: "assembly/wgs.contigs.fasta"

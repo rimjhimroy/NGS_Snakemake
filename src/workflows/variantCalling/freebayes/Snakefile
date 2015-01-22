@@ -3,6 +3,7 @@
 
 """
 import json, os, inspect, sys
+import shutil
 
 ruleDir = os.path.dirname(inspect.getframeinfo(inspect.currentframe()).filename) + "/../../../rules/"
 
@@ -10,8 +11,45 @@ ruleDir = os.path.dirname(inspect.getframeinfo(inspect.currentframe()).filename)
 
 sys.path.append(os.path.dirname(inspect.getframeinfo(inspect.currentframe()).filename)+ "/../../../")
 
-with open("config.json") as f:
+current_path = os.getcwd()
+json_file = "config.json"
+"""The following lines are necessary to connect snakemake to galaxy"""
+
+if 'config' in globals() and "GALAXY_OUTPUT" in config: #The output from galaxy has name. When not present, this is normal snakemake run
+    json_file = config["json"]
+    current_path = '/'.join(json_file.split("/")[:-1]) + "/" # found out where we are
+    try: #setup data from galaxy as required by the pipeline 
+        os.makedirs(current_path + "raw_reads") 
+        os.makedirs(current_path + "refGenome")
+        shutil.copy(config["forward"], current_path + "raw_reads/" + config["samples"][0] + "_1.fastq" )
+        shutil.copy(config["reverse"], current_path + "raw_reads/" + config["samples"][0] + "_2.fastq" )
+        shutil.copy(config["refGenome"], current_path + "refGenome/" + config["samples"][0] + ".fasta")
+        shutil.copy(config["gff"], current_path + "refGenome/" + config["samples"][0] + ".gff" )
+        config['refGenome'] = current_path + "refGenome/" + config["samples"][0] + ".fasta"
+        config['gff'] = current_path + "refGenome/" + config["samples"][0] + ".gff"
+    except:
+        # files already exist
+        pass
+
+workdir: current_path
+
+with open(json_file) as f:
     CONFIG = json.load(f)
+    
+"""Now see if we have any command line overrides (usually from galaxy plugin): """
+def replace_items_config(config, CONFIG):
+    for key in config:
+        if isinstance(config[key], str): #is it a string value? 
+            CONFIG[key] = config[key]
+        elif isinstance(config[key], dict): # is this a json object (dict) ? 
+            replace_items_config(config[key], CONFIG[key])
+        else: # we don't do lists, just copy them!
+            CONFIG[key] = config[key]
+            
+try: #will work only when called from galaxy             
+    replace_items_config(config, CONFIG)
+except:
+    pass 
 
 include: ruleDir + "utils/Unzip.rules"
 include: ruleDir + "utils/ExtensionChanger.rules"
@@ -24,16 +62,24 @@ include: ruleDir + "variantCalling/Freebayes.rules"
 #rule all:
 #    input: "report/report.xpdf"
 
+
+
 #SAMPLES,=glob_wildcards("raw_reads/{sample}_1.fastq.gz")
 SAMPLES=CONFIG["samples"]
 
+"""Some galaxy specific code:"""
+    
 rule all:
     #input: expand("processed/trim.{samples}.fastq", samples=SAMPLES)
     #input: expand("mapped/bwaMem.{samples}.sam", samples=SAMPLES)
     #input: expand("processedbam/RG.noDup.sorted.bwaMem.{samples}.bam", samples=SAMPLES)
     #input: expand("variantCalling/fb.{sample}.vcf", samples=SAMPLES)
     input: expand("variantCalling/fb.RG.noDup.sorted.bwaMem.{samples}.vcf", samples=SAMPLES)
-                                    #RG.noDup.sorted.bwaMem.STsub_sample1.bam
+    run:
+        if "GALAXY_OUTPUT" in CONFIG:
+            for s in SAMPLES:
+                os.rename(current_path + "variantCalling/fb.RG.noDup.sorted.bwaMem.{0}.vcf".format(s), CONFIG["GALAXY_OUTPUT"])
+                os.rename(current_path + "processedbam/RG.noDup.sorted.bwaMem.{0}.bam".format(s), CONFIG["GALAXY_BAM"])
 
 #DATASETS,=glob_wildcards("./processed/{sample}.fastq")
 #rule all:

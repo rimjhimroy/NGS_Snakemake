@@ -52,7 +52,7 @@ rule trimmomatic_installation:
         "unzip trimmomatic.zip && "
         "rm trimmomatic.zip && "
         "mkdir -p " + CONFIG["trimmomatic"]["path"] + " && "
-        "mv Trimmomatic*/* " + CONFIG["trimmomatic"]["path"] + " &&"
+        "mv -b Trimmomatic*/* " + CONFIG["trimmomatic"]["path"] + " &&"
         "touch " + CONFIG["trimmomatic"]["path"] + "/* && "
         "rmdir Trimmomatic* && "
         "cd / && rmdir $TEMPDIR;"
