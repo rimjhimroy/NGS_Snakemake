@@ -3,7 +3,7 @@
         "someLibName":{
             "reads" : ["/path/to/reads_1.fastq","/path/to/reads_2.fastq"],
             "type" : "pe",
-            "insertSize" : 180,
+            "insertSize" : "180"
         }
     },
     "allpaths":{
