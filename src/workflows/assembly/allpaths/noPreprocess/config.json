@@ -1,22 +1,4 @@
 {
-    "libraries":{
-        "paired-end":{
-            "reads" : ["/path/to/pe/reads_1.fastq","/path/to/pe/reads_2.fastq"],
-            "type" : "pe",
-            "insertSize" : "180"
-        },
-        "mate-pair":{
-            "reads" : ["/path/to/mp/reads_1.fastq","/path/to/mp/reads_2.fastq"],
-            "type" : "mp",
-            "insertSize" : "3500",
-            "insertSizeStDev": ""
-        },
-        "long":{
-            "reads" : ["/path/to/long/reads_1.fastq"],
-            "type" : "u",
-            "insertSize" : "35000"
-        }
-    },
     "allpaths":{
         "preparation":{
             "optionalOpts": ""
