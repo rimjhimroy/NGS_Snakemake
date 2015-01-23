@@ -38,18 +38,14 @@ ALLPATHS_VERSION = subprocess.check_output("RunAllPathsLG --version", shell=True
 
 rule prepareAllpaths:
 	input:
-		reads = [item for sublist in CONFIG["allpaths"]["input"].values() for item in sublist],
-		libsCsv = rules.inLibsCsv,output,
+		libsCsv = rules.inLibsCsv.output,
 		groupsCsv = rules.inGroupsCsv.output
 	output: "assembly/assembly/jump_reads_orig.fastb"
 	version: ALLPATHS_VERSION
 	params:
 		optionalOpts = CONFIG["allpaths"]["preparation"]["optionalOpts"]
 	run:
-		shell("PrepareAllPathsInputs.pl {params.optionalOpts} DATA_DIR={workDir}/assembly/assembly/ "
-			"IN_GROUPS_CSV={input.groupsCsv} IN_LIBS_CSV={input.libsCsv} PLOIDY=2 OVERWRITE=1".format(params=params,
-																									  workDir=os.getcwd(),
-																									  input=input))
+		shell("PrepareAllPathsInputs.pl {params.optionalOpts} DATA_DIR=${pwd}/assembly/assembly/ IN_GROUPS_CSV={input.groupsCsv} IN_LIBS_CSV={input.libsCsv} PLOIDY=2 OVERWRITE=1"
 
 rule allpaths:
 	input: rules.prepareAllpaths.output
