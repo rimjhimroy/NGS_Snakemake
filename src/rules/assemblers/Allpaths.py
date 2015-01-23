@@ -3,7 +3,7 @@
 #################
 import csv
 
-def createInLibsCsv(libraries, outputFile):
+def createInLibsCsv(samples, outputFile):
     """
     The method createInLibsCsv creates a csv file with all libraries as allpaths wants its input.
     """
@@ -11,86 +11,97 @@ def createInLibsCsv(libraries, outputFile):
     try:
         csvWriter = csv.writer(csvfile)
         csvWriter.writerow(("library_name", "project_name", "organism_name", "type", "paired", "frag_size", "frag_stddev", "insert_size", "insert_stddev", "read_orientation", "genomic_start", "genomic_end"))
-        for lib in libraries:
-            row = []
-            row.append(lib)
-            row.append("assembly")
-            row.append("assembly")
-            if libraries[lib]["type"] == "mp":
-                row.append("jumping")
-                row.append(1)
-                row.append("")
-                row.append("")
-                row.append(libraries[lib]["insertSize"])
-                if "insertSizeStDev" in libraries[lib]:
-                    if libraries[lib]["insertSizeStDev"] != "":
-                        row.append(int(libraries[lib]["insertSizeStDev"]))
+        for sample, libraries in samples.items():
+            for library, info in libraries.items():
+                row = []
+                row.append(library)
+                row.append("assembly")
+                row.append("assembly")
+                if info["type"] == "mp":
+                    row.append("jumping")
+                    row.append(1)
+                    row.append("")
+                    row.append("")
+                    row.append(info["insertSize"])
+                    if "insertSizeStDev" in info:
+                        if info["insertSizeStDev"] != "":
+                            row.append(int(info["insertSizeStDev"]))
+                        else:
+                            row.append(int(int(info["insertSize"])*0.2))
                     else:
-                        row.append(int(int(libraries[lib]["insertSize"])*0.2))
-                else:
-                    row.append(int(int(libraries[lib]["insertSize"])*0.2))
-                row.append("outward")
-                row.append(0)
-                row.append(0)
-            elif libraries[lib]["type"] == "pe":
-                row.append("fragment")
-                row.append(1)
-                row.append(int(libraries[lib]["insertSize"]))
-                if "insertSizeStDev" in libraries[lib]:
-                    if libraries[lib]["insertSizeStDev"] != "":
-                        row.append(int(libraries[lib]["insertSizeStDev"]))
+                        row.append(int(int(info["insertSize"])*0.2))
+                    row.append("outward")
+                    row.append(0)
+                    row.append(0)
+                elif info["type"] == "pe":
+                    row.append("fragment")
+                    row.append(1)
+                    row.append(int(info["insertSize"]))
+                    if "insertSizeStDev" in info:
+                        if info["insertSizeStDev"] != "":
+                            row.append(int(info["insertSizeStDev"]))
+                        else:
+                            row.append(int(int(info["insertSize"])*0.2))
                     else:
-                        row.append(int(int(libraries[lib]["insertSize"])*0.2))
-                else:
-                    row.append(int(int(libraries[lib]["insertSize"])*0.2))
-                row.append("")
-                row.append("")
-                row.append("inward")
-                row.append(0)
-                row.append(0)
-            elif libraries[lib]["type"] == "u":
-                row.append("long")
-                row.append("0")
-                row.append("")
-                row.append("")
-                row.append("")
-                row.append("")
-                row.append("")
-                row.append(0)
-                row.append(0)
-            csvWriter.writerow(row)
+                        row.append(int(int(info["insertSize"])*0.2))
+                    row.append("")
+                    row.append("")
+                    row.append("inward")
+                    row.append(0)
+                    row.append(0)
+                elif info["type"] == "u":
+                    row.append("long")
+                    row.append("0")
+                    row.append("")
+                    row.append("")
+                    row.append("")
+                    row.append("")
+                    row.append("")
+                    row.append(0)
+                    row.append(0)
+                csvWriter.writerow(row)
     finally:
         csvfile.close()
 
-def createInGroupsCsv(libraries, outputFile):
+def createInGroupsCsv(samples, outputFile):
     """
-    The method createInGroupsCsv creates a csv file with all paths to the libraries in it. When the reads are mated, the last "1" is replaced by a ? for the allpaths regex input.
+    The method createInGroupsCsv creates a csv file with all paths to the libraries in it.
+    When the reads are mated, the last "1" is replaced by a ? for the allpaths regex input.
     """
     csvfile =  open(outputFile, "w")
     try:
         csvWriter = csv.writer(csvfile)
         i = 0
         csvWriter.writerow(("group_name", "library_name", "file_name"))
-        for lib in libraries:
-            row = []
-            row.append(i)
-            row.append(lib)
-            if len(libraries[lib]["reads"]) == 2:
-                row.append(rreplace(libraries[lib]["reads"][0], "1", "?",1))
-            else:
-                row.append(libraries[lib]["reads"][0])
-            i += 1
-            csvWriter.writerow(row)
+        for sample, libraries in samples.items():
+            for library, info in libraries.items():
+                #print(library)
+                #print(info["type"])
+                #print(info["insertSize"])
+                #print(info["insertSizeStDev"])
+                #print(info["platform"])
+                for name,reads in info["readsets"].items():
+                    row = []
+                    row.append(i)
+                    row.append(library)
+                    #print(name, reads)
+                    if len(reads) == 2:
+                        row.append(rreplace(reads[0], "1", "?",1))
+                    else:
+                        row.append(reads[0])
+                    i += 1
+                    csvWriter.writerow(row)
     finally:
         csvfile.close()
 
-def rreplace(s, old, new, occurrence):
+def rreplace(substitute, old_value, new_value, occurrence):
     """
-    The method rreplace replaces the last occurence(s) of a given string with a new value.
-    :param s: The string to replace the last value with
-    :param old: The substring to replace
-    :param new: The new value for the substring
-    :param occurence: The number of times to replace the substring, beginning from the end.
+    The method rreplace replaces the last occurence of a given string with a new value.
+    :param substitute: The string to replace the last value with
+    :param old_value: The substring to replace
+    :param new_value: The new value for the substring
+    :param occurence: The number of times to replace the substring from the end.
+    See https://docs.python.org/3.4/library/stdtypes.html#str.rsplit
     """
-    li = s.rsplit(old, occurrence)
-    return new.join(li)
+    li = substitute.rsplit(old_value, occurrence)
+    return new_value.join(li)
