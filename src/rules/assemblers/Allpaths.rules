@@ -32,7 +32,7 @@ Sequence from longer fragments will enable longer-range continuity.
 ##  Allpaths  ##
 ################
 import os, subprocess
-import Allpaths
+from Allpaths import *
 
 ALLPATHS_VERSION = subprocess.check_output("RunAllPathsLG --version", shell=True).decode("utf-8").split()[7]
 
