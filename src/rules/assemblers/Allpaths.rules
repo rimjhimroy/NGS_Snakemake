@@ -8,26 +8,25 @@ To use it, you should first generate ~100 base Illumina reads from two libraries
 one with ~180 bp insert size (fragment data), and one with a ~3000 bp insert size (jumping library), both at about 45x coverage.
 Sequence from longer fragments will enable longer-range continuity.
 {
-    "libraries":{
-        "libName":{
-            "reads" : ["/path/to/reads_1.fastq","/path/to/reads_2.fastq"],
-            "type" : "pe",
-            "insertSize" : 180,
-        }
-    },
-    "allpaths":{
-        "input":{
-            "fragData":["../preprocessing/trim.fragData_1.fastq"]
-        },
-        "preparation":{
-            "optionalOpts": ""
-        },
-        "optionalOpts": "FF_MAX_STRETCH=5"
-    }
+	"libraries":{
+		"libName":{
+			"reads" : ["/path/to/reads_1.fastq","/path/to/reads_2.fastq"],
+			"type" : "pe",
+			"insertSize" : 180,
+		}
+	},
+	"allpaths":{
+		"input":{
+			"fragData":["../preprocessing/trim.fragData_1.fastq"]
+		},
+		"preparation":{
+			"optionalOpts": ""
+		},
+		"optionalOpts": "FF_MAX_STRETCH=5"
+	}
 }
 
 """
-
 
 ################
 ##  Allpaths  ##
@@ -37,53 +36,53 @@ import Allpaths
 
 ALLPATHS_VERSION = subprocess.check_output("RunAllPathsLG --version", shell=True).decode("utf-8").split()[7]
 
-
 rule prepareAllpaths:
-    input:
-        reads = [item for sublist in CONFIG["allpaths"]["input"].values() for item in sublist],
-        libsCsv = "assembly/assembly/libs.csv",
-        groupsCsv = "assembly/assembly/groups.csv"
-    output: "assembly/assembly/jump_reads_orig.fastb"
-    version: ALLPATHS_VERSION
-    params:
-        optionalOpts = CONFIG["allpaths"]["preparation"]["optionalOpts"]
-    run:
-        shell("PrepareAllPathsInputs.pl {params.optionalOpts} DATA_DIR={workDir}/assembly/assembly/ "
-            "IN_GROUPS_CSV={input.groupsCsv} IN_LIBS_CSV={input.libsCsv} PLOIDY=2 OVERWRITE=1".format(params=params,
-                                                                                                      workDir=os.getcwd(),
-                                                                                                      input=input))
+	input:
+		reads = [item for sublist in CONFIG["allpaths"]["input"].values() for item in sublist],
+		libsCsv = rules.inLibsCsv,output,
+		groupsCsv = rules.inGroupsCsv.output
+	output: "assembly/assembly/jump_reads_orig.fastb"
+	version: ALLPATHS_VERSION
+	params:
+		optionalOpts = CONFIG["allpaths"]["preparation"]["optionalOpts"]
+	run:
+		shell("PrepareAllPathsInputs.pl {params.optionalOpts} DATA_DIR={workDir}/assembly/assembly/ "
+			"IN_GROUPS_CSV={input.groupsCsv} IN_LIBS_CSV={input.libsCsv} PLOIDY=2 OVERWRITE=1".format(params=params,
+																									  workDir=os.getcwd(),
+																									  input=input))
 
 rule allpaths:
-    input: rules.prepareAllpaths.output
-    output:
-        contigs = "assembly/assembly/assembly/ASSEMBLIES/assembly/final.contigs.fasta",
-        scaffolds = "assembly/assembly/assembly/ASSEMBLIES/assembly/final.assembly.fasta"
-    threads: 999
-    version: ALLPATHS_VERSION
-    shell: "RunAllPathsLG PRE=./ REFERENCE_NAME=assembly DATA_SUBDIR=assembly RUN=assembly SUBDIR=assembly OVERWRITE=TRUE THREADS={threads}"
+	input: rules.prepareAllpaths.output
+	output:
+		contigs = "assembly/assembly/assembly/ASSEMBLIES/assembly/final.contigs.fasta",
+		scaffolds = "assembly/assembly/assembly/ASSEMBLIES/assembly/final.assembly.fasta"
+	threads: 999
+	version: ALLPATHS_VERSION
+	shell: "RunAllPathsLG PRE=./ REFERENCE_NAME=assembly DATA_SUBDIR=assembly RUN=assembly SUBDIR=assembly OVERWRITE=TRUE THREADS={threads}"
 
 rule allpathsCleanup:
-    input:
-        contigs = "assembly/assembly/assembly/ASSEMBLIES/assembly/final.contigs.fasta",
-        scaffolds = "assembly/assembly/assembly/ASSEMBLIES/assembly/final.assembly.fasta"
-    output:
-        contigs = "assembly/allpaths.contigs.fasta",
-        scaffolds = "assembly/allpaths.scaffolds.fasta"
-    version: "0.1"
-    shell: "mv {input.contigs} {output.contigs};"
-        "mv {input.scaffolds} {output.scaffolds};"
-        "rm -r assembly/assembly"
+	input:
+		contigs = rules.allpaths.output["contigs"],
+		scaffolds = rules.allpaths.output["scaffolds"]
+	output:
+		contigs = "assembly/allpaths.contigs.fasta",
+		scaffolds = "assembly/allpaths.scaffolds.fasta"
+	version: "0.1"
+	shell:
+		"mv {input.contigs} {output.contigs};"
+		"mv {input.scaffolds} {output.scaffolds};"
+		"rm -r assembly/assembly"
 
 rule inLibsCsv:
-    params: libs = CONFIG["allpaths"]["input"]
-    output: "assembly/assembly/libs.csv"
-    version: "0.1"
-    run:
-        createInLibsCsv(params, output[0])
+	params: libs = CONFIG["allpaths"]["input"]
+	output: "assembly/assembly/libs.csv"
+	version: "0.1"
+	run:
+		createInLibsCsv(params, output[0])
 
 rule inGroupsCsv:
-    params: CONFIG["libraries"]
-    output: "assembly/assembly/groups.csv"
-    version: "0.1"
-    run:
-        createInGroupsCsv(params, output[0])
+	params: CONFIG["libraries"]
+	output: "assembly/assembly/groups.csv"
+	version: "0.1"
+	run:
+		createInGroupsCsv(params, output[0])
