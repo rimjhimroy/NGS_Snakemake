@@ -8,7 +8,7 @@ ruleDir = os.path.dirname(inspect.getframeinfo(inspect.currentframe()).filename)
 with open("config.json") as f:
     CONFIG = json.load(f)
 
-include: ruleDir + "/assembly/Allpaths.rules"
+include: ruleDir + "/assemblers/Allpaths.rules"
 
 rule all:
     input: "assembly/allpaths.contigs.fasta"
