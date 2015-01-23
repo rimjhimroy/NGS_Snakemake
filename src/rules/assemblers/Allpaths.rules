@@ -70,15 +70,15 @@ rule allpathsCleanup:
 		"rm -r assembly/assembly"
 
 rule inLibsCsv:
-	params: libs = CONFIG["allpaths"]["input"]
-	output: "assembly/assembly/libs.csv"
+	params: CONFIG["samples"]
+	output: "assembly/assembly/in_libs.csv"
 	version: "0.1"
 	run:
 		createInLibsCsv(params, output[0])
 
 rule inGroupsCsv:
-	params: CONFIG["libraries"]
-	output: "assembly/assembly/groups.csv"
+	params: CONFIG["samples"]
+	output: "assembly/assembly/in_groups.csv"
 	version: "0.1"
 	run:
 		createInGroupsCsv(params, output[0])
