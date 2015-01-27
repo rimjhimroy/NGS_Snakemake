@@ -3,8 +3,14 @@
 """
 import json, os, inspect
 
-ruleDir = os.path.dirname(inspect.getframeinfo(inspect.currentframe()).filename) + "/../../../../rules/"
+# Get lib configuration
+# Set PYTHONPATH before running Snakemake :
+# export PYTHONPATH=$PYTHONPATH:/home/haars001/scratch/projects/VLPB/
+from SnakeMakeVlpb import VLPB_LIB_PATH
 
+ruleDir = VLPB_LIB_PATH + "rules/"
+
+# Load configuration
 with open("config.json") as f:
     CONFIG = json.load(f)
 
