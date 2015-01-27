@@ -1,29 +1,47 @@
 """
-@author: Jetse
-@version: 0.1
-@attention: Not tested yet...
+@author: Jetse Jacobi & Jan van Haarst
+@version: 0.2
 
 ALLPATHS-LG is a short read assembler and it works on both small and large (mammalian size) genomes.
 To use it, you should first generate ~100 base Illumina reads from two libraries:
 one with ~180 bp insert size (fragment data), and one with a ~3000 bp insert size (jumping library), both at about 45x coverage.
 Sequence from longer fragments will enable longer-range continuity.
+
 {
-	"libraries":{
-		"libName":{
-			"reads" : ["/path/to/reads_1.fastq","/path/to/reads_2.fastq"],
-			"type" : "pe",
-			"insertSize" : 180,
-		}
-	},
-	"allpaths":{
-		"input":{
-			"fragData":["../preprocessing/trim.fragData_1.fastq"]
-		},
-		"preparation":{
-			"optionalOpts": ""
-		},
-		"optionalOpts": "FF_MAX_STRETCH=5"
-	}
+    "allpaths":{
+        "preparation":{
+            "optionalOpts": ""
+        },
+        "optionalOpts": "FF_MAX_STRETCH=5"
+    },
+    "samples": {
+        "Staphylococcus aureus (SRS004751,SRS004751)": {
+            "SRR022868": {
+                "readsets": {
+                        "1": [
+                                "/home/haars001/scratch/projects/VLPB/test_data/Staphylococcus_aureus/Data.original/frag_1.fastq.gz",
+                                "/home/haars001/scratch/projects/VLPB/test_data/Staphylococcus_aureus/Data.original/frag_2.fastq.gz"
+                                ]
+                        },
+                "type": "pe",
+                "insertSize": "180",
+                "insertSizeStDev": "",
+                "platform": "illumina"
+            },
+            "SRR022865": {
+                "readsets": {
+                        "1": [
+                                "/home/haars001/scratch/projects/VLPB/test_data/Staphylococcus_aureus/Data.original/shortjump_1.fastq.gz",
+                                "/home/haars001/scratch/projects/VLPB/test_data/Staphylococcus_aureus/Data.original/shortjump_2.fastq.gz"
+                                ]
+                        },
+                "type": "mp",
+                "insertSize": "3500",
+                "insertSizeStDev": "",
+                "platform": "illumina"
+            }
+        }
+    }
 }
 
 """
@@ -36,49 +54,50 @@ from Allpaths import *
 
 ALLPATHS_VERSION = subprocess.check_output("RunAllPathsLG --version", shell=True).decode("utf-8").split()[7]
 
-rule prepareAllpaths:
-	input:
-		libsCsv = rules.inLibsCsv.output,
-		groupsCsv = rules.inGroupsCsv.output
-	output: "assembly/assembly/jump_reads_orig.fastb"
-	version: ALLPATHS_VERSION
-	params:
-		optionalOpts = CONFIG["allpaths"]["preparation"]["optionalOpts"]
-	run:
-		shell("PrepareAllPathsInputs.pl {params.optionalOpts} DATA_DIR=${pwd}/assembly/assembly/ IN_GROUPS_CSV={input.groupsCsv} IN_LIBS_CSV={input.libsCsv} PLOIDY=2 OVERWRITE=1"
-
-rule allpaths:
-	input: rules.prepareAllpaths.output
-	output:
-		contigs = "assembly/assembly/assembly/ASSEMBLIES/assembly/final.contigs.fasta",
-		scaffolds = "assembly/assembly/assembly/ASSEMBLIES/assembly/final.assembly.fasta"
-	threads: 999
-	version: ALLPATHS_VERSION
-	shell: "RunAllPathsLG PRE=./ REFERENCE_NAME=assembly DATA_SUBDIR=assembly RUN=assembly SUBDIR=assembly OVERWRITE=TRUE THREADS={threads}"
-
-rule allpathsCleanup:
-	input:
-		contigs = rules.allpaths.output["contigs"],
-		scaffolds = rules.allpaths.output["scaffolds"]
-	output:
-		contigs = "assembly/allpaths.contigs.fasta",
-		scaffolds = "assembly/allpaths.scaffolds.fasta"
-	version: "0.1"
-	shell:
-		"mv {input.contigs} {output.contigs};"
-		"mv {input.scaffolds} {output.scaffolds};"
-		"rm -r assembly/assembly"
-
 rule inLibsCsv:
-	params: CONFIG["samples"]
-	output: "assembly/assembly/in_libs.csv"
-	version: "0.1"
-	run:
-		createInLibsCsv(params, output[0])
+    params: CONFIG["samples"] # Can't be used in the command below, as somehow we only get the top level of the dictionary.
+    output: "assembly/assembly/in_libs.csv"
+    version: "0.1"
+    run:
+        createInLibsCsv(CONFIG["samples"], output[0])
 
 rule inGroupsCsv:
-	params: CONFIG["samples"]
-	output: "assembly/assembly/in_groups.csv"
-	version: "0.1"
-	run:
-		createInGroupsCsv(params, output[0])
+    params: CONFIG["samples"] # Can't be used in the command below, as somehow we only get the top level of the dictionary.
+    output: "assembly/assembly/in_groups.csv"
+    version: "0.1"
+    run:
+        createInGroupsCsv(CONFIG["samples"], output[0])
+
+rule prepareAllpaths:
+    input:
+        libsCsv = rules.inLibsCsv.output,
+        groupsCsv = rules.inGroupsCsv.output
+    output: "assembly/assembly/jump_reads_orig.fastb"
+    version: ALLPATHS_VERSION
+    params:
+        optionalOpts = CONFIG["allpaths"]["preparation"]["optionalOpts"]
+    shell:
+        "PrepareAllPathsInputs.pl {params.optionalOpts} DATA_DIR=`pwd`/assembly/assembly/ IN_GROUPS_CSV={input.groupsCsv} IN_LIBS_CSV={input.libsCsv} PLOIDY=2 OVERWRITE=1"
+
+rule allpaths:
+    input: rules.prepareAllpaths.output
+    output:
+        contigs = "assembly/assembly/assembly/ASSEMBLIES/assembly/final.contigs.fasta",
+        scaffolds = "assembly/assembly/assembly/ASSEMBLIES/assembly/final.assembly.fasta"
+    threads: 999
+    version: ALLPATHS_VERSION
+    shell:
+        "RunAllPathsLG PRE=./ REFERENCE_NAME=assembly DATA_SUBDIR=assembly RUN=assembly SUBDIR=assembly OVERWRITE=TRUE THREADS={threads}"
+
+rule allpathsCleanup:
+    input:
+        contigs = rules.allpaths.output["contigs"],
+        scaffolds = rules.allpaths.output["scaffolds"]
+    output:
+        contigs = "assembly/allpaths.contigs.fasta",
+        scaffolds = "assembly/allpaths.scaffolds.fasta"
+    version: "0.1"
+    shell:
+        "mv {input.contigs} {output.contigs};"
+        "mv {input.scaffolds} {output.scaffolds};"
+        "rm -r assembly/assembly;"
