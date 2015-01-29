@@ -1,0 +1,346 @@
+"""Run the maker annotation pipeline"""
+
+import json, os, inspect
+import configparser
+import io
+
+""" Recursive function to do a string format on each of the string values in the config.
+    Full replace on a JSON does not work: it uses, like formatting, {} which results
+    in errors."""
+def replace_paths_in_json(conf, paths):
+    for item in conf:
+        if isinstance(conf[item], str): #is it a string value?
+            conf[item] = conf[item].format(**paths) #use json to replace values
+        elif isinstance(conf[item], dict): # is this a json object (dict) ?
+            replace_paths_in_json(conf[item], paths) # parse object
+
+# Get the config file:
+with open("config.json") as conf:
+    with open("paths.json") as paths:
+        PATHS = json.load(paths)
+        CONFIG = json.load(conf)
+        replace_paths_in_json(CONFIG, PATHS)
+
+# Set some basic variables (snakemake doesn't always allow these calls directly in rules
+working_dir = CONFIG['base']['working_dir']
+maker_out = ".".join(CONFIG["maker_opts"]["genome"].split(".")[:-1]) + ".output"
+
+""" This function takes the maker configuration file ctl and overrides settings if found in the relevant section of config.json"""
+def read_maker_opts_ctl(json_section, ctl):
+    config = configparser.RawConfigParser()
+    config.optionxform = str # Return options as they are, do not convert to lowercase
+    config.read(ctl)
+    # All settings are in the "maker" json_section
+    # Loop over all the settings
+    for c in config.items("maker"):
+        # Check for a matching entry in config.json
+        if c[0] in CONFIG[json_section]:
+            # Replace with new setting
+            config.set("maker", c[0], CONFIG[json_section][c[0]])
+    # Place the new configuration in a single string:
+    output = io.StringIO()
+    config.write(output,space_around_delimiters=False)
+    return output.getvalue()
+
+""" maker doesn't give proper output, so we need our own flag file"""
+rule all:
+    input: expand("{working_dir}/maker_done.txt", working_dir=working_dir),
+        expand("{working_dir}/predicted_proteins.faa", working_dir=working_dir),
+        expand("{working_dir}/concatenated.gff", working_dir=working_dir)
+        #expand("{working_dir}/gffs_renamed.txt", working_dir=working_dir)
+        #expand("{working_dir}/uniprot", working_dir=working_dir)
+
+""" use this rule to clean-up maker settings """
+rule clean_maker:
+    shell: "rm -f {working_dir}/maker_*.ctl {working_dir}/maker_done.txt"
+
+""" use this rule to clean-up all the data produced by maker """
+rule clean_data:
+    shell: "rm -rf {working_dir}/{maker_out} {working_dir}/concatenated.gff {working_dir}/predicted_proteins.faa {working_dir}/ids.map"
+
+rule clean_perl:
+    shell: "rm -rf " + CONFIG["base"]["perl_install"]
+
+# Install maker dependancies :
+
+# Download and install Augustus
+rule augustus_installation:
+    output: CONFIG["base"]["maker_helpers_dir"] + 'augustus'
+    shell:
+        "TEMPDIR=`mktemp -d`;"
+        "cd $TEMPDIR;"
+        "wget"+CONFIG['maker_installation']['wget_options']+CONFIG['maker_installation']['augustus_URL']+";"
+        "tar xzf augustus*;"
+        "rm *.tar.*;"
+        "mv augustus* {output};"
+        "touch {output} && "
+        "echo 'export PATH='`readlink -f {output}/bin/`':$PATH' >>" + CONFIG['base']['maker_bashrc'] + ";"
+        "echo 'export AUGUSTUS_CONFIG_PATH='`readlink -f {output}/config/`  >>"+ CONFIG['base']['maker_bashrc'] + ";"
+        "cd / && rmdir $TEMPDIR;"
+
+# Download and install Exonerate
+rule exonerate_installation:
+    output: CONFIG["base"]["maker_helpers_dir"] + 'exonerate'
+    shell:
+        "TEMPDIR=`mktemp -d`;"
+        "cd $TEMPDIR;"
+        "wget"+CONFIG['maker_installation']['wget_options']+CONFIG['maker_installation']['exonerate_URL']+";"
+        "tar xzf exonerate*;"
+        "rm *.tar.*;"
+        "mv exonerate* {output};"
+        "touch {output} && "
+        "echo 'export PATH='`readlink -f {output}/bin/`':$PATH' >>" + CONFIG['base']['maker_bashrc'] + ";"
+        "cd / && rmdir $TEMPDIR;"
+
+# Download and install SNAP
+rule snap_installation:
+    output: CONFIG["base"]["maker_helpers_dir"] + 'snap'
+    shell:
+        "TEMPDIR=`mktemp -d`;"
+        "cd $TEMPDIR;"
+        "wget"+CONFIG['maker_installation']['wget_options']+CONFIG['maker_installation']['snap_URL']+";"
+        "tar xzf snap*;"
+        "rm *.tar.*;"
+        "mv snap* {output};"
+        "touch {output} && "
+        "cd {output} && make;"
+        "echo 'export ZOE='`readlink -f {output}` >>" + CONFIG['base']['maker_bashrc'] + ";"
+        "echo 'export PATH='`readlink -f {output}`':$PATH' >>" + CONFIG['base']['maker_bashrc'] + ";"
+        "cd / && rmdir $TEMPDIR;"
+
+# Download and install TRF
+rule trf_installation:
+    output: CONFIG["base"]["maker_helpers_dir"] + 'trf/trf'
+    shell:
+        "mkdir -p `dirname {output}` && "
+        "cd `dirname {output}` && "
+        "wget"+CONFIG['maker_installation']['wget_options']+CONFIG['maker_installation']['trf_URL']+" && "
+        "mv trf* trf && "
+        "chmod ugo+x trf && "
+        "touch {output} && "
+        "echo 'export PATH='`readlink -f {output}`':$PATH' >>" + CONFIG['base']['maker_bashrc'] + ";"
+
+# Download and install BLAST+
+rule blast_plus_installation:
+    output: CONFIG["base"]["maker_helpers_dir"] + 'blast+'
+    shell:
+        "TEMPDIR=`mktemp -d`;"
+        "cd $TEMPDIR;"
+        "wget"+CONFIG['maker_installation']['wget_options']+CONFIG['maker_installation']['blast+_URL']+" && "
+        "tar xzf ncbi* && "
+        "rm *.tar.* && "
+        "mv ncbi* {output} && "
+        "touch {output} && "
+        "echo 'export PATH='`readlink -f {output}/bin`':$PATH' >>" + CONFIG['base']['maker_bashrc'] + ";"
+        "cd / && rmdir $TEMPDIR;"
+
+# Download and install RMBLAST plus corresponding BLAST+
+rule rmblast_installation:
+    output: CONFIG["base"]["maker_helpers_dir"] + 'rmblast'
+    shell:
+        "TEMPDIR=`mktemp -d`;"
+        "cd $TEMPDIR;"
+        "wget"+CONFIG['maker_installation']['wget_options']+CONFIG['maker_installation']['rmblast_URL']+" && "
+        "tar xzf ncbi-blast* && "
+        "tar xzf ncbi-rmblast* && "
+        "rm  *.tar.* && "
+        "cp -R ncbi-rmblast*/* ncbi-blast*/ &&"
+        "mv  ncbi-blast* {output} && "
+        "touch {output} && "
+        "cd / && rm -rf $TEMPDIR;"
+
+# Download and install GIRI RepBase
+rule repbase_installation:
+    output: CONFIG["base"]["maker_helpers_dir"] + 'repbase'
+    shell:
+        "TEMPDIR=`mktemp -d`;"
+        "cd $TEMPDIR && "
+        "curl --remote-name --anyauth --netrc-file "+CONFIG['maker_installation']['repeatmaskerlibraries_URL_netrc']+" "+CONFIG['maker_installation']['repeatmaskerlibraries_URL']+" && "
+        "tar xzf repeatmaskerlibraries* && "
+        "mv  Libraries {output} && "
+        "mv  repeatmaskerlibraries* {output} && "
+        "touch {output} && "
+        "cd / && rm -rf $TEMPDIR;"
+
+# Download and install Repeatmasker
+rule repeatmasker_installation:
+    input:
+        REPBASE=rules.repbase_installation.output,
+        RMBLAST=rules.rmblast_installation.output,
+        TRF=rules.trf_installation.output
+    output: CONFIG["base"]["maker_helpers_dir"] + 'repeatmasker'
+    shell:
+        "TEMPDIR=`mktemp -d`;"
+        "cd $TEMPDIR;"
+        "wget"+CONFIG['maker_installation']['wget_options']+CONFIG['maker_installation']['repeatmasker_URL']+" && "
+        "tar xzf RepeatMasker-open-* && "
+        "rm *.tar.* && "
+        "mv RepeatMasker* {output} && "
+        "cd {output} && grep -l -r '#!/u1' * | xargs -I '%' sed -i 's|/u1/local/bin/perl|/usr/bin/env perl|' % && "
+        "cp RepeatMaskerConfig.tmpl RepeatMaskerConfig.pm && chmod -x RepeatMaskerConfig.pm && "
+        'sed -i \'s|DEFAULT_SEARCH_ENGINE\s\+=.*|DEFAULT_SEARCH_ENGINE = "ncbi";|\' RepeatMaskerConfig.pm && '
+        'sed -i \'s|TRF_PRGM\s\+=.*|TRF_PRGM = "' + "{input.TRF}" + '";|\' RepeatMaskerConfig.pm && '
+        'sed -i \'s|RMBLAST_DIR\s\+=.*|RMBLAST_DIR = "' + "{input.RMBLAST}" + '/bin";|\' RepeatMaskerConfig.pm && '
+        "cp  {input.REPBASE}/RepeatMaskerLib.embl Libraries/ ; "
+        "touch {output} && "
+        "echo 'export PATH='`readlink -f {output}`':$PATH' >>" + CONFIG['base']['maker_bashrc'] + " && "
+        "cd / && rm -rf $TEMPDIR;"
+
+# Create local Perl library
+rule perl_installation:
+    output: CONFIG["base"]["perl_install"] + "bin/cpanm"
+    shell: "mkdir -p " + CONFIG["base"]["perl_install"] + "bin && "
+            "cd "+ CONFIG["base"]["perl_install"] + "bin && "
+            "wget http://xrl.us/cpanm && "
+            "chmod +x cpanm && "
+            "locallib_LATEST=` curl -s ftp://ftp.cpan.org/pub/CPAN/authors/id/A/AP/APEIRON/ | awk '{{print $9}}' | grep --perl-regexp --ignore-case --only-matching \"local-lib.*.gz\" "
+            " | sort --ignore-case --version-sort  | tail -1` && "
+            "wget ftp://ftp.cpan.org/pub/CPAN/authors//id/A/AP/APEIRON/${{locallib_LATEST}} && "
+            "tar -xvzf ${{locallib_LATEST}} && "
+            "cd $(basename `echo ${{locallib_LATEST}}` .tar.gz) && "
+            "perl Makefile.PL --bootstrap && "
+            "make test && make install && make clean && "
+            "echo 'eval $(perl -I$HOME/perl5/lib/perl5 -Mlocal::lib)' >> ~/.bashrc && "
+            "source ~/.bashrc"
+
+# Install necessary Perl libraries
+rule perl_libs:
+    input: rules.perl_installation.output
+    output: CONFIG["base"]["perl_install"] + "lib/done"
+    run:
+        for lib in CONFIG["base"]["perl_libs"]:
+            shell(CONFIG["base"]["perl_install"] + "bin/cpanm --skip-satisfied " + lib)
+        shell("touch " + CONFIG["base"]["perl_install"] + "lib/done")
+
+#  Download and install Maker
+# TODO : Fix output handling, this is ugly
+
+rule maker_installation:
+    input:
+        rules.repeatmasker_installation.output,
+        rules.blast_plus_installation.output,
+        rules.snap_installation.output,
+        rules.exonerate_installation.output,
+        rules.augustus_installation.output,
+        rules.perl_libs.output
+    output: CONFIG["base"]["maker_installation_dir"]+"maker/bin/maker"
+    shell:
+        "TEMPDIR=`mktemp -d`;"
+        "cd $TEMPDIR;"
+        "wget"+CONFIG['maker_installation']['wget_options']+CONFIG['maker_installation']['maker_URL']+" && "
+        "tar xzf maker* && "
+        "rm maker*.tgz && "
+        "touch maker && "
+        "cp --recursive maker "+CONFIG["base"]["maker_installation_dir"] +" && "
+        "cd / && rm -rf $TEMPDIR;"
+        "cd "+CONFIG["base"]["maker_installation_dir"] +"maker/src && source " + CONFIG['base']['maker_bashrc'] + " && "
+        "perl Build.PL &&"
+        "./Build install"
+
+""" create the maker_bopts.ctl file """
+rule maker_bopts:
+    input: rules.maker_installation.output
+    params : configured = read_maker_opts_ctl("maker_bopts", "maker_bopts.ctl.conf")
+    output: "{working_dir}/maker_bopts.ctl"
+    shell:
+        'cd {working_dir} && '
+        '{input} -BOPTS && '
+        'echo -e "{params.configured}" | grep -v "\[maker\]" > {output}'
+
+""" create the maker_opts.ctl file """
+rule maker_opts:
+    input: rules.maker_installation.output
+    params : configured = read_maker_opts_ctl("maker_opts", "maker_opts.ctl.conf")
+    output: "{working_dir}/maker_opts.ctl"
+    shell:
+        'cd {working_dir} && '
+        '{input} -OPTS && '
+        'echo -e "{params.configured}" | grep -v "\[maker\]" > {output}'
+
+""" create the maker_exe.ctl file """
+rule maker_exe:
+    input: rules.maker_installation.output
+    params : configured = read_maker_opts_ctl("maker_exe", "maker_exe.ctl.conf")
+    output: "{working_dir}/maker_exe.ctl"
+    shell:
+        'cd {working_dir} && '
+        '{input} -EXE && '
+        'echo -e "{params.configured}" | grep -v "\[maker\]" > {output}'
+
+"""" rule to run maker based on the given configuration """
+rule maker:
+    input:
+        rules.maker_bopts.output,
+        rules.maker_opts.output,
+        rules.maker_exe.output,
+        MAKER=rules.maker_installation.output
+    output: "{working_dir}/maker_done.txt"
+    shell: 'cd {working_dir} && '
+           "source " + CONFIG['base']['maker_bashrc'] + " && "
+           '{input.MAKER} &&'
+           'touch {working_dir}/maker_done.txt'
+
+# Rule to concatenate all generated GFFs
+rule concatenate_gffs:
+    input: rules.maker.output
+    output: "{working_dir}/concatenated.gff"
+    shell: 'cd {working_dir} && '
+           "MAKER_OUTPUT=`find . -type d -wholename '*maker.output'` && "
+           "MAKER_PREFIX=`basename $MAKER_OUTPUT .maker.output` && "
+           "touch concatenated.gff && "
+           "find $MAKER_OUTPUT -maxdepth 5 -type f -iname '*gff' | xargs cat >> concatenated.gff "
+
+rule copy_gffs:
+    input: rules.maker.output
+    output: "{working_dir}/gffs"
+    shell: 'cd {working_dir} && '
+            "mkdir -p gffs && "
+            "MAKER_OUTPUT=`find . -type d -wholename '*maker.output'` && "
+            "MAKER_PREFIX=`basename $MAKER_OUTPUT .maker.output` && "
+            "find $MAKER_OUTPUT -maxdepth 5 -type f -iname '*gff' | xargs -I{} cp {} gffs"
+
+
+# Get all predicted proteins:
+rule get_predicted_proteins:
+    input: rules.maker.output
+    output: "{working_dir}/predicted_proteins.faa"
+    shell: "cd {working_dir} && "
+        "MAKER_OUTPUT=`find . -type d -wholename '*maker.output'` && "
+        "touch  predicted_proteins.faa && "
+        "find $MAKER_OUTPUT -type f -iname '*maker.proteins.fasta' | xargs cat >> predicted_proteins.faa"
+
+
+# pretty-print names from maker prediction
+rule create_id_mapping_file:
+    input: rules.concatenate_gffs.output
+    output: "{working_dir}/ids.map"
+    shell: "cd {working_dir} && "
+        "" + CONFIG['base']['maker_perl'] + "maker_map_ids --prefix '" + CONFIG['output']['protein_prefix'] + "' --justify 8 concatenated.gff > ids.map"
+
+rule rename_ids_gff:
+    input: rules.create_id_mapping_file.output,
+        rules.copy_gffs.output,
+        gff = glob_wildcards("{working_dir}/gffs/{gff}.gff")
+
+    output: "{working_dir}/gffs/renamed{gff}.txt"
+    shell: "cd {working_dir} && "
+        "" + CONFIG['base']['maker_perl'] + "map_gff_ids ids.map {input.gff}.gff"
+
+
+#rule rename_proteins:
+#    input: rules.id_mapping_file,
+#        rules.get_predicted_proteins
+
+rule install_uniprot:
+    output: "{working_dir}/uniprot"
+    shell:
+        "source " + CONFIG['base']['maker_bashrc'] + " && "
+        "TEMPDIR=/tmp/VLPB_maker/uniprot && "
+        "cd $TEMPDIR && "
+        "lftp -e 'mirror --parallel=4 --continue --use-pget=15 --no-recursion --verbose --dereference --exclude-glob='*.xml.gz' "+CONFIG['jbrowse_installation']['uniprot_url']+" && "
+        "gunzip -vk uniref100.fasta.gz && "
+        'TITLE="UniRef100 - "`cat uniref100.release_note | grep Release | sed \'s/^[ \\t]*//\'` && '
+        'makeblastdb -in uniref100.fasta -dbtype prot -out uniref -title "$TITLE" -parse_seqids && '
+        "mkdir -p {output} && "
+        "mv -v * {output} && "
+        #"cd / && rm -rv $TEMPDIR;"

@@ -1,0 +1,93 @@
+{
+	"base":{
+		"working_dir":"{base_dir}TEMP_MAKER",
+		"maker_dir":"{base_dir}bin/maker/bin/",
+		"maker_installation_dir":"{base_dir}bin/",
+		"maker_helpers_dir":"{base_dir}{maker_exe}",
+		"maker_bashrc":"{base_dir}{maker_exe}maker.bashrc",
+		"maker_perl":"{base_dir}bin/maker/src/",
+		"perl_install":"{home_dir}perl5/",
+		"perl_libs" : ["BioPerl", "DBI", "Error", "Error::Simple", "File::NFSLock", "File::Which", "Inline", "Perl::Unsafe::Signals", "Proc::Simple",
+						"URI::Escape", "Bit::Vector", "Inline::C", "PerlIO::gzip", "forks", "forks::shared", "IO::All", "IO::Prompt", "DBD::SQLite"]
+
+	},
+	"output":{
+			"protein_prefix":"PRI_"
+	},
+	"maker_opts":{
+		"genome":"{base_dir}data/dpp_contig.fasta",
+		"organism_type":"eukaryotic",
+		"est": "{base_dir}data/dpp_est.fasta",
+		"protein": "{base_dir}data/dpp_protein.fasta",
+		"repeat_protein": "{base_dir}bin/maker/data/te_proteins.fasta",
+		"model_org": "all",
+		"snaphmm": "{base_dir}{maker_exe}snap/HMM/D.melanogaster.hmm",
+		"augustus_species":"nasonia",
+		"est2genome":"1",
+		"protein2genome":"1",
+		"cpus":"8"
+	},
+	"maker_bopts":{
+		"blast_type":"ncbi+"
+	},
+	"maker_exe": {
+		"makeblastdb":"{base_dir}{maker_exe}blast+/bin/makeblastdb",
+		"blastn":"{base_dir}{maker_exe}blast+/bin/blastn",
+		"blastx":"{base_dir}{maker_exe}blast+/bin/blastx",
+		"tblastx":"{base_dir}{maker_exe}blast+/bin/tblastx",
+		"RepeatMasker":"{base_dir}{maker_exe}repeatmasker/RepeatMasker",
+		"exonerate":"{base_dir}{maker_exe}exonerate/bin/exonerate",
+		"snap":"{base_dir}{maker_exe}snap/snap",
+		"augustus":"{base_dir}{maker_exe}augustus/bin/augustus"
+
+	},
+	"maker_installation": {
+		"maker_URL":                        "{web_host}maker_test.nobackup/maker-2.31.6.tgz",
+		"version":"2.31.6",
+		"wget_options":" -c --proxy=off --no-verbose ",
+		"augustus_URL":                     "{web_host}maker_test.nobackup/augustus.2.5.5.tar.gz",
+		"exonerate_URL":                    "{web_host}maker_test.nobackup/exonerate-2.2.0-x86_64.tar.gz",
+		"snap_URL":                         "{web_host}maker_test.nobackup/snap-2013-11-29.tar.gz",
+		"trf_URL":                          "{web_host}maker_test.nobackup/trf407b.linux64",
+		"blast+_URL":                       "{web_host}maker_test.nobackup/ncbi-blast-2.2.29+-x64-linux.tar.gz",
+		"rmblast_URL":                      "{web_host}maker_test.nobackup/ncbi-rmblastn-2.2.28-x64-linux.tar.gz {web_host}maker_test.nobackup/ncbi-blast-2.2.28+-x64-linux.tar.gz",
+		"repeatmasker_URL":                 "{web_host}maker_test.nobackup/RepeatMasker-open-4-0-5.tar.gz",
+		"repeatmaskerlibraries_URL":        "{web_host}repbase.nobackup/repeatmaskerlibraries-20140131.tar.gz",
+		"repeatmaskerlibraries_URL_netrc":  "{home_dir}/.netrc",
+		"recon_URL":						"{web_host}maker_test.nobackup/RECON-1.08.tar.gz",
+		"repeatscout_URL":					"{web_host}maker_test.nobackup/RepeatScout-1.0.5.tar.gz",
+		"repeatmodeler_URL":				"{web_host}maker_test.nobackup/RepeatModeler-open-1-0-8.tar.gz"
+	},
+		"maker_installation_production": {
+		"maker_URL":"{web_host}maker-2.31.6.tgz",
+		"version":"2.31.6",
+		"wget_options":" -c --proxy=off ",
+		"augustus_URL":"http://augustus.gobics.de/binaries/augustus.2.5.5.tar.gz",
+		"exonerate_URL":"http://www.ebi.ac.uk/~guy/exonerate/exonerate-2.2.0-x86_64.tar.gz",
+		"snap_URL":"http://korflab.ucdavis.edu/Software/snap-2013-11-29.tar.gz",
+		"trf_URL":"http://tandem.bu.edu/trf/downloads/trf407b.linux64",
+		"blast+_URL": "ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/2.2.29/ncbi-blast-2.2.29+-x64-linux.tar.gz",
+		"rmblast_URL": "ftp://ftp.ncbi.nlm.nih.gov/blast/executables/rmblast/2.2.28/ncbi-rmblastn-2.2.28-x64-linux.tar.gz ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/2.2.28/ncbi-blast-2.2.28+-x64-linux.tar.gz",
+		"repeatmasker_URL":"http://www.repeatmasker.org/RepeatMasker-open-4-0-5.tar.gz",
+		"repeatmaskerlibraries_URL":"http://assembly.ab.wurnet.nl/~jvh/repbase/repeatmaskerlibraries-20140131.tar.gz",
+		"repeatmaskerlibraries_URL_org":"http://www.girinst.org/server/RepBase/protected/repeatmaskerlibraries/repeatmaskerlibraries-20140131.tar.gz",
+		"repeatmaskerlibraries_URL_netrc":"{home_dir}/.netrc",
+		"recon_URL":"http://www.repeatmasker.org/RECON-1.08.tar.gz",
+		"repeatscout_URL":"http://repeatscout.bioprojects.org/RepeatScout-1.0.5.tar.gz",
+		"repeatmodeler_URL":"http://www.repeatmasker.org/RepeatModeler-open-1-0-8.tar.gz"
+	},
+	"jbrowse_installation":{
+	    "jbrowse_url":                      "{web_host}JBrowse-1.11.5.zip",
+	    "interproscan_url":                 "{web_host}interproscan-5.7-48.0-64-bit.tar.gz",
+	    "panther_url":                      "{web_host}panther-data-9.0.tar.gz",
+	    "lookup_service_url":               "{web_host}lookup_service_5.6-48.0.tar.gz",
+	    "uniprot_url":                      "{web_host}uniref100/"
+	},
+	"jbrowse_installation_production":{
+	    "jbrowse_url":"http://jbrowse.org/releases/JBrowse-1.11.5.zip",
+	    "interproscan_url":"ftp://ftp.ebi.ac.uk/pub/software/unix/iprscan/5/5.7-48.0/interproscan-5.7-48.0-64-bit.tar.gz",
+	    "panther_url":"ftp://ftp.ebi.ac.uk/pub/software/unix/iprscan/5/data/panther-data-9.0.tar.gz",
+	    "lookup_service_url":"ftp://ftp.ebi.ac.uk/pub/software/unix/iprscan/5/lookup_service/lookup_service_5.6-48.0.tar.gz",
+	    "uniprot_url":"ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/uniref/uniref100/"
+	}
+}
