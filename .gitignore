@@ -1,3 +1,8 @@
+# Annotation stuff :
+data
+TEMP_MAKER
+bin
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
