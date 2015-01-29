@@ -1,9 +1,10 @@
 {
+    "default_threads":"999",
     "allpaths":{
         "preparation":{
-            "optionalOpts": ""
+            "optionalOpts": "PLOIDY=2 OVERWRITE=1"
         },
-        "optionalOpts": "FF_MAX_STRETCH=5"
+        "optionalOpts": "FF_MAX_STRETCH=5 OVERWRITE=TRUE"
     },
     "samples": {
         "Staphylococcus aureus (SRS004751,SRS004751)": {

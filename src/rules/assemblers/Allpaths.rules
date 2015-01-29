@@ -77,17 +77,17 @@ rule prepareAllpaths:
     params:
         optionalOpts = CONFIG["allpaths"]["preparation"]["optionalOpts"]
     shell:
-        "PrepareAllPathsInputs.pl {params.optionalOpts} DATA_DIR=`pwd`/assembly/assembly/ IN_GROUPS_CSV={input.groupsCsv} IN_LIBS_CSV={input.libsCsv} PLOIDY=2 OVERWRITE=1"
+        "PrepareAllPathsInputs.pl {params.optionalOpts} DATA_DIR=`pwd`/assembly/assembly/ IN_GROUPS_CSV={input.groupsCsv} IN_LIBS_CSV={input.libsCsv}"
 
 rule allpaths:
     input: rules.prepareAllpaths.output
     output:
         contigs = "assembly/assembly/assembly/ASSEMBLIES/assembly/final.contigs.fasta",
         scaffolds = "assembly/assembly/assembly/ASSEMBLIES/assembly/final.assembly.fasta"
-    threads: 999
+    threads: CONFIG["default_threads"]
     version: ALLPATHS_VERSION
     shell:
-        "RunAllPathsLG PRE=./ REFERENCE_NAME=assembly DATA_SUBDIR=assembly RUN=assembly SUBDIR=assembly OVERWRITE=TRUE THREADS={threads}"
+        "RunAllPathsLG PRE=./ REFERENCE_NAME=assembly DATA_SUBDIR=assembly RUN=assembly SUBDIR=assembly THREADS={threads}"
 
 rule allpathsCleanup:
     input:
