@@ -3,6 +3,7 @@
 #############
 
 import os, subprocess
+import configparser
 from Maker import *
 
 """ use this rule to clean-up maker settings """
@@ -20,97 +21,105 @@ rule clean_perl:
 
 # Download and install Augustus
 rule augustus_installation:
-    output: CONFIG["base"]["maker_helpers_dir"] + 'augustus'
+    output: CONFIG["executables"]["augustus"]
+    params: dir = strip_path_level(CONFIG["executables"]["augustus"],2)
     shell:
         "TEMPDIR=`mktemp -d`;"
         "cd $TEMPDIR;"
-        "wget"+CONFIG['maker_installation']['wget_options']+CONFIG['maker_installation']['augustus_URL']+";"
+        "wget"+CONFIG['executable_sources']['wget_options']+CONFIG['executable_sources']['augustus_URL']+";"
         "tar xzf augustus*;"
         "rm *.tar.*;"
-        "mv augustus* {output};"
+        "mv  augustus*/* {params.dir};"
+        "rmdir augustus*;"
         "touch {output} && "
-        "echo 'export PATH='`readlink -f {output}/bin/`':$PATH' >>" + CONFIG['base']['maker_bashrc'] + ";"
-        "echo 'export AUGUSTUS_CONFIG_PATH='`readlink -f {output}/config/`  >>"+ CONFIG['base']['maker_bashrc'] + ";"
+        "echo 'export PATH='`readlink -f {params.dir}/bin/`':$PATH' >>" + CONFIG['base']['maker_bashrc'] + ";"
+        "echo 'export AUGUSTUS_CONFIG_PATH='`readlink -f {params.dir}/config/`  >>"+ CONFIG['base']['maker_bashrc'] + ";"
         "cd / && rmdir $TEMPDIR;"
 
 # Download and install Exonerate
 rule exonerate_installation:
-    output: CONFIG["base"]["maker_helpers_dir"] + 'exonerate'
+    output: CONFIG["executables"]["exonerate"]
+    params: dir = strip_path_level(CONFIG["executables"]["exonerate"],2)
     shell:
         "TEMPDIR=`mktemp -d`;"
         "cd $TEMPDIR;"
-        "wget"+CONFIG['maker_installation']['wget_options']+CONFIG['maker_installation']['exonerate_URL']+";"
+        "wget"+CONFIG['executable_sources']['wget_options']+CONFIG['executable_sources']['exonerate_URL']+";"
         "tar xzf exonerate*;"
         "rm *.tar.*;"
-        "mv exonerate* {output};"
+        "mv exonerate*/* {params.dir};"
+        "rmdir exonerate*;"
         "touch {output} && "
-        "echo 'export PATH='`readlink -f {output}/bin/`':$PATH' >>" + CONFIG['base']['maker_bashrc'] + ";"
+        "echo 'export PATH='`readlink -f {params.dir}/bin/`':$PATH' >>" + CONFIG['base']['maker_bashrc'] + ";"
         "cd / && rmdir $TEMPDIR;"
 
 # Download and install SNAP
 rule snap_installation:
-    output: CONFIG["base"]["maker_helpers_dir"] + 'snap'
+    output: CONFIG["executables"]["snap"]
+    params: dir = strip_path_level(CONFIG["executables"]["snap"],1)
     shell:
         "TEMPDIR=`mktemp -d`;"
         "cd $TEMPDIR;"
-        "wget"+CONFIG['maker_installation']['wget_options']+CONFIG['maker_installation']['snap_URL']+";"
+        "wget"+CONFIG['executable_sources']['wget_options']+CONFIG['executable_sources']['snap_URL']+";"
         "tar xzf snap*;"
         "rm *.tar.*;"
-        "mv snap* {output};"
+        "mv snap*/* {params.dir};"
         "touch {output} && "
-        "cd {output} && make;"
-        "echo 'export ZOE='`readlink -f {output}` >>" + CONFIG['base']['maker_bashrc'] + ";"
-        "echo 'export PATH='`readlink -f {output}`':$PATH' >>" + CONFIG['base']['maker_bashrc'] + ";"
-        "cd / && rmdir $TEMPDIR;"
+        "cd {params.dir} && make;"
+        "echo 'export ZOE='`readlink -f {params.dir}` >>" + CONFIG['base']['maker_bashrc'] + ";"
+        "echo 'export PATH='`readlink -f {params.dir}`':$PATH' >>" + CONFIG['base']['maker_bashrc'] + ";"
+        "cd / && rm -rf $TEMPDIR;"
 
 # Download and install TRF
 rule trf_installation:
-    output: CONFIG["base"]["maker_helpers_dir"] + 'trf/trf'
+    output: CONFIG["executables"]["trf"]
+    params: dir = strip_path_level(CONFIG["executables"]["trf"],1)
     shell:
-        "mkdir -p `dirname {output}` && "
-        "cd `dirname {output}` && "
-        "wget"+CONFIG['maker_installation']['wget_options']+CONFIG['maker_installation']['trf_URL']+" && "
-        "mv trf* trf && "
-        "chmod ugo+x trf && "
+        "mkdir -p {params.dir} && "
+        "cd {params.dir} && "
+        "wget"+CONFIG['executable_sources']['wget_options']+CONFIG['executable_sources']['trf_URL']+" && "
+        "mv trf* {output} && "
+        "chmod a+x {output} && "
         "touch {output} && "
-        "echo 'export PATH='`readlink -f {output}`':$PATH' >>" + CONFIG['base']['maker_bashrc'] + ";"
+        "echo 'export PATH='`readlink -f {params.dir}`':$PATH' >>" + CONFIG['base']['maker_bashrc'] + ";"
 
 # Download and install BLAST+
 rule blast_plus_installation:
-    output: CONFIG["base"]["maker_helpers_dir"] + 'blast+'
+    output: CONFIG["executables"]["blastn"]
+    params: dir = strip_path_level(CONFIG["executables"]["blastn"],2)
     shell:
         "TEMPDIR=`mktemp -d`;"
         "cd $TEMPDIR;"
-        "wget"+CONFIG['maker_installation']['wget_options']+CONFIG['maker_installation']['blast+_URL']+" && "
+        "wget"+CONFIG['executable_sources']['wget_options']+CONFIG['executable_sources']['blast+_URL']+" && "
         "tar xzf ncbi* && "
         "rm *.tar.* && "
-        "mv ncbi* {output} && "
+        "mv ncbi*/* {params.dir} && rmdir ncbi* && "
         "touch {output} && "
-        "echo 'export PATH='`readlink -f {output}/bin`':$PATH' >>" + CONFIG['base']['maker_bashrc'] + ";"
+        "echo 'export PATH='`readlink -f {params.dir}/bin`':$PATH' >>" + CONFIG['base']['maker_bashrc'] + ";"
         "cd / && rmdir $TEMPDIR;"
 
 # Download and install RMBLAST plus corresponding BLAST+
 rule rmblast_installation:
-    output: CONFIG["base"]["maker_helpers_dir"] + 'rmblast'
+    output: CONFIG["executables"]["rmblast"]
+    params: dir = strip_path_level(CONFIG["executables"]["rmblast"],2)
     shell:
         "TEMPDIR=`mktemp -d`;"
         "cd $TEMPDIR;"
-        "wget"+CONFIG['maker_installation']['wget_options']+CONFIG['maker_installation']['rmblast_URL']+" && "
+        "wget"+CONFIG['executable_sources']['wget_options']+CONFIG['executable_sources']['rmblast_URL']+" && "
         "tar xzf ncbi-blast* && "
         "tar xzf ncbi-rmblast* && "
         "rm  *.tar.* && "
         "cp -R ncbi-rmblast*/* ncbi-blast*/ &&"
-        "mv  ncbi-blast* {output} && "
+        "mv  ncbi-blast*/* {params.dir} && "
         "touch {output} && "
         "cd / && rm -rf $TEMPDIR;"
 
 # Download and install GIRI RepBase
 rule repbase_installation:
-    output: CONFIG["base"]["maker_helpers_dir"] + 'repbase'
+    output: CONFIG["executables"]["repbase"] 
     shell:
         "TEMPDIR=`mktemp -d`;"
         "cd $TEMPDIR && "
-        "curl --remote-name --anyauth --netrc-file "+CONFIG['maker_installation']['repeatmaskerlibraries_URL_netrc']+" "+CONFIG['maker_installation']['repeatmaskerlibraries_URL']+" && "
+        "curl --remote-name --anyauth --netrc-file "+CONFIG['executable_sources']['repeatmaskerlibraries_URL_netrc']+" "+CONFIG['executable_sources']['repeatmaskerlibraries_URL']+" && "
         "tar xzf repeatmaskerlibraries* && "
         "mv  Libraries {output} && "
         "mv  repeatmaskerlibraries* {output} && "
@@ -123,25 +132,26 @@ rule repeatmasker_installation:
         REPBASE=rules.repbase_installation.output,
         RMBLAST=rules.rmblast_installation.output,
         TRF=rules.trf_installation.output
-    output: CONFIG["base"]["maker_helpers_dir"] + 'repeatmasker'
+    output: CONFIG["executables"]["RepeatMasker"]
+    params: dir = strip_path_level(CONFIG["executables"]["RepeatMasker"],1)
     shell:
         "TEMPDIR=`mktemp -d`;"
         "cd $TEMPDIR;"
-        "wget"+CONFIG['maker_installation']['wget_options']+CONFIG['maker_installation']['repeatmasker_URL']+" && "
+        "wget"+CONFIG['executable_sources']['wget_options']+CONFIG['executable_sources']['repeatmasker_URL']+" && "
         "tar xzf RepeatMasker-open-* && "
         "rm *.tar.* && "
-        "mv RepeatMasker* {output} && "
-        "cd {output} && grep -l -r '#!/u1' * | xargs -I '%' sed -i 's|/u1/local/bin/perl|/usr/bin/env perl|' % && "
+        "mv RepeatMasker*/* {params.dir} && "
+        "cd {params.dir} && grep -l -r '#!/u1' * | xargs -I '%' sed -i 's|/u1/local/bin/perl|/usr/bin/env perl|' % && "
         "cp RepeatMaskerConfig.tmpl RepeatMaskerConfig.pm && chmod -x RepeatMaskerConfig.pm && "
         'sed -i \'s|DEFAULT_SEARCH_ENGINE\s\+=.*|DEFAULT_SEARCH_ENGINE = "ncbi";|\' RepeatMaskerConfig.pm && '
         'sed -i \'s|TRF_PRGM\s\+=.*|TRF_PRGM = "' + "{input.TRF}" + '";|\' RepeatMaskerConfig.pm && '
         'sed -i \'s|RMBLAST_DIR\s\+=.*|RMBLAST_DIR = "' + "{input.RMBLAST}" + '/bin";|\' RepeatMaskerConfig.pm && '
-        "cp  {input.REPBASE}/RepeatMaskerLib.embl Libraries/ ; "
+        "cp  {input.REPBASE}RepeatMaskerLib.embl Libraries/ ; "
         "touch {output} && "
-        "echo 'export PATH='`readlink -f {output}`':$PATH' >>" + CONFIG['base']['maker_bashrc'] + " && "
+        "echo 'export PATH='`readlink -f {params.dir}`':$PATH' >>" + CONFIG['base']['maker_bashrc'] + " && "
         "cd / && rm -rf $TEMPDIR;"
 
-# Create local Perl library
+# Create local Perl library 
 rule perl_installation:
     output: CONFIG["base"]["perl_install"] + "bin/cpanm"
     shell: "mkdir -p " + CONFIG["base"]["perl_install"] + "bin && "
@@ -178,17 +188,18 @@ rule maker_installation:
         rules.exonerate_installation.output,
         rules.augustus_installation.output,
         rules.perl_libs.output
-    output: CONFIG["base"]["maker_installation_dir"]+"maker/bin/maker"
+    params: dir = strip_path_level(CONFIG["executables"]["maker"],2)
+    output: CONFIG["executables"]["maker"]
     shell:
         "TEMPDIR=`mktemp -d`;"
         "cd $TEMPDIR;"
-        "wget"+CONFIG['maker_installation']['wget_options']+CONFIG['maker_installation']['maker_URL']+" && "
+        "wget"+CONFIG['executable_sources']['wget_options']+CONFIG['executable_sources']['maker_URL']+" && "
         "tar xzf maker* && "
         "rm maker*.tgz && "
         "touch maker && "
-        "cp --recursive maker "+CONFIG["base"]["maker_installation_dir"] +" && "
+        "cp --recursive maker {params.dir} && "
         "cd / && rm -rf $TEMPDIR;"
-        "cd "+CONFIG["base"]["maker_installation_dir"] +"maker/src && source " + CONFIG['base']['maker_bashrc'] + " && "
+        "cd {params.dir}/maker/src && source " + CONFIG['base']['maker_bashrc'] + " && "
         "perl Build.PL &&"
         "./Build install"
 
@@ -215,7 +226,7 @@ rule maker_opts:
 """ create the maker_exe.ctl file """
 rule maker_exe:
     input: rules.maker_installation.output
-    params : configured = read_maker_opts_ctl(CONFIG["maker_exe"], "maker_exe.ctl.conf")
+    params : configured = read_maker_opts_ctl(CONFIG["executables"], "maker_exe.ctl.conf")
     output: "{working_dir}/maker_exe.ctl"
     shell:
         'cd {working_dir} && '

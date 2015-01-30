@@ -1,6 +1,6 @@
 {
 	"base_dir": "/tmp/",
-	"maker_exe": "bin/maker_helpers",
+	"executables": "bin/maker_helpers/",
 	"web_host":"http://assembly.ab.wurnet.nl/~jvh/",
 	"home_dir":"/home/sven/"
 }

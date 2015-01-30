@@ -1,4 +1,8 @@
 """ This function takes the maker configuration file ctl and overrides settings if found in the relevant section of config.json"""
+import os.path
+import configparser
+import io
+
 def read_maker_opts_ctl(CONFIG, ctl):
     config = configparser.RawConfigParser()
     config.optionxform = str # Return options as they are, do not convert to lowercase
@@ -14,3 +18,9 @@ def read_maker_opts_ctl(CONFIG, ctl):
     output = io.StringIO()
     config.write(output,space_around_delimiters=False)
     return output.getvalue()
+
+def strip_path_level(path, level = 0):
+    head = path
+    for i in range(0, level):
+        (head, tail) = os.path.split(head)
+    return head
