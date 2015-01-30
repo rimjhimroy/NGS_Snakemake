@@ -1,3 +1,10 @@
+#############
+##  Maker  ##
+#############
+
+import os, subprocess
+from Maker import *
+
 """ use this rule to clean-up maker settings """
 rule clean_maker:
     shell: "rm -f {working_dir}/maker_*.ctl {working_dir}/maker_done.txt"
@@ -188,7 +195,7 @@ rule maker_installation:
 """ create the maker_bopts.ctl file """
 rule maker_bopts:
     input: rules.maker_installation.output
-    params : configured = read_maker_opts_ctl("maker_bopts", "maker_bopts.ctl.conf")
+    params : configured = read_maker_opts_ctl(CONFIG["maker_bopts"], "maker_bopts.ctl.conf")
     output: "{working_dir}/maker_bopts.ctl"
     shell:
         'cd {working_dir} && '
@@ -198,7 +205,7 @@ rule maker_bopts:
 """ create the maker_opts.ctl file """
 rule maker_opts:
     input: rules.maker_installation.output
-    params : configured = read_maker_opts_ctl("maker_opts", "maker_opts.ctl.conf")
+    params : configured = read_maker_opts_ctl(CONFIG["maker_opts"], "maker_opts.ctl.conf")
     output: "{working_dir}/maker_opts.ctl"
     shell:
         'cd {working_dir} && '
@@ -208,7 +215,7 @@ rule maker_opts:
 """ create the maker_exe.ctl file """
 rule maker_exe:
     input: rules.maker_installation.output
-    params : configured = read_maker_opts_ctl("maker_exe", "maker_exe.ctl.conf")
+    params : configured = read_maker_opts_ctl(CONFIG["maker_exe"], "maker_exe.ctl.conf")
     output: "{working_dir}/maker_exe.ctl"
     shell:
         'cd {working_dir} && '
