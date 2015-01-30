@@ -115,7 +115,7 @@ rule rmblast_installation:
 
 # Download and install GIRI RepBase
 rule repbase_installation:
-    output: CONFIG["executables"]["repbase"] 
+    output: CONFIG["executables"]["repbase"]
     shell:
         "TEMPDIR=`mktemp -d`;"
         "cd $TEMPDIR && "
@@ -146,27 +146,29 @@ rule repeatmasker_installation:
         'sed -i \'s|DEFAULT_SEARCH_ENGINE\s\+=.*|DEFAULT_SEARCH_ENGINE = "ncbi";|\' RepeatMaskerConfig.pm && '
         'sed -i \'s|TRF_PRGM\s\+=.*|TRF_PRGM = "' + "{input.TRF}" + '";|\' RepeatMaskerConfig.pm && '
         'sed -i \'s|RMBLAST_DIR\s\+=.*|RMBLAST_DIR = "' + "{input.RMBLAST}" + '/bin";|\' RepeatMaskerConfig.pm && '
-        "cp  {input.REPBASE}RepeatMaskerLib.embl Libraries/ ; "
+        "cp {input.REPBASE}RepeatMaskerLib.embl Libraries/ ; "
         "touch {output} && "
         "echo 'export PATH='`readlink -f {params.dir}`':$PATH' >>" + CONFIG['base']['maker_bashrc'] + " && "
         "cd / && rm -rf $TEMPDIR;"
 
-# Create local Perl library 
+# Create local Perl library
 rule perl_installation:
     output: CONFIG["base"]["perl_install"] + "bin/cpanm"
-    shell: "mkdir -p " + CONFIG["base"]["perl_install"] + "bin && "
-            "cd "+ CONFIG["base"]["perl_install"] + "bin && "
-            "wget http://xrl.us/cpanm && "
-            "chmod +x cpanm && "
-            "locallib_LATEST=` curl -s ftp://ftp.cpan.org/pub/CPAN/authors/id/A/AP/APEIRON/ | awk '{{print $9}}' | grep --perl-regexp --ignore-case --only-matching \"local-lib.*.gz\" "
-            " | sort --ignore-case --version-sort  | tail -1` && "
-            "wget ftp://ftp.cpan.org/pub/CPAN/authors//id/A/AP/APEIRON/${{locallib_LATEST}} && "
-            "tar -xvzf ${{locallib_LATEST}} && "
-            "cd $(basename `echo ${{locallib_LATEST}}` .tar.gz) && "
-            "perl Makefile.PL --bootstrap && "
-            "make test && make install && make clean && "
-            "echo 'eval $(perl -I$HOME/perl5/lib/perl5 -Mlocal::lib)' >> ~/.bashrc && "
-            "source ~/.bashrc"
+    shell:
+        "set -o nounset;"
+        "mkdir -p " + CONFIG["base"]["perl_install"] + "bin && "
+        "cd "+ CONFIG["base"]["perl_install"] + "bin && "
+        "wget http://xrl.us/cpanm && "
+        "chmod +x cpanm && "
+        "locallib_LATEST=` curl -s ftp://ftp.cpan.org/pub/CPAN/authors/id/A/AP/APEIRON/ | grep --perl-regexp --ignore-case --only-matching \"local-lib.*?.gz\" "
+        " | sort --ignore-case --version-sort  | tail -1` && "
+        "wget ftp://ftp.cpan.org/pub/CPAN/authors//id/A/AP/APEIRON/${{locallib_LATEST}} && "
+        "tar -xvzf ${{locallib_LATEST}} && "
+        "cd $(basename `echo ${{locallib_LATEST}}` .tar.gz) && "
+        "perl Makefile.PL --bootstrap && "
+        "make test && make install && make clean && "
+        "echo 'eval $(perl -I$HOME/perl5/lib/perl5 -Mlocal::lib)' >> ~/.bashrc && "
+        "source ~/.bashrc"
 
 # Install necessary Perl libraries
 rule perl_libs:
@@ -197,9 +199,9 @@ rule maker_installation:
         "tar xzf maker* && "
         "rm maker*.tgz && "
         "touch maker && "
-        "cp --recursive maker {params.dir} && "
+        "cp --recursive maker/* {params.dir} && "
         "cd / && rm -rf $TEMPDIR;"
-        "cd {params.dir}/maker/src && source " + CONFIG['base']['maker_bashrc'] + " && "
+        "cd {params.dir}/src && source " + CONFIG['base']['maker_bashrc'] + " && "
         "perl Build.PL &&"
         "./Build install"
 
