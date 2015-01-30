@@ -1,0 +1,65 @@
+"""
+Run the maker annotation pipeline
+"""
+
+import json, os, inspect
+import configparser
+import io
+
+# Get lib configuration
+# Set PYTHONPATH before running Snakemake :
+# export PYTHONPATH=$PYTHONPATH:/home/haars001/scratch/projects/VLPB/
+from SnakeMakeVlpb import VLPB_LIB_PATH
+
+ruleDir = VLPB_LIB_PATH + "rules/"
+
+# Include necessary rules
+include: ruleDir + "/annotation/Maker.rules"
+
+"""
+Recursive function to do a string format on each of the string values in the config.
+    Full replace on a JSON does not work: it uses '{}' for formatting, which results
+    in errors.
+"""
+def replace_paths_in_json(conf, paths):
+    for item in conf:
+        if isinstance(conf[item], str): #is it a string value?
+            conf[item] = conf[item].format(**paths) #use json to replace values
+        elif isinstance(conf[item], dict): # is this a json object (dict) ?
+            replace_paths_in_json(conf[item], paths) # parse object
+
+# Get the config file:
+with open("config.json") as conf:
+    with open("paths.json") as paths:
+        PATHS = json.load(paths)
+        CONFIG = json.load(conf)
+        replace_paths_in_json(CONFIG, PATHS)
+
+# Set some basic variables (snakemake doesn't always allow these calls directly in rules)
+working_dir = CONFIG['base']['working_dir']
+maker_out = ".".join(CONFIG["maker_opts"]["genome"].split(".")[:-1]) + ".output"
+
+""" This function takes the maker configuration file ctl and overrides settings if found in the relevant section of config.json"""
+def read_maker_opts_ctl(json_section, ctl):
+    config = configparser.RawConfigParser()
+    config.optionxform = str # Return options as they are, do not convert to lowercase
+    config.read(ctl)
+    # All settings are in the "maker" json_section
+    # Loop over all the settings
+    for c in config.items("maker"):
+        # Check for a matching entry in config.json
+        if c[0] in CONFIG[json_section]:
+            # Replace with new setting
+            config.set("maker", c[0], CONFIG[json_section][c[0]])
+    # Place the new configuration in a single string:
+    output = io.StringIO()
+    config.write(output,space_around_delimiters=False)
+    return output.getvalue()
+
+""" maker doesn't give proper output, so we need our own flag file"""
+rule all:
+    input: expand("{working_dir}/maker_done.txt", working_dir=working_dir),
+        expand("{working_dir}/predicted_proteins.faa", working_dir=working_dir),
+        expand("{working_dir}/concatenated.gff", working_dir=working_dir)
+        #expand("{working_dir}/gffs_renamed.txt", working_dir=working_dir)
+        #expand("{working_dir}/uniprot", working_dir=working_dir)
