@@ -6,13 +6,17 @@ import os, subprocess
 import configparser
 from Maker import *
 
+# Set some basic variables (snakemake doesn't always allow these calls directly in rules)
+maker_out = ".".join(CONFIG["maker_opts"]["genome"].split(".")[:-1]) + ".output"
+
+
 """ use this rule to clean-up maker settings """
 rule clean_maker:
-    shell: "rm -f {working_dir}/maker_*.ctl {working_dir}/maker_done.txt"
+    shell: "rm -f " + CONFIG['base']['working_dir'] + "/maker_*.ctl " + CONFIG['base']['working_dir'] + "/maker_done.txt"
 
 """ use this rule to clean-up all the data produced by maker """
 rule clean_data:
-    shell: "rm -rf {working_dir}/{maker_out} {working_dir}/concatenated.gff {working_dir}/predicted_proteins.faa {working_dir}/ids.map"
+    shell: "rm -rf " + CONFIG['base']['working_dir']
 
 rule clean_perl:
     shell: "rm -rf " + CONFIG["base"]["perl_install"]
@@ -133,7 +137,7 @@ rule repeatmasker_installation:
         RMBLAST=rules.rmblast_installation.output,
         TRF=rules.trf_installation.output
     output: CONFIG["executables"]["RepeatMasker"]
-    params: dir = strip_path_level(CONFIG["executables"]["RepeatMasker"],1)
+    params: dir = strip_path_level(CONFIG["executables"]["RepeatMasker"],1), RMBLAST = strip_path_level(CONFIG["executables"]["rmblast"],1)
     shell:
         "TEMPDIR=`mktemp -d`;"
         "cd $TEMPDIR;"
@@ -145,8 +149,8 @@ rule repeatmasker_installation:
         "cp RepeatMaskerConfig.tmpl RepeatMaskerConfig.pm && chmod -x RepeatMaskerConfig.pm && "
         'sed -i \'s|DEFAULT_SEARCH_ENGINE\s\+=.*|DEFAULT_SEARCH_ENGINE = "ncbi";|\' RepeatMaskerConfig.pm && '
         'sed -i \'s|TRF_PRGM\s\+=.*|TRF_PRGM = "' + "{input.TRF}" + '";|\' RepeatMaskerConfig.pm && '
-        'sed -i \'s|RMBLAST_DIR\s\+=.*|RMBLAST_DIR = "' + "{input.RMBLAST}" + '/bin";|\' RepeatMaskerConfig.pm && '
-        "cp {input.REPBASE}RepeatMaskerLib.embl Libraries/ ; "
+        'sed -i \'s|RMBLAST_DIR\s\+=.*|RMBLAST_DIR = "' + "{params.RMBLAST}" + '";|\' RepeatMaskerConfig.pm && '
+        "cp {input.REPBASE}Libraries/RepeatMaskerLib.embl Libraries/ ; "
         "touch {output} && "
         "echo 'export PATH='`readlink -f {params.dir}`':$PATH' >>" + CONFIG['base']['maker_bashrc'] + " && "
         "cd / && rm -rf $TEMPDIR;"
@@ -209,9 +213,9 @@ rule maker_installation:
 rule maker_bopts:
     input: rules.maker_installation.output
     params : configured = read_maker_opts_ctl(CONFIG["maker_bopts"], "maker_bopts.ctl.conf")
-    output: "{working_dir}/maker_bopts.ctl"
+    output: CONFIG['base']['working_dir'] + "/maker_bopts.ctl"
     shell:
-        'cd {working_dir} && '
+        'cd ' + CONFIG['base']['working_dir'] + ' && '
         '{input} -BOPTS && '
         'echo -e "{params.configured}" | grep -v "\[maker\]" > {output}'
 
@@ -219,9 +223,9 @@ rule maker_bopts:
 rule maker_opts:
     input: rules.maker_installation.output
     params : configured = read_maker_opts_ctl(CONFIG["maker_opts"], "maker_opts.ctl.conf")
-    output: "{working_dir}/maker_opts.ctl"
+    output: CONFIG['base']['working_dir'] + "/maker_opts.ctl"
     shell:
-        'cd {working_dir} && '
+        'cd ' + CONFIG['base']['working_dir'] + ' && '
         '{input} -OPTS && '
         'echo -e "{params.configured}" | grep -v "\[maker\]" > {output}'
 
@@ -229,9 +233,9 @@ rule maker_opts:
 rule maker_exe:
     input: rules.maker_installation.output
     params : configured = read_maker_opts_ctl(CONFIG["executables"], "maker_exe.ctl.conf")
-    output: "{working_dir}/maker_exe.ctl"
+    output: CONFIG['base']['working_dir']+ "/maker_exe.ctl"
     shell:
-        'cd {working_dir} && '
+        'cd ' + CONFIG['base']['working_dir'] + ' && '
         '{input} -EXE && '
         'echo -e "{params.configured}" | grep -v "\[maker\]" > {output}'
 
@@ -242,37 +246,35 @@ rule maker:
         rules.maker_opts.output,
         rules.maker_exe.output,
         MAKER=rules.maker_installation.output
-    output: "{working_dir}/maker_done.txt"
-    shell: 'cd {working_dir} && '
+    output: CONFIG['base']['working_dir'] + "/maker_done.txt"
+    shell: 'cd ' + CONFIG['base']['working_dir'] + ' && '
            "source " + CONFIG['base']['maker_bashrc'] + " && "
            '{input.MAKER} &&'
-           'touch {working_dir}/maker_done.txt'
-
-# Rule to concatenate all generated GFFs
-rule concatenate_gffs:
-    input: rules.maker.output
-    output: "{working_dir}/concatenated.gff"
-    shell: 'cd {working_dir} && '
-           "MAKER_OUTPUT=`find . -type d -wholename '*maker.output'` && "
-           "MAKER_PREFIX=`basename $MAKER_OUTPUT .maker.output` && "
-           "touch concatenated.gff && "
-           "find $MAKER_OUTPUT -maxdepth 5 -type f -iname '*gff' | xargs cat >> concatenated.gff "
+           'touch ' + CONFIG['base']['working_dir'] + '/maker_done.txt'
 
 rule copy_gffs:
     input: rules.maker.output
-    output: "{working_dir}/gffs"
-    shell: 'cd {working_dir} && '
-            "mkdir -p gffs && "
-            "MAKER_OUTPUT=`find . -type d -wholename '*maker.output'` && "
-            "MAKER_PREFIX=`basename $MAKER_OUTPUT .maker.output` && "
-            "find $MAKER_OUTPUT -maxdepth 5 -type f -iname '*gff' | xargs -I{} cp {} gffs"
+    output: CONFIG['base']['working_dir'] + "/gffs"
+    shell: 'cd ' + CONFIG['base']['working_dir'] + ' && '
+        "mkdir -p gffs && "
+        "MAKER_OUTPUT=`find . -type d -wholename '*maker.output'` && "
+        "MAKER_PREFIX=`basename $MAKER_OUTPUT .maker.output` && "
+        "find $MAKER_OUTPUT -maxdepth 5 -type f -iname '*gff' | xargs -I{{}} cp {{}} gffs"
+        
+# Rule to concatenate all generated GFFs
+rule concatenate_gffs:
+    input: GFFs = rules.copy_gffs.output
+    output: CONFIG['base']['working_dir'] + "/concatenated.gff"
+    shell: 'cd {input.GFFs} && '
+           "touch ../concatenated.gff && "
+           "ls *.gff | xargs cat >> ../concatenated.gff "
 
 
 # Get all predicted proteins:
 rule get_predicted_proteins:
     input: rules.maker.output
-    output: "{working_dir}/predicted_proteins.faa"
-    shell: "cd {working_dir} && "
+    output: CONFIG['base']['working_dir'] + "/predicted_proteins.faa"
+    shell: "cd " + CONFIG['base']['working_dir'] +  "  && "
         "MAKER_OUTPUT=`find . -type d -wholename '*maker.output'` && "
         "touch  predicted_proteins.faa && "
         "find $MAKER_OUTPUT -type f -iname '*maker.proteins.fasta' | xargs cat >> predicted_proteins.faa"
@@ -281,17 +283,17 @@ rule get_predicted_proteins:
 # pretty-print names from maker prediction
 rule create_id_mapping_file:
     input: rules.concatenate_gffs.output
-    output: "{working_dir}/ids.map"
-    shell: "cd {working_dir} && "
+    output: CONFIG['base']['working_dir'] + "/ids.map"
+    shell: "cd " +CONFIG['base']['working_dir']+ "  && "
         "" + CONFIG['base']['maker_perl'] + "maker_map_ids --prefix '" + CONFIG['output']['protein_prefix'] + "' --justify 8 concatenated.gff > ids.map"
 
 rule rename_ids_gff:
     input: rules.create_id_mapping_file.output,
         rules.copy_gffs.output,
-        gff = glob_wildcards("{working_dir}/gffs/{gff}.gff")
+        gff = glob_wildcards(CONFIG['base']['working_dir'] + "/gffs/{gff}.gff")
 
-    output: "{working_dir}/gffs/renamed{gff}.txt"
-    shell: "cd {working_dir} && "
+    output: CONFIG['base']['working_dir'] + "/gffs/renamed{gff}.txt"
+    shell: "cd " + CONFIG['base']['working_dir']+ " && "
         "" + CONFIG['base']['maker_perl'] + "map_gff_ids ids.map {input.gff}.gff"
 
 
@@ -300,15 +302,16 @@ rule rename_ids_gff:
 #        rules.get_predicted_proteins
 
 rule install_uniprot:
-    output: "{working_dir}/uniprot"
+    output: CONFIG["functional_annotation"]["uniprot"]
     shell:
         "source " + CONFIG['base']['maker_bashrc'] + " && "
-        "TEMPDIR=/tmp/VLPB_maker/uniprot && "
-        "cd $TEMPDIR && "
-        "lftp -e 'mirror --parallel=4 --continue --use-pget=15 --no-recursion --verbose --dereference --exclude-glob='*.xml.gz' "+CONFIG['jbrowse_installation']['uniprot_url']+" && "
+        "TEMPDIR=`mktemp -d`;"
+        "cd $TEMPDIR;"
+        #"lftp -e mirror --parallel=4 --continue --use-pget=15 --no-recursion --verbose --dereference --exclude-glob='*.xml.gz' "+CONFIG["functional_annotation"]["uniprot_url"]+" && "
+        "wget -m -R 'xml.gz' " + CONFIG["functional_annotation"]["uniprot_url"] + " && "  
         "gunzip -vk uniref100.fasta.gz && "
         'TITLE="UniRef100 - "`cat uniref100.release_note | grep Release | sed \'s/^[ \\t]*//\'` && '
-        'makeblastdb -in uniref100.fasta -dbtype prot -out uniref -title "$TITLE" -parse_seqids && '
+        CONFIG["executables"]['makeblastdb'] + ' -in uniref100.fasta -dbtype prot -out uniref -title "$TITLE" -parse_seqids && '
         "mkdir -p {output} && "
         "mv -v * {output} && "
-        #"cd / && rm -rv $TEMPDIR;"
+        "cd - && rm -rf $TEMPDIR;"

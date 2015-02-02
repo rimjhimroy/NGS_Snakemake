@@ -12,11 +12,11 @@
 			"protein_prefix":"PRI_"
 	},
 	"maker_opts":{
-		"genome":			"{base_dir}{executables}/maker/data/dpp_contig.fasta",
+		"genome":			"{base_dir}{executables}maker/data/dpp_contig.fasta",
 		"organism_type":	"eukaryotic",
-		"est":				"{base_dir}{executables}/maker/data/dpp_est.fasta",
-		"protein": 			"{base_dir}{executables}/maker/data/dpp_protein.fasta",
-		"repeat_protein": 	"{base_dir}bin/maker/data/te_proteins.fasta",
+		"est":				"{base_dir}{executables}maker/data/dpp_est.fasta",
+		"protein": 			"{base_dir}{executables}maker/data/dpp_protein.fasta",
+		"repeat_protein": 	"{base_dir}{executables}maker/data/te_proteins.fasta",
 		"model_org": 		"all",
 		"snaphmm": 			"{base_dir}{executables}snap/HMM/D.melanogaster.hmm",
 		"augustus_species":	"fly",
@@ -81,14 +81,17 @@
 	    "jbrowse_url":                      "{web_host}JBrowse-1.11.5.zip",
 	    "interproscan_url":                 "{web_host}interproscan-5.7-48.0-64-bit.tar.gz",
 	    "panther_url":                      "{web_host}panther-data-9.0.tar.gz",
-	    "lookup_service_url":               "{web_host}lookup_service_5.6-48.0.tar.gz",
-	    "uniprot_url":                      "{web_host}uniref100/"
+	    "lookup_service_url":               "{web_host}lookup_service_5.6-48.0.tar.gz"
 	},
 	"jbrowse_installation_production":{
 	    "jbrowse_url":"http://jbrowse.org/releases/JBrowse-1.11.5.zip",
 	    "interproscan_url":"ftp://ftp.ebi.ac.uk/pub/software/unix/iprscan/5/5.7-48.0/interproscan-5.7-48.0-64-bit.tar.gz",
 	    "panther_url":"ftp://ftp.ebi.ac.uk/pub/software/unix/iprscan/5/data/panther-data-9.0.tar.gz",
-	    "lookup_service_url":"ftp://ftp.ebi.ac.uk/pub/software/unix/iprscan/5/lookup_service/lookup_service_5.6-48.0.tar.gz",
-	    "uniprot_url":"ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/uniref/uniref100/"
+	    "lookup_service_url":"ftp://ftp.ebi.ac.uk/pub/software/unix/iprscan/5/lookup_service/lookup_service_5.6-48.0.tar.gz"
+	},
+	"functional_annotation":{
+		"uniprot": "{base_dir}{databases}/uniprot",
+	    "uniprot_url":"ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/uniref/uniref50/"
 	}
+		
 }

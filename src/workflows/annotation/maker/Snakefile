@@ -34,14 +34,12 @@ with open("config.json") as conf:
         CONFIG = json.load(conf)
         replace_paths_in_json(CONFIG, PATHS)
 
-# Set some basic variables (snakemake doesn't always allow these calls directly in rules)
-working_dir = CONFIG['base']['working_dir']
-maker_out = ".".join(CONFIG["maker_opts"]["genome"].split(".")[:-1]) + ".output"
+
 # Include necessary rules
 include: ruleDir + "/annotation/Maker.rules"
 """ maker doesn't give proper output, so we need our own flag file"""
 rule all:
-    input: rules.maker_installation.output
+    input: rules.get_predicted_proteins.output, rules.concatenate_gffs.output
 #rule all:
 #    input: expand("{working_dir}/maker_done.txt", working_dir=working_dir),
 #        expand("{working_dir}/predicted_proteins.faa", working_dir=working_dir),
