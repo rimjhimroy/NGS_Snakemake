@@ -81,7 +81,7 @@ rule trf_installation:
         "mkdir -p {params.dir} && "
         "cd {params.dir} && "
         "wget"+CONFIG['executable_sources']['wget_options']+CONFIG['executable_sources']['trf_URL']+" && "
-        "mv trf* {output} && "
+        "mv trf* {output} &&"
         "chmod a+x {output} && "
         "touch {output} && "
         "echo 'export PATH='`readlink -f {params.dir}`':$PATH' >>" + CONFIG['base']['maker_bashrc'] + ";"
@@ -112,8 +112,8 @@ rule rmblast_installation:
         "tar xzf ncbi-blast* && "
         "tar xzf ncbi-rmblast* && "
         "rm  *.tar.* && "
-        "cp -R ncbi-rmblast*/* ncbi-blast*/ &&"
-        "mv  ncbi-blast*/* {params.dir} && "
+        "cp -R ncbi-rmblast*/* ncbi-blast*/ && "
+        "cp -R ncbi-blast*/* {params.dir} && "
         "touch {output} && "
         "cd / && rm -rf $TEMPDIR;"
 
@@ -125,8 +125,8 @@ rule repbase_installation:
         "cd $TEMPDIR && "
         "curl --remote-name --anyauth --netrc-file "+CONFIG['executable_sources']['repeatmaskerlibraries_URL_netrc']+" "+CONFIG['executable_sources']['repeatmaskerlibraries_URL']+" && "
         "tar xzf repeatmaskerlibraries* && "
-        "mv  Libraries {output} && "
-        "mv  repeatmaskerlibraries* {output} && "
+        "cp -R Libraries {output} && "
+        "cp -R repeatmaskerlibraries* {output} && "
         "touch {output} && "
         "cd / && rm -rf $TEMPDIR;"
 
@@ -155,32 +155,57 @@ rule repeatmasker_installation:
         "echo 'export PATH='`readlink -f {params.dir}`':$PATH' >>" + CONFIG['base']['maker_bashrc'] + " && "
         "cd / && rm -rf $TEMPDIR;"
 
-# Create local Perl library
-rule perl_installation:
-    output: CONFIG["base"]["perl_install"] + "bin/cpanm"
+# Install perl if version is too low (as on our cluster)
+rule install_perl:
+    output: CONFIG["executables"]["perl"]
+    params: dir = strip_path_level(CONFIG["executables"]["perl"],2)
     shell:
-        "set -o nounset;"
+        "if [ `echo $(perl -e 'print $];')'>5.018' | bc` != '1' ];"
+        "then "
+            "TEMPDIR=`mktemp -d` && "
+            "cd $TEMPDIR && "
+            "wget"+CONFIG['executable_sources']['wget_options']+CONFIG['executable_sources']['perl_URL']+" && "
+            "tar xzf ActivePerl-5* && "
+            "cd ActivePerl-5* && "
+            "rm -rf {params.dir} && "
+            "sh install.sh --prefix={params.dir} --no-install-html --license-accepted && "
+            "cd - && "
+            "rm -rf ActivePerl-5* && "
+            "cd / && rm -rf $TEMPDIR &&"
+            "touch {output} && "
+            "echo 'export PATH='`readlink -f {params.dir}`':$PATH' >>" + CONFIG['base']['maker_bashrc'] + " ; "
+        "else "
+            "ln -s `which perl` {output};"
+        "fi;"
+
+# Create local Perl library
+rule install_perl_locallib:
+    output: CONFIG["base"]["perl_install"] + "bin/cpanm"
+    input: PERL=rules.install_perl.output
+    shell:
+        "source " + CONFIG['base']['maker_bashrc'] + " ; "
         "mkdir -p " + CONFIG["base"]["perl_install"] + "bin && "
         "cd "+ CONFIG["base"]["perl_install"] + "bin && "
-        "wget http://xrl.us/cpanm && "
+        "wget --no-check-certificate http://xrl.us/cpanm && "
         "chmod +x cpanm && "
         "locallib_LATEST=` curl -s ftp://ftp.cpan.org/pub/CPAN/authors/id/A/AP/APEIRON/ | grep --perl-regexp --ignore-case --only-matching \"local-lib.*?.gz\" "
         " | sort --ignore-case --version-sort  | tail -1` && "
         "wget ftp://ftp.cpan.org/pub/CPAN/authors//id/A/AP/APEIRON/${{locallib_LATEST}} && "
-        "tar -xvzf ${{locallib_LATEST}} && "
+        "tar -xzf ${{locallib_LATEST}} && "
         "cd $(basename `echo ${{locallib_LATEST}}` .tar.gz) && "
-        "perl Makefile.PL --bootstrap && "
+        "{input.PERL} Makefile.PL --bootstrap && "
         "make test && make install && make clean && "
-        "echo 'eval $(perl -I$HOME/perl5/lib/perl5 -Mlocal::lib)' >> ~/.bashrc && "
-        "source ~/.bashrc"
+        "echo 'eval $({input.PERL} -I$HOME/perl5/lib/perl5 -Mlocal::lib)' >>  " + CONFIG['base']['maker_bashrc']
 
 # Install necessary Perl libraries
 rule perl_libs:
-    input: rules.perl_installation.output
+    input:
+        rules.install_perl_locallib.output,
+        PERL=rules.install_perl.output
     output: CONFIG["base"]["perl_install"] + "lib/done"
     run:
         for lib in CONFIG["base"]["perl_libs"]:
-            shell(CONFIG["base"]["perl_install"] + "bin/cpanm --skip-satisfied " + lib)
+            shell("source " + CONFIG['base']['maker_bashrc'] + " ; " + CONFIG["base"]["perl_install"] + "bin/cpanm --skip-satisfied " + lib)
         shell("touch " + CONFIG["base"]["perl_install"] + "lib/done")
 
 #  Download and install Maker
@@ -260,7 +285,7 @@ rule copy_gffs:
         "MAKER_OUTPUT=`find . -type d -wholename '*maker.output'` && "
         "MAKER_PREFIX=`basename $MAKER_OUTPUT .maker.output` && "
         "find $MAKER_OUTPUT -maxdepth 5 -type f -iname '*gff' | xargs -I{{}} cp {{}} gffs"
-        
+
 # Rule to concatenate all generated GFFs
 rule concatenate_gffs:
     input: GFFs = rules.copy_gffs.output
@@ -308,7 +333,7 @@ rule install_interproscan:
         "source " + CONFIG['base']['maker_bashrc'] + " && "
         "TEMPDIR=`mktemp -d`;"
         "cd $TEMPDIR;"
-        "wget " + CONFIG["functional_annotation"]["interproscan_url"] + " && "  
+        "wget " + CONFIG["functional_annotation"]["interproscan_url"] + " && "
         "tar zxvf *.gz && "
         "mkdir -p {output} && "
         "mv -v */* {output} && "
@@ -320,7 +345,7 @@ rule install_uniprot:
         "source " + CONFIG['base']['maker_bashrc'] + " && "
         "TEMPDIR=`mktemp -d`;"
         "cd $TEMPDIR;"
-        "wget -m -R 'xml.gz' " + CONFIG["functional_annotation"]["uniprot_url"] + " && "  
+        "wget -m -R 'xml.gz' " + CONFIG["functional_annotation"]["uniprot_url"] + " && "
         "gunzip -vk uniref100.fasta.gz && "
         'TITLE="UniRef100 - "`cat uniref100.release_note | grep Release | sed \'s/^[ \\t]*//\'` && '
         '' + CONFIG["executables"]['makeblastdb'] + ' -in uniref100.fasta -dbtype prot -out uniref -title "$TITLE" -parse_seqids && '
