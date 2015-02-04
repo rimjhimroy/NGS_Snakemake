@@ -301,6 +301,7 @@ rule rename_ids_gff:
 #    input: rules.id_mapping_file,
 #        rules.get_predicted_proteins
 
+""" FUNCTIONAL ANNOTATION """
 
 rule install_interproscan:
     output: CONFIG["functional_annotation"]["interproscan"]
@@ -313,6 +314,17 @@ rule install_interproscan:
         "mkdir -p {output} && "
         "mv -v */* {output} && "
         "cd - && rm -rf $TEMPDIR;"
+        
+rule install_panther:
+    input: interpro=rules.install_interproscan.output
+    output: CONFIG["functional_annotation"]["interproscan"] + "/data/panther"
+    shell:
+        "source " + CONFIG['base']['maker_bashrc'] + " && "
+        "cd {input.interpro}/data && "
+        "wget " + CONFIG["functional_annotation"]["panther_url"] + " && "  
+        "tar zxvf panther*.gz && touch " + CONFIG["functional_annotation"]["interproscan"] + "/data/panther && "
+        "rm panther*.gz" 
+    
 
 rule install_uniprot:
     output: CONFIG["functional_annotation"]["uniprot"]
@@ -327,4 +339,20 @@ rule install_uniprot:
         "mkdir -p {output} && "
         "mv -v * {output} && "
         "cd - && rm -rf $TEMPDIR;"
+
+rule interproscan:
+    input: interpro = rules.install_interproscan.output,
+        proteins = rules.get_predicted_proteins.output
+    output: CONFIG['base']['working_dir'] + "/protein_annotation.tsv"
+    shell: "{input.interpro}/interproscan.sh -i {input.proteins} -f tsv -o {output}"
+    
+rule uniprot:
+    input: uniprot = rules.install_uniprot.output,
+        proteins = rules.get_predicted_proteins.output
+    output: CONFIG['base']['working_dir'] + "/protein_uniprot.csv"
+    shell: CONFIG["executables"]['blastp'] + " -out {output}" 
+        "-num_threads 4 -outformat 7 "
+        "-max_target_seqs 1 "
+        "-query {input.proteins} "
+        "-db {input.uniprot}/uniref" 
 
