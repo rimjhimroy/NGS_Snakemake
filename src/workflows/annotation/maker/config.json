@@ -1,11 +1,11 @@
 {
-	"base": 
+	"base":
 	{
 		"working_dir": "{base_dir}TEMP_MAKER",
 		"maker_bashrc": "{base_dir}{executables}maker.bashrc",
 		"maker_perl": "{base_dir}bin/maker/src/",
 		"perl_install": "{home_dir}perl5/",
-		"perl_libs": 
+		"perl_libs":
 		[
 			"BioPerl",
 			"DBI",
@@ -29,12 +29,12 @@
 		]
 	},
 
-	"output": 
+	"output":
 	{
 		"protein_prefix": "PRI_"
 	},
 
-	"maker_opts": 
+	"maker_opts":
 	{
 		"genome": "{base_dir}{executables}maker/data/dpp_contig.fasta",
 		"organism_type": "eukaryotic",
@@ -49,12 +49,12 @@
 		"cpus": "8"
 	},
 
-	"maker_bopts": 
+	"maker_bopts":
 	{
 		"blast_type": "ncbi+"
 	},
 
-	"executables": 
+	"executables":
 	{
 		"rmblast": "{base_dir}{executables}rmblast/bin/rmblastn",
 		"makeblastdb": "{base_dir}{executables}blast+/bin/makeblastdb",
@@ -68,10 +68,11 @@
 		"augustus": "{base_dir}{executables}augustus/bin/augustus",
 		"trf": "{base_dir}{executables}trf/trf",
 		"repbase": "{base_dir}{executables}repbase/",
-		"maker": "{base_dir}{executables}/maker/bin/maker"
+		"maker": "{base_dir}{executables}/maker/bin/maker",
+		"perl" : "{home_dir}perl5/bin/perl"
 	},
 
-	"executable_sources": 
+	"executable_sources":
 	{
 		"maker_URL": "{web_host}maker_test.nobackup/maker-2.31.6.tgz",
 		"version": "2.31.6",
@@ -87,10 +88,11 @@
 		"repeatmaskerlibraries_URL_netrc": "{home_dir}/.netrc",
 		"recon_URL": "{web_host}maker_test.nobackup/RECON-1.08.tar.gz",
 		"repeatscout_URL": "{web_host}maker_test.nobackup/RepeatScout-1.0.5.tar.gz",
-		"repeatmodeler_URL": "{web_host}maker_test.nobackup/RepeatModeler-open-1-0-8.tar.gz"
+		"repeatmodeler_URL": "{web_host}maker_test.nobackup/RepeatModeler-open-1-0-8.tar.gz",
+		"perl_URL": "http://downloads.activestate.com/ActivePerl/releases/5.18.4.1803/ActivePerl-5.18.4.1803-x86_64-linux-glibc-2.5-298573.tar.gz"
 	},
 
-	"maker_installation_production": 
+	"maker_installation_production":
 	{
 		"maker_URL": "{web_host}maker-2.31.6.tgz",
 		"version": "2.31.6",
@@ -110,7 +112,7 @@
 		"repeatmodeler_URL": "http://www.repeatmasker.org/RepeatModeler-open-1-0-8.tar.gz"
 	},
 
-	"jbrowse_installation": 
+	"jbrowse_installation":
 	{
 		"jbrowse_url": "{web_host}JBrowse-1.11.5.zip",
 		"interproscan_url": "{web_host}interproscan-5.7-48.0-64-bit.tar.gz",
@@ -118,7 +120,7 @@
 		"lookup_service_url": "{web_host}lookup_service_5.6-48.0.tar.gz"
 	},
 
-	"jbrowse_installation_production": 
+	"jbrowse_installation_production":
 	{
 		"jbrowse_url": "http://jbrowse.org/releases/JBrowse-1.11.5.zip",
 		"interproscan_url": "ftp://ftp.ebi.ac.uk/pub/software/unix/iprscan/5/5.7-48.0/interproscan-5.7-48.0-64-bit.tar.gz",
@@ -126,7 +128,7 @@
 		"lookup_service_url": "ftp://ftp.ebi.ac.uk/pub/software/unix/iprscan/5/lookup_service/lookup_service_5.6-48.0.tar.gz"
 	},
 
-	"functional_annotation": 
+	"functional_annotation":
 	{
 		"uniprot": "{base_dir}{databases}/uniprot",
 		"uniprot_url": "ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/uniref/uniref50/",
