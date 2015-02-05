@@ -169,6 +169,7 @@ rule install_perl:
     output: CONFIG["executables"]["perl"]
     params: dir = strip_path_level(CONFIG["executables"]["perl"],2)
     shell:
+        "source {input} && "
         "if [ `echo $(perl -e 'print $];')'>5.018' | bc` != '1' ];"
         "then "
             "TEMPDIR=`mktemp -d` && "
@@ -176,7 +177,7 @@ rule install_perl:
             "wget"+CONFIG['executable_sources']['wget_options']+CONFIG['executable_sources']['perl_URL']+" && "
             "tar xzf ActivePerl-5* && "
             "cd ActivePerl-5* && "
-            "rm -rf {params.dir} && "
+            "rmdir {params.dir} && "
             "sh install.sh --prefix={params.dir} --no-install-html --license-accepted && "
             "cd - && "
             "rm -rf ActivePerl-5* && "
@@ -185,7 +186,9 @@ rule install_perl:
             "echo 'export PATH='`readlink -f {params.dir}`':$PATH' >> {input} && "
             "touch {output};"
         "else "
-            "ln --verbose --symbolic --backup --force `which perl` {output};"
+            "cd {params.dir} && "
+            "ln --verbose --symbolic --backup --force `which perl`  && "
+            "touch --no-dereference {output};"
         "fi;"
 
 # Create local Perl library
@@ -248,7 +251,7 @@ rule maker_installation:
         "cd {params.dir}/src && source {input.BASHRC} && "
         "perl Build.PL && "
         "./Build install && "
-        "touch --no-dereference {output}"
+        "touch {output}"
 
 """ create the maker_bopts.ctl file """
 rule maker_bopts:
