@@ -225,7 +225,7 @@ rule perl_libs:
     output: CONFIG["base"]["perl_install"] + "lib/done"
     run:
         for lib in CONFIG["base"]["perl_libs"]:
-            shell("source  {input.BASHRC} ; " + CONFIG["base"]["perl_install"] + "bin/cpanm --skip-satisfied " + lib)
+            shell("source  {input.BASHRC} ; " + CONFIG["base"]["perl_install"] + "bin/cpanm --skip-satisfied --self-contained --force --notest " + lib)
         shell("touch " + CONFIG["base"]["perl_install"] + "lib/done")
 
 #  Download and install Maker
