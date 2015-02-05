@@ -37,17 +37,16 @@ rule augustus_installation:
     output: CONFIG["executables"]["augustus"]
     params: dir = strip_path_level(CONFIG["executables"]["augustus"],2)
     shell:
-        "TEMPDIR=`mktemp -d`;"
-        "cd $TEMPDIR;"
-        "wget"+CONFIG['executable_sources']['wget_options']+CONFIG['executable_sources']['augustus_URL']+";"
-        "tar xzf augustus*;"
-        "rm *.tar.*;"
-        "mv  augustus*/* {params.dir};"
-        "rmdir augustus*;"
-        "touch {output} && "
-        "echo 'export PATH='`readlink -f {params.dir}/bin/`':$PATH' >> {input} ;"
-        "echo 'export AUGUSTUS_CONFIG_PATH='`readlink -f {params.dir}/config/`  >> {input} ;"
-        "cd / && rmdir $TEMPDIR;"
+        "TEMPDIR=`mktemp -d` && "
+        "cd $TEMPDIR && "
+        "wget"+CONFIG['executable_sources']['wget_options']+CONFIG['executable_sources']['augustus_URL']+" && "
+        "tar xzf augustus* && "
+        "rm *.tar.* && "
+        "cp -R augustus*/* {params.dir} && "
+        "echo 'export PATH='`readlink -f {params.dir}/bin/`':$PATH' >> {input} && "
+        "echo 'export AUGUSTUS_CONFIG_PATH='`readlink -f {params.dir}/config/`  >> {input}  && "
+        "cd / && rm -rf $TEMPDIR && "
+        "touch {output};"
 
 # Download and install Exonerate
 rule exonerate_installation:
@@ -55,16 +54,14 @@ rule exonerate_installation:
     output: CONFIG["executables"]["exonerate"]
     params: dir = strip_path_level(CONFIG["executables"]["exonerate"],2)
     shell:
-        "TEMPDIR=`mktemp -d`;"
-        "cd $TEMPDIR;"
-        "wget"+CONFIG['executable_sources']['wget_options']+CONFIG['executable_sources']['exonerate_URL']+";"
-        "tar xzf exonerate*;"
-        "rm *.tar.*;"
-        "mv exonerate*/* {params.dir};"
-        "rmdir exonerate*;"
-        "touch {output} && "
-        "echo 'export PATH='`readlink -f {params.dir}/bin/`':$PATH' >> {input} ;"
-        "cd / && rmdir $TEMPDIR;"
+        "TEMPDIR=`mktemp -d` && "
+        "cd $TEMPDIR && "
+        "wget"+CONFIG['executable_sources']['wget_options']+CONFIG['executable_sources']['exonerate_URL']+" && "
+        "tar xzf exonerate* && "
+        "cp -R exonerate*/* {params.dir} && "
+        "echo 'export PATH='`readlink -f {params.dir}/bin/`':$PATH' >> {input}  && "
+        "cd / && rm -rf $TEMPDIR && "
+        "touch {output};"
 
 # Download and install SNAP
 rule snap_installation:
@@ -72,17 +69,16 @@ rule snap_installation:
     output: CONFIG["executables"]["snap"]
     params: dir = strip_path_level(CONFIG["executables"]["snap"],1)
     shell:
-        "TEMPDIR=`mktemp -d`;"
-        "cd $TEMPDIR;"
-        "wget"+CONFIG['executable_sources']['wget_options']+CONFIG['executable_sources']['snap_URL']+";"
-        "tar xzf snap*;"
-        "rm *.tar.*;"
-        "mv snap*/* {params.dir};"
-        "touch {output} && "
-        "cd {params.dir} && make;"
-        "echo 'export ZOE='`readlink -f {params.dir}` >> {input} ;"
-        "echo 'export PATH='`readlink -f {params.dir}`':$PATH' >> {input} ;"
-        "cd / && rm -rf $TEMPDIR;"
+        "TEMPDIR=`mktemp -d` && "
+        "cd $TEMPDIR && "
+        "wget"+CONFIG['executable_sources']['wget_options']+CONFIG['executable_sources']['snap_URL']+" && "
+        "tar xzf snap* && "
+        "cp -R snap*/* {params.dir} && "
+        "cd {params.dir} && make && "
+        "echo 'export ZOE='`readlink -f {params.dir}` >> {input}  && "
+        "echo 'export PATH='`readlink -f {params.dir}`':$PATH' >> {input}  && "
+        "cd / && rm -rf $TEMPDIR && "
+        "touch {output};"
 
 # Download and install TRF
 rule trf_installation:
@@ -92,11 +88,10 @@ rule trf_installation:
     shell:
         "mkdir -p {params.dir} && "
         "cd {params.dir} && "
-        "wget"+CONFIG['executable_sources']['wget_options']+CONFIG['executable_sources']['trf_URL']+" && "
-        "mv trf* {output} && "
+        "wget"+CONFIG['executable_sources']['wget_options']+CONFIG['executable_sources']['trf_URL']+" --output-document={output} && "
         "chmod a+x {output} && "
-        "touch {output} && "
-        "echo 'export PATH='`readlink -f {params.dir}`':$PATH' >> {input} ;"
+        "echo 'export PATH='`readlink -f {params.dir}`':$PATH' >> {input} && "
+        "touch {output};"
 
 # Download and install BLAST+
 rule blast_plus_installation:
@@ -104,44 +99,43 @@ rule blast_plus_installation:
     output: CONFIG["executables"]["blastn"]
     params: dir = strip_path_level(CONFIG["executables"]["blastn"],2)
     shell:
-        "TEMPDIR=`mktemp -d`;"
-        "cd $TEMPDIR;"
+        "TEMPDIR=`mktemp -d` && "
+        "cd $TEMPDIR && "
         "wget"+CONFIG['executable_sources']['wget_options']+CONFIG['executable_sources']['blast+_URL']+" && "
         "tar xzf ncbi* && "
-        "rm *.tar.* && "
-        "mv ncbi*/* {params.dir} && rmdir ncbi* && "
-        "touch {output} && "
-        "echo 'export PATH='`readlink -f {params.dir}/bin`':$PATH' >> {input} ;"
-        "cd / && rmdir $TEMPDIR;"
+        "cp -R ncbi*/* {params.dir} && "
+        "echo 'export PATH='`readlink -f {params.dir}/bin`':$PATH' >> {input}  && "
+        "cd / && rm -rf $TEMPDIR && "
+        "touch {output};"
 
 # Download and install RMBLAST plus corresponding BLAST+
 rule rmblast_installation:
     output: CONFIG["executables"]["rmblast"]
     params: dir = strip_path_level(CONFIG["executables"]["rmblast"],2)
     shell:
-        "TEMPDIR=`mktemp -d`;"
+        "TEMPDIR=`mktemp -d` && "
         "cd $TEMPDIR;"
         "wget"+CONFIG['executable_sources']['wget_options']+CONFIG['executable_sources']['rmblast_URL']+" && "
         "tar xzf ncbi-blast* && "
         "tar xzf ncbi-rmblast* && "
-        "rm  *.tar.* && "
         "cp -R ncbi-rmblast*/* ncbi-blast*/ && "
         "cp -R ncbi-blast*/* {params.dir} && "
-        "touch {output} && "
-        "cd / && rm -rf $TEMPDIR;"
+        "cd / && rm -rf $TEMPDIR && "
+        "touch {output};"
 
 # Download and install GIRI RepBase
 rule repbase_installation:
     output: CONFIG["executables"]["repbase"]
     shell:
-        "TEMPDIR=`mktemp -d`;"
+        "TEMPDIR=`mktemp -d` && "
         "cd $TEMPDIR && "
         "curl --remote-name --anyauth --netrc-file "+CONFIG['executable_sources']['repeatmaskerlibraries_URL_netrc']+" "+CONFIG['executable_sources']['repeatmaskerlibraries_URL']+" && "
         "tar xzf repeatmaskerlibraries* && "
         "cp -R Libraries {output} && "
         "cp -R repeatmaskerlibraries* {output} && "
-        "touch {output} && "
-        "cd / && rm -rf $TEMPDIR;"
+        "cd / && rm -rf $TEMPDIR && "
+        "touch {output};"
+
 
 # Download and install Repeatmasker
 rule repeatmasker_installation:
@@ -153,12 +147,12 @@ rule repeatmasker_installation:
     output: CONFIG["executables"]["RepeatMasker"]
     params: dir = strip_path_level(CONFIG["executables"]["RepeatMasker"],1), RMBLAST = strip_path_level(CONFIG["executables"]["rmblast"],1)
     shell:
-        "TEMPDIR=`mktemp -d`;"
-        "cd $TEMPDIR;"
+        "TEMPDIR=`mktemp -d` && "
+        "cd $TEMPDIR && "
         "wget"+CONFIG['executable_sources']['wget_options']+CONFIG['executable_sources']['repeatmasker_URL']+" && "
         "tar xzf RepeatMasker-open-* && "
         "rm *.tar.* && "
-        "mv RepeatMasker*/* {params.dir} && "
+        "cp -R RepeatMasker*/* {params.dir} && "
         "cd {params.dir} && grep -l -r '#!/u1' * | xargs -I '%' sed -i 's|/u1/local/bin/perl|/usr/bin/env perl|' % && "
         "cp RepeatMaskerConfig.tmpl RepeatMaskerConfig.pm && chmod -x RepeatMaskerConfig.pm && "
         'sed -i \'s|DEFAULT_SEARCH_ENGINE\s\+=.*|DEFAULT_SEARCH_ENGINE = "ncbi";|\' RepeatMaskerConfig.pm && '
@@ -166,7 +160,7 @@ rule repeatmasker_installation:
         'sed -i \'s|RMBLAST_DIR\s\+=.*|RMBLAST_DIR = "' + "{params.RMBLAST}" + '";|\' RepeatMaskerConfig.pm && '
         "cp {input.REPBASE}Libraries/RepeatMaskerLib.embl Libraries/ ; "
         "echo 'export PATH='`readlink -f {params.dir}`':$PATH' >> {input.BASHRC} && "
-        "cd / && rm -rf $TEMPDIR;"
+        "cd / && rm -rf $TEMPDIR && "
         "touch {output}"
 
 # Install perl if version is too low (as on our cluster)
@@ -191,7 +185,7 @@ rule install_perl:
             "echo 'export PATH='`readlink -f {params.dir}`':$PATH' >> {input} && "
             "touch {output};"
         "else "
-            "ln -s `which perl` {output};"
+            "ln --verbose --symbolic --backup --force `which perl` {output};"
         "fi;"
 
 # Create local Perl library
@@ -201,7 +195,7 @@ rule install_perl_locallib:
         PERL=rules.install_perl.output
     output: CONFIG["base"]["perl_install"] + "bin/cpanm"
     shell:
-        "source {input.BASHRC};"
+        "source {input.BASHRC} && "
         "mkdir -p " + CONFIG["base"]["perl_install"] + "bin && "
         "cd "+ CONFIG["base"]["perl_install"] + "bin && "
         "wget --no-check-certificate http://xrl.us/cpanm && "
@@ -243,8 +237,8 @@ rule maker_installation:
     params: dir = strip_path_level(CONFIG["executables"]["maker"],2)
     output: CONFIG["executables"]["maker"]
     shell:
-        "TEMPDIR=`mktemp -d`;"
-        "cd $TEMPDIR;"
+        "TEMPDIR=`mktemp -d` && "
+        "cd $TEMPDIR && "
         "wget"+CONFIG['executable_sources']['wget_options']+CONFIG['executable_sources']['maker_URL']+" && "
         "tar xzf maker* && "
         "rm maker*.tgz && "
@@ -254,7 +248,7 @@ rule maker_installation:
         "cd {params.dir}/src && source {input.BASHRC} && "
         "perl Build.PL && "
         "./Build install && "
-        "touch --no-dereference {output} && "
+        "touch --no-dereference {output}"
 
 """ create the maker_bopts.ctl file """
 rule maker_bopts:
@@ -295,10 +289,11 @@ rule maker:
         MAKER=rules.maker_installation.output,
         BASHRC=rules.maker_bashrc.output
     output: CONFIG['base']['working_dir'] + "/maker_done.txt"
-    shell: 'cd ' + CONFIG['base']['working_dir'] + ' && '
-           "source {input.BASHRC} && "
-           '{input.MAKER} &&'
-           'touch ' + CONFIG['base']['working_dir'] + '/maker_done.txt'
+    shell:
+        "cd " + CONFIG['base']['working_dir'] + " && "
+        "source {input.BASHRC} && "
+        "{input.MAKER} && "
+        "touch {output}"
 
 rule copy_gffs:
     input: rules.maker.output
@@ -307,33 +302,40 @@ rule copy_gffs:
         "mkdir -p gffs && "
         "MAKER_OUTPUT=`find . -type d -wholename '*maker.output'` && "
         "MAKER_PREFIX=`basename $MAKER_OUTPUT .maker.output` && "
-        "find $MAKER_OUTPUT -maxdepth 5 -type f -iname '*gff' | xargs -I{{}} cp {{}} gffs"
+        "find $MAKER_OUTPUT -maxdepth 5 -type f -iname '*gff' | xargs -I{{}} cp {{}} gffs && "
+        "touch {output}"
 
 # Rule to concatenate all generated GFFs
 rule concatenate_gffs:
     input: GFFs = rules.copy_gffs.output
     output: CONFIG['base']['working_dir'] + "/concatenated.gff"
-    shell: 'cd {input.GFFs} && '
-           "touch ../concatenated.gff && "
-           "ls *.gff | xargs cat >> ../concatenated.gff "
+    shell:
+        "cd {input.GFFs} && "
+        "touch ../concatenated.gff && "
+        "ls *.gff | xargs cat >> ../concatenated.gff  && "
+        "touch {output}"
 
 
 # Get all predicted proteins:
 rule get_predicted_proteins:
     input: rules.maker.output
     output: CONFIG['base']['working_dir'] + "/predicted_proteins.faa"
-    shell: "cd " + CONFIG['base']['working_dir'] +  "  && "
+    shell:
+        "cd " + CONFIG['base']['working_dir'] +  "  && "
         "MAKER_OUTPUT=`find . -type d -wholename '*maker.output'` && "
         "touch  predicted_proteins.faa && "
-        "find $MAKER_OUTPUT -type f -iname '*maker.proteins.fasta' | xargs cat >> predicted_proteins.faa"
+        "find $MAKER_OUTPUT -type f -iname '*maker.proteins.fasta' | xargs cat >> predicted_proteins.faa  && "
+        "touch {output}"
 
 
 # pretty-print names from maker prediction
 rule create_id_mapping_file:
     input: rules.concatenate_gffs.output
     output: CONFIG['base']['working_dir'] + "/ids.map"
-    shell: "cd " +CONFIG['base']['working_dir']+ "  && "
-        "" + CONFIG['base']['maker_perl'] + "maker_map_ids --prefix '" + CONFIG['output']['protein_prefix'] + "' --justify 8 concatenated.gff > ids.map"
+    shell:
+        "cd " +CONFIG['base']['working_dir']+ "  && "
+        "" + CONFIG['base']['maker_perl'] + "maker_map_ids --prefix '" + CONFIG['output']['protein_prefix'] + "' --justify 8 concatenated.gff > ids.map && "
+        "touch {output}"
 
 rule rename_ids_gff:
     input:
@@ -342,9 +344,10 @@ rule rename_ids_gff:
         GFF = glob_wildcards(CONFIG['base']['working_dir'] + "/gffs/{gff}.gff")
 
     output: CONFIG['base']['working_dir'] + "/gffs/renamed{gff}.txt"
-    shell: "cd " + CONFIG['base']['working_dir']+ " && "
-        "" + CONFIG['base']['maker_perl'] + "map_gff_ids ids.map {input.GFF}.gff"
-
+    shell:
+        "cd " + CONFIG['base']['working_dir']+ " && "
+        "" + CONFIG['base']['maker_perl'] + "map_gff_ids ids.map {input.GFF}.gff && "
+        "touch {output}"
 
 #rule rename_proteins:
 #    input: rules.id_mapping_file,
@@ -357,13 +360,14 @@ rule install_interproscan:
     output: CONFIG["functional_annotation"]["interproscan"]
     shell:
         "source {input} && "
-        "TEMPDIR=`mktemp -d`;"
-        "cd $TEMPDIR;"
+        "TEMPDIR=`mktemp -d` && "
+        "cd $TEMPDIR && "
         "wget " + CONFIG["functional_annotation"]["interproscan_url"] + " && "
         "tar zxvf *.gz && "
         "mkdir -p {output} && "
-        "mv -v */* {output} && "
-        "cd - && rm -rf $TEMPDIR;"
+        "cp -R -v */* {output} && "
+        "cd - && rm -rf $TEMPDIR && "
+        "touch {output}"
 
 rule install_panther:
     input:
@@ -377,28 +381,29 @@ rule install_panther:
         "tar zxvf panther*.gz && touch " + CONFIG["functional_annotation"]["interproscan"] + "/data/panther && "
         "rm panther*.gz"
 
-
 rule install_uniprot:
     input: rules.maker_bashrc.output
     output: CONFIG["functional_annotation"]["uniprot"]
     shell:
         "source {input} && "
-        "TEMPDIR=`mktemp -d`;"
-        "cd $TEMPDIR;"
+        "TEMPDIR=`mktemp -d` && "
+        "cd $TEMPDIR && "
         "wget -m -R 'xml.gz' " + CONFIG["functional_annotation"]["uniprot_url"] + " && "
         "gunzip -vk uniref100.fasta.gz && "
         'TITLE="UniRef100 - "`cat uniref100.release_note | grep Release | sed \'s/^[ \\t]*//\'` && '
         '' + CONFIG["executables"]['makeblastdb'] + ' -in uniref100.fasta -dbtype prot -out uniref -title "$TITLE" -parse_seqids && '
         "mkdir -p {output} && "
-        "mv -v * {output} && "
-        "cd - && rm -rf $TEMPDIR;"
+        "cp -R -v * {output} && "
+        "cd - && rm -rf $TEMPDIR"
 
 rule interproscan:
     input:
         INTERPRO = rules.install_interproscan.output,
         PROTEINS = rules.get_predicted_proteins.output
     output: CONFIG['base']['working_dir'] + "/protein_annotation.tsv"
-    shell: "{input.INTERPRO}/interproscan.sh -i {input.PROTEINS} -f tsv -o {output}"
+    shell:
+        "{input.INTERPRO}/interproscan.sh -i {input.PROTEINS} -f tsv -o {output} && "
+        "touch {output}"
 
 rule uniprot:
     input:
@@ -409,4 +414,5 @@ rule uniprot:
         "-num_threads 4 -outformat 7 "
         "-max_target_seqs 1 "
         "-query {input.PROTEINS} "
-        "-db {input.UNIPROT}/uniref"
+        "-db {input.UNIPROT}/uniref && "
+        "touch {output}"
