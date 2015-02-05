@@ -57,11 +57,11 @@
 	"executables":
 	{
 		"rmblast": "{base_dir}{executables}rmblast/bin/rmblastn",
-		"makeblastdb": "{base_dir}{executables}blast+/bin/makeblastdb",
-		"blastn": "{base_dir}{executables}blast+/bin/blastn",
-		"blastp": "{base_dir}{executables}blast+/bin/blastp",
-		"blastx": "{base_dir}{executables}blast+/bin/blastx",
-		"tblastx": "{base_dir}{executables}blast+/bin/tblastx",
+		"makeblastdb": "{base_dir}{executables}blast_plus/bin/makeblastdb",
+		"blastn": "{base_dir}{executables}blast_plus/bin/blastn",
+		"blastp": "{base_dir}{executables}blast_plus/bin/blastp",
+		"blastx": "{base_dir}{executables}blast_plus/bin/blastx",
+		"tblastx": "{base_dir}{executables}blast_plus/bin/tblastx",
 		"RepeatMasker": "{base_dir}{executables}repeatmasker/RepeatMasker",
 		"exonerate": "{base_dir}{executables}exonerate/bin/exonerate",
 		"snap": "{base_dir}{executables}snap/snap",
@@ -132,7 +132,7 @@
 	{
 		"uniprot": "{base_dir}{databases}/uniprot",
 		"uniprot_url": "ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/uniref/uniref50/",
-		"interproscan": "/media/sven/extData/sven/interproscan/interproscan-5.8-49.0", 
+		"interproscan": "/media/sven/extData/sven/interproscan/interproscan-5.8-49.0",
 		"interproscan_url": "ftp://ftp.ebi.ac.uk/pub/databases/interpro/iprscan/5/5.8-49.0/interproscan-5.8-49.0-64-bit.tar.gz",
 		"panther_url" : "ftp://ftp.ebi.ac.uk/pub/software/unix/iprscan/5/data/panther-data-9.0.tar.gz"
 	}
