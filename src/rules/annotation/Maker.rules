@@ -167,7 +167,9 @@ rule repeatmasker_installation:
 rule install_perl:
     input: rules.maker_bashrc.output
     output: CONFIG["executables"]["perl"]
-    params: dir = strip_path_level(CONFIG["executables"]["perl"],2)
+    params:
+            dir = strip_path_level(CONFIG["executables"]["perl"],2),
+            topdir = strip_path_level(CONFIG["executables"]["perl"],1)
     shell:
         "source {input} && "
         "if [ `echo $(perl -e 'print $];')'>5.018' | bc` != '1' ];"
@@ -177,6 +179,7 @@ rule install_perl:
             "wget"+CONFIG['executable_sources']['wget_options']+CONFIG['executable_sources']['perl_URL']+" && "
             "tar xzf ActivePerl-5* && "
             "cd ActivePerl-5* && "
+            "rmdir {params.topdir} && "
             "rmdir {params.dir} && "
             "sh install.sh --prefix={params.dir} --no-install-html --license-accepted && "
             "cd - && "
@@ -185,10 +188,10 @@ rule install_perl:
             "touch {output} && "
             "echo 'export PATH='`readlink -f {params.dir}`':$PATH' >> {input} && "
             "touch {output};"
-        "else "
-            "cd {params.dir} && "
-            "ln --verbose --symbolic --backup --force `which perl`  && "
-            "touch --no-dereference {output};"
+#        "else "
+#            "cd {params.dir} && "
+#            "ln --verbose --symbolic --backup --force `which perl`  && "
+#            "touch --no-dereference {output};"
         "fi;"
 
 # Create local Perl library
