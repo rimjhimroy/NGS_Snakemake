@@ -167,7 +167,7 @@ rule repeatmasker_installation:
         "cp {input.REPBASE}Libraries/RepeatMaskerLib.embl Libraries/ ; "
         "echo 'export PATH='`readlink -f {params.dir}`':$PATH' >> {input.BASHRC} && "
         "cd / && rm -rf $TEMPDIR;"
-        "touch {output} && "
+        "touch {output}"
 
 # Install perl if version is too low (as on our cluster)
 rule install_perl:
