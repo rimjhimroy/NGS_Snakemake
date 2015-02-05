@@ -254,7 +254,7 @@ rule maker_installation:
         "cd {params.dir}/src && source {input.BASHRC} && "
         "perl Build.PL && "
         "./Build install && "
-        "touch {output} && "
+        "touch --no-dereference {output} && "
 
 """ create the maker_bopts.ctl file """
 rule maker_bopts:
