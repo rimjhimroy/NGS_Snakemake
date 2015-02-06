@@ -21,19 +21,19 @@ rule clean_data:
 rule clean_perl:
     shell: "rm -rf " + CONFIG["base"]["perl_install"]
 
-# Install maker dependancies :
+# Install maker dependencies :
 
 # Create .bashrc to store settings and paths
 rule maker_bashrc:
     output : CONFIG['base']['maker_bashrc']
     params : dir = strip_path_level(CONFIG['base']['maker_bashrc'],1)
+    priority: 5000
     shell :
         "mkdir -p {params.dir} && "
         "touch {output}"
 
 # Download and install Augustus
 rule augustus_installation:
-    input: rules.maker_bashrc.output
     output: CONFIG["executables"]["augustus"]
     params: dir = strip_path_level(CONFIG["executables"]["augustus"],2)
     shell:
@@ -43,14 +43,13 @@ rule augustus_installation:
         "tar xzf augustus* && "
         "rm *.tar.* && "
         "cp -R augustus*/* {params.dir} && "
-        "echo 'export PATH='`readlink -f {params.dir}/bin/`':$PATH' >> {input} && "
-        "echo 'export AUGUSTUS_CONFIG_PATH='`readlink -f {params.dir}/config/`  >> {input}  && "
+        "echo 'export PATH='`readlink -f {params.dir}/bin/`':$PATH' >> {rules.maker_bashrc.output} && "
+        "echo 'export AUGUSTUS_CONFIG_PATH='`readlink -f {params.dir}/config/`  >> {rules.maker_bashrc.output}  && "
         "cd / && rm -rf $TEMPDIR && "
         "touch {output};"
 
 # Download and install Exonerate
 rule exonerate_installation:
-    input: rules.maker_bashrc.output
     output: CONFIG["executables"]["exonerate"]
     params: dir = strip_path_level(CONFIG["executables"]["exonerate"],2)
     shell:
@@ -59,13 +58,12 @@ rule exonerate_installation:
         "wget"+CONFIG['executable_sources']['wget_options']+CONFIG['executable_sources']['exonerate_URL']+" && "
         "tar xzf exonerate* && "
         "cp -R exonerate*/* {params.dir} && "
-        "echo 'export PATH='`readlink -f {params.dir}/bin/`':$PATH' >> {input}  && "
+        "echo 'export PATH='`readlink -f {params.dir}/bin/`':$PATH' >> {rules.maker_bashrc.output}  && "
         "cd / && rm -rf $TEMPDIR && "
         "touch {output};"
 
 # Download and install SNAP
 rule snap_installation:
-    input: rules.maker_bashrc.output
     output: CONFIG["executables"]["snap"]
     params: dir = strip_path_level(CONFIG["executables"]["snap"],1)
     shell:
@@ -75,14 +73,13 @@ rule snap_installation:
         "tar xzf snap* && "
         "cp -R snap*/* {params.dir} && "
         "cd {params.dir} && make && "
-        "echo 'export ZOE='`readlink -f {params.dir}` >> {input}  && "
-        "echo 'export PATH='`readlink -f {params.dir}`':$PATH' >> {input}  && "
+        "echo 'export ZOE='`readlink -f {params.dir}` >> {rules.maker_bashrc.output}  && "
+        "echo 'export PATH='`readlink -f {params.dir}`':$PATH' >> {rules.maker_bashrc.output}  && "
         "cd / && rm -rf $TEMPDIR && "
         "touch {output};"
 
 # Download and install TRF
 rule trf_installation:
-    input: rules.maker_bashrc.output
     output: CONFIG["executables"]["trf"]
     params: dir = strip_path_level(CONFIG["executables"]["trf"],1)
     shell:
@@ -90,12 +87,11 @@ rule trf_installation:
         "cd {params.dir} && "
         "wget"+CONFIG['executable_sources']['wget_options']+CONFIG['executable_sources']['trf_URL']+" --output-document={output} && "
         "chmod a+x {output} && "
-        "echo 'export PATH='`readlink -f {params.dir}`':$PATH' >> {input} && "
+        "echo 'export PATH='`readlink -f {params.dir}`':$PATH' >> {rules.maker_bashrc.output} && "
         "touch {output};"
 
 # Download and install BLAST+
 rule blast_plus_installation:
-    input: rules.maker_bashrc.output
     output: CONFIG["executables"]["blastn"]
     params: dir = strip_path_level(CONFIG["executables"]["blastn"],2)
     shell:
@@ -104,7 +100,7 @@ rule blast_plus_installation:
         "wget"+CONFIG['executable_sources']['wget_options']+CONFIG['executable_sources']['blast+_URL']+" && "
         "tar xzf ncbi* && "
         "cp -R ncbi*/* {params.dir} && "
-        "echo 'export PATH='`readlink -f {params.dir}/bin`':$PATH' >> {input}  && "
+        "echo 'export PATH='`readlink -f {params.dir}/bin`':$PATH' >> {rules.maker_bashrc.output}  && "
         "cd / && rm -rf $TEMPDIR && "
         "touch {output};"
 
@@ -142,8 +138,7 @@ rule repeatmasker_installation:
     input:
         REPBASE=rules.repbase_installation.output,
         RMBLAST=rules.rmblast_installation.output,
-        TRF=rules.trf_installation.output,
-        BASHRC=rules.maker_bashrc.output
+        TRF=rules.trf_installation.output
     output: CONFIG["executables"]["RepeatMasker"]
     params: dir = strip_path_level(CONFIG["executables"]["RepeatMasker"],1), RMBLAST = strip_path_level(CONFIG["executables"]["rmblast"],1)
     shell:
@@ -159,19 +154,18 @@ rule repeatmasker_installation:
         'sed -i \'s|TRF_PRGM\s\+=.*|TRF_PRGM = "' + "{input.TRF}" + '";|\' RepeatMaskerConfig.pm && '
         'sed -i \'s|RMBLAST_DIR\s\+=.*|RMBLAST_DIR = "' + "{params.RMBLAST}" + '";|\' RepeatMaskerConfig.pm && '
         "cp {input.REPBASE}Libraries/RepeatMaskerLib.embl Libraries/ ; "
-        "echo 'export PATH='`readlink -f {params.dir}`':$PATH' >> {input.BASHRC} && "
+        "echo 'export PATH='`readlink -f {params.dir}`':$PATH' >> {rules.maker_bashrc.output} && "
         "cd / && rm -rf $TEMPDIR && "
         "touch {output}"
 
 # Install perl if version is too low (as on our cluster)
 rule install_perl:
-    input: rules.maker_bashrc.output
     output: CONFIG["executables"]["perl"]
     params:
             dir = strip_path_level(CONFIG["executables"]["perl"],2),
             topdir = strip_path_level(CONFIG["executables"]["perl"],1)
     shell:
-        "source {input} && "
+        "source {rules.maker_bashrc.output} && "
         "if [ `echo $(perl -e 'print $];')'>5.018' | bc` != '1' ];"
         "then "
             "TEMPDIR=`mktemp -d` && "
@@ -186,7 +180,7 @@ rule install_perl:
             "rm -rf ActivePerl-5* && "
             "cd / && rm -rf $TEMPDIR &&"
             "touch {output} && "
-            "echo 'export PATH='`readlink -f {params.dir}`':$PATH' >> {input} && "
+            "echo 'export PATH='`readlink -f {params.dir}`':$PATH' >> {rules.maker_bashrc.output} && "
             "touch {output};"
 #        "else "
 #            "cd {params.dir} && "
@@ -197,11 +191,10 @@ rule install_perl:
 # Create local Perl library
 rule install_perl_locallib:
     input:
-        BASHRC=rules.maker_bashrc.output,
         PERL=rules.install_perl.output
     output: CONFIG["base"]["perl_install"] + "bin/cpanm"
     shell:
-        "source {input.BASHRC} && "
+        "source {rules.maker_bashrc.output} && "
         "mkdir -p " + CONFIG["base"]["perl_install"] + "bin && "
         "cd "+ CONFIG["base"]["perl_install"] + "bin && "
         "wget --no-check-certificate http://xrl.us/cpanm && "
@@ -213,19 +206,18 @@ rule install_perl_locallib:
         "cd $(basename `echo ${{locallib_LATEST}}` .tar.gz) && "
         "{input.PERL} Makefile.PL --bootstrap && "
         "make test && make install && make clean && "
-        "echo 'eval $({input.PERL} -I$HOME/perl5/lib/perl5 -Mlocal::lib)' >> {input.BASHRC} && "
+        "echo 'eval $({input.PERL} -I$HOME/perl5/lib/perl5 -Mlocal::lib)' >> {rules.maker_bashrc.output} && "
         "touch {output}"
 
 # Install necessary Perl libraries
 rule perl_libs:
     input:
         rules.install_perl_locallib.output,
-        rules.install_perl.output,
-        BASHRC=rules.maker_bashrc.output
+        rules.install_perl.output
     output: CONFIG["base"]["perl_install"] + "lib/done"
     run:
         for lib in CONFIG["base"]["perl_libs"]:
-            shell("source  {input.BASHRC} ; " + CONFIG["base"]["perl_install"] + "bin/cpanm --skip-satisfied --self-contained --force --notest " + lib)
+            shell("source  {rules.maker_bashrc.output} ; " + CONFIG["base"]["perl_install"] + "bin/cpanm --skip-satisfied --self-contained --force --notest " + lib)
         shell("touch " + CONFIG["base"]["perl_install"] + "lib/done")
 
 #  Download and install Maker
@@ -238,8 +230,7 @@ rule maker_installation:
         rules.snap_installation.output,
         rules.exonerate_installation.output,
         rules.augustus_installation.output,
-        rules.perl_libs.output,
-        BASHRC=rules.maker_bashrc.output
+        rules.perl_libs.output
     params: dir = strip_path_level(CONFIG["executables"]["maker"],2)
     output: CONFIG["executables"]["maker"]
     shell:
@@ -251,7 +242,7 @@ rule maker_installation:
         "touch maker && "
         "cp --recursive maker/* {params.dir} && "
         "cd / && rm -rf $TEMPDIR;"
-        "cd {params.dir}/src && source {input.BASHRC} && "
+        "cd {params.dir}/src && source {rules.maker_bashrc.output} && "
         "perl Build.PL && "
         "./Build install && "
         "touch {output}"
@@ -292,12 +283,11 @@ rule maker:
         rules.maker_bopts.output,
         rules.maker_opts.output,
         rules.maker_exe.output,
-        MAKER=rules.maker_installation.output,
-        BASHRC=rules.maker_bashrc.output
+        MAKER=rules.maker_installation.output
     output: CONFIG['base']['working_dir'] + "/maker_done.txt"
     shell:
         "cd " + CONFIG['base']['working_dir'] + " && "
-        "source {input.BASHRC} && "
+        "source {rules.maker_bashrc.output} && "
         "{input.MAKER} && "
         "touch {output}"
 
@@ -362,10 +352,9 @@ rule rename_ids_gff:
 """ FUNCTIONAL ANNOTATION """
 
 rule install_interproscan:
-    input: rules.maker_bashrc.output
     output: CONFIG["functional_annotation"]["interproscan"]
     shell:
-        "source {input} && "
+        "source {rules.maker_bashrc.output} && "
         "TEMPDIR=`mktemp -d` && "
         "cd $TEMPDIR && "
         "wget " + CONFIG["functional_annotation"]["interproscan_url"] + " && "
@@ -377,21 +366,19 @@ rule install_interproscan:
 
 rule install_panther:
     input:
-        INTERPRO=rules.install_interproscan.output,
-        BASHRC=rules.maker_bashrc.output
+        INTERPRO=rules.install_interproscan.output
     output: CONFIG["functional_annotation"]["interproscan"] + "/data/panther"
     shell:
-        "source {input.BASHRC} && "
+        "source {rules.maker_bashrc.output} && "
         "cd {input.INTERPRO}/data && "
         "wget " + CONFIG["functional_annotation"]["panther_url"] + " && "
         "tar zxvf panther*.gz && touch " + CONFIG["functional_annotation"]["interproscan"] + "/data/panther && "
         "rm panther*.gz"
 
 rule install_uniprot:
-    input: rules.maker_bashrc.output
     output: CONFIG["functional_annotation"]["uniprot"]
     shell:
-        "source {input} && "
+        "source {rules.maker_bashrc.output} && "
         "TEMPDIR=`mktemp -d` && "
         "cd $TEMPDIR && "
         "wget -m -R 'xml.gz' " + CONFIG["functional_annotation"]["uniprot_url"] + " && "
