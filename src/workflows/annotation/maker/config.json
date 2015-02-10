@@ -5,6 +5,7 @@
 		"maker_bashrc": "{base_dir}{executables}maker.bashrc",
 		"maker_perl": "{base_dir}bin/maker/src/",
 		"perl_install": "{home_dir}perl5/",
+		"perl_cpanm_options" : "--force --notest --local-lib-contained {home_dir}perl5/ --local-lib {home_dir}perl5/",
 		"perl_libs":
 		[
 			"BioPerl",
@@ -69,7 +70,8 @@
 		"trf": "{base_dir}{executables}trf/trf",
 		"repbase": "{base_dir}{executables}repbase/",
 		"maker": "{base_dir}{executables}/maker/bin/maker",
-		"perl" : "{home_dir}perl5/bin/perl"
+		"perl" : "{home_dir}perl5/bin/perl",
+		"cpanm" : "{home_dir}perl5/bin/cpanm"
 	},
 
 	"executable_sources":
@@ -89,7 +91,7 @@
 		"recon_URL": "{web_host}maker_test.nobackup/RECON-1.08.tar.gz",
 		"repeatscout_URL": "{web_host}maker_test.nobackup/RepeatScout-1.0.5.tar.gz",
 		"repeatmodeler_URL": "{web_host}maker_test.nobackup/RepeatModeler-open-1-0-8.tar.gz",
-		"perl_URL": "http://downloads.activestate.com/ActivePerl/releases/5.18.4.1803/ActivePerl-5.18.4.1803-x86_64-linux-glibc-2.5-298573.tar.gz"
+		"perl_URL": "{web_host}maker_test.nobackup/ActivePerl-5.18.4.1803-x86_64-linux-glibc-2.5-298573.tar.gz"
 	},
 
 	"maker_installation_production":
@@ -109,7 +111,8 @@
 		"repeatmaskerlibraries_URL_netrc": "{home_dir}/.netrc",
 		"recon_URL": "http://www.repeatmasker.org/RECON-1.08.tar.gz",
 		"repeatscout_URL": "http://repeatscout.bioprojects.org/RepeatScout-1.0.5.tar.gz",
-		"repeatmodeler_URL": "http://www.repeatmasker.org/RepeatModeler-open-1-0-8.tar.gz"
+		"repeatmodeler_URL": "http://www.repeatmasker.org/RepeatModeler-open-1-0-8.tar.gz",
+		"perl_URL": "http://downloads.activestate.com/ActivePerl/releases/5.18.4.1803/ActivePerl-5.18.4.1803-x86_64-linux-glibc-2.5-298573.tar.gz"
 	},
 
 	"jbrowse_installation":
