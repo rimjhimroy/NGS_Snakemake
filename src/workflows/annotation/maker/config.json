@@ -8,6 +8,7 @@
 		"perl_cpanm_options" : "--force --notest --local-lib-contained {home_dir}perl5/ --local-lib {home_dir}perl5/",
 		"perl_libs":
 		[
+			"forks",
 			"BioPerl",
 			"DBI",
 			"Error",
