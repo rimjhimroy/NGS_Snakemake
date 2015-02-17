@@ -52,7 +52,38 @@ Sequence from longer fragments will enable longer-range continuity.
 import os, subprocess
 from Allpaths import *
 
-ALLPATHS_VERSION = subprocess.check_output("RunAllPathsLG --version", shell=True).decode("utf-8").split()[7]
+# Create bashrc to store settings and paths
+rule bashrc:
+    output : CONFIG['base']['bashrc']
+    params : dir = strip_path_level(CONFIG['base']['bashrc'],1)
+    priority: 5000
+    shell :
+        "mkdir -p {params.dir} && "
+        "touch {output}"
+
+# Download and install AllPathsLG
+rule Allpaths_installation:
+    output :
+        PREPAREALLPATHSINPUTS=CONFIG["executables"]["PrepareAllPathsInputs"],
+        RUNALLPATHSLG=CONFIG["executables"]["RunAllPathsLG"]
+    params:
+        topdir = strip_path_level(CONFIG["executables"]["RunAllPathsLG"],1),
+        dir = strip_path_level(CONFIG["executables"]["RunAllPathsLG"],2)
+    threads: CONFIG["default_threads"]
+    shell:
+        "TEMPDIR=`mktemp -d` && "
+        "cd $TEMPDIR && "
+        "wget"+CONFIG['executable_sources']['wget_options']+CONFIG['executable_sources']['allpaths_URL']+" && "
+        "tar xzf * && "
+        "cd all* &&"
+        "./configure --prefix={params.dir} && "
+        "make --jobs {threads} && "
+        "make install &&"
+        "cd / && rm -rf $TEMPDIR && "
+        "echo 'export PATH='`readlink -f {params.topdir}`':$PATH' >> {rules.bashrc.output} && "
+        "touch {output.PREPAREALLPATHSINPUTS} {output.RUNALLPATHSLG};"
+
+# ALLPATHS_VERSION = subprocess.check_output("RunAllPathsLG --version", shell=True).decode("utf-8").split()[7]
 
 rule inLibsCsv:
     params: CONFIG["samples"] # Can't be used in the command below, as somehow we only get the top level of the dictionary.
@@ -71,23 +102,32 @@ rule inGroupsCsv:
 rule prepareAllpaths:
     input:
         libsCsv = rules.inLibsCsv.output,
-        groupsCsv = rules.inGroupsCsv.output
+        groupsCsv = rules.inGroupsCsv.output,
+        PREPAREALLPATHSINPUTS = rules.Allpaths_installation.output["PREPAREALLPATHSINPUTS"]
     output: "assembly/assembly/jump_reads_orig.fastb"
-    version: ALLPATHS_VERSION
+    # version: ALLPATHS_VERSION
     params:
-        optionalOpts = CONFIG["allpaths"]["preparation"]["optionalOpts"]
+        optionalOpts = CONFIG["allpaths"]["preparation"]["optionalOpts"],
+        bashrc = rules.bashrc.output
     shell:
-        "PrepareAllPathsInputs.pl {params.optionalOpts} DATA_DIR=`pwd`/assembly/assembly/ IN_GROUPS_CSV={input.groupsCsv} IN_LIBS_CSV={input.libsCsv}"
+        "source {params.bashrc} && "
+        "{input.PREPAREALLPATHSINPUTS} {params.optionalOpts} DATA_DIR=`pwd`/assembly/assembly/ IN_GROUPS_CSV={input.groupsCsv} IN_LIBS_CSV={input.libsCsv}"
 
 rule allpaths:
-    input: rules.prepareAllpaths.output
+    input:
+        RUNALLPATHSLG = rules.Allpaths_installation.output["RUNALLPATHSLG"],
+        PREPAREALLPATHSOUTPUT = rules.prepareAllpaths.output
     output:
         contigs = "assembly/assembly/assembly/ASSEMBLIES/assembly/final.contigs.fasta",
         scaffolds = "assembly/assembly/assembly/ASSEMBLIES/assembly/final.assembly.fasta"
     threads: CONFIG["default_threads"]
-    version: ALLPATHS_VERSION
+    # version: ALLPATHS_VERSION
+    params:
+        optionalOpts = CONFIG["allpaths"]["optionalOpts"],
+        bashrc = rules.bashrc.output
     shell:
-        "RunAllPathsLG PRE=./ REFERENCE_NAME=assembly DATA_SUBDIR=assembly RUN=assembly SUBDIR=assembly THREADS={threads}"
+        "source {params.bashrc} && "
+        "{input.RUNALLPATHSLG} {params.optionalOpts} PRE=./ REFERENCE_NAME=assembly DATA_SUBDIR=assembly RUN=assembly SUBDIR=assembly THREADS={threads}"
 
 rule allpathsCleanup:
     input:

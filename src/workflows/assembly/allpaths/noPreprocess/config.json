@@ -1,10 +1,21 @@
 {
-    "default_threads":"999",
+    "base":{
+        "bashrc": "{base_dir}{executables}bashrc"
+    },
+    "executables":{
+        "PrepareAllPathsInputs" : "{base_dir}{executables}allpaths/bin/PrepareAllPathsInputs.pl",
+        "RunAllPathsLG" : "{base_dir}{executables}allpaths/bin/RunAllPathsLG"
+    },
+    "executable_sources":{
+        "wget_options": " -c --proxy=off --no-verbose ",
+        "allpaths_URL": "ftp://ftp.broadinstitute.org/pub/crd/ALLPATHS/Release-LG/latest_source_code/LATEST_VERSION.tar.gz"
+    },
+    "default_threads": 999,
     "allpaths":{
         "preparation":{
-            "optionalOpts": "PLOIDY=2 OVERWRITE=1"
+            "optionalOpts": "PLOIDY=2 OVERWRITE=True"
         },
-        "optionalOpts": "FF_MAX_STRETCH=5 OVERWRITE=TRUE"
+        "optionalOpts": "FF_MAX_STRETCH=5 OVERWRITE=True"
     },
     "samples": {
         "Staphylococcus aureus (SRS004751,SRS004751)": {
@@ -35,3 +46,4 @@
         }
     }
 }
+

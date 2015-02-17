@@ -2,6 +2,7 @@
 ##  Functions  ##
 #################
 import csv
+import os.path
 
 def createInLibsCsv(samples, outputFile):
     """
@@ -105,3 +106,9 @@ def rreplace(substitute, old_value, new_value, occurrence):
     """
     li = substitute.rsplit(old_value, occurrence)
     return new_value.join(li)
+
+def strip_path_level(path, level = 0):
+    head = path
+    for i in range(0, level):
+        (head, tail) = os.path.split(head)
+    return head
