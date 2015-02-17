@@ -1,16 +1,35 @@
 """
 
 """
-
 import json, os, inspect
 
-### Get lib configuration
+# Get lib configuration
+# Set PYTHONPATH before running Snakemake :
+# export PYTHONPATH=$PYTHONPATH:/home/haars001/scratch/projects/VLPB/
 from SnakeMakeVlpb import VLPB_LIB_PATH
- 
-with open("config.json") as f:
-    CONFIG = json.load(f)
 
-## Create a symlink so the data is perfectly fit for all rules. All reads contain the name of their library. 
+ruleDir = VLPB_LIB_PATH + "rules/"
+
+"""
+Recursive function to do a string format on each of the string values in the config.
+    Full replace on a JSON does not work: it uses '{}' for formatting, which results
+    in errors.
+"""
+def replace_paths_in_json(conf, paths):
+    for item in conf:
+        if isinstance(conf[item], str): #is it a string value?
+            conf[item] = conf[item].format(**paths) #use json to replace values
+        elif isinstance(conf[item], dict): # is this a json object (dict) ?
+            replace_paths_in_json(conf[item], paths) # parse object
+
+# Get the config file:
+with open("config.json") as conf:
+    with open("paths.json") as paths:
+        PATHS = json.load(paths)
+        CONFIG = json.load(conf)
+        replace_paths_in_json(CONFIG, PATHS)
+
+## Create a symlink so the data is perfectly fit for all rules. All reads contain the name of their library.
 ## All forward reads are {library name}_1.fastq and all reversed reads are {library name}_2.fastq
 for sample in CONFIG["libraries"]:
     for i in range(len(CONFIG["libraries"][sample]["reads"])):
@@ -21,9 +40,7 @@ for sample in CONFIG["libraries"]:
         except FileExistsError:
             pass
 
-ruleDir = VLPB_LIB_PATH + "rules/"
-
-#Preprocessing     
+#Preprocessing
 include: ruleDir + "fastqProcessors/Trimmomatic.rules"
 include: ruleDir + "fastqProcessors/Quake.rules"
 include: ruleDir + "fastqProcessors/FastqMcf.rules"

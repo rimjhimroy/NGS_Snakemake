@@ -1,17 +1,41 @@
 {
-    "libraries":{
-        "someLibName":{
-            "reads" : ["/path/to/reads_1.fastq","/path/to/reads_2.fastq"],
-            "type" : "pe",
-            "insertSize" : 180,
-            "insertSizeStdev" : 36,
-            "readlen" : 100,
-            "platform" : "illumina"
-        }
+    "base":{
+        "bashrc": "{base_dir}{executables}bashrc"
     },
-    "wgs":{
-        "input":{
-            "someLibName":["../preprocessing/trim.reads_1.fastq"]
+    "executables":{},
+    "executable_sources":{
+        "wget_options": " -c --proxy=off --no-verbose ",
+        "wgs_URL": "http://downloads.sourceforge.net/project/wgs-assembler/wgs-assembler/wgs-8.2/wgs-8.2-Linux_amd64.tar.bz2?r=http%3A%2F%2Fsourceforge.net%2Fprojects%2Fwgs-assembler%2Ffiles%2Fwgs-assembler%2Fwgs-8.2%2Fwgs-8.2-Linux_amd64.tar.bz2%2Fdownload&ts=1424174727&use_mirror=heanet"
+    },
+    "default_threads": 999,
+    "wgs":{}
+    },
+    "samples": {
+        "Staphylococcus aureus (SRS004751,SRS004751)": {
+            "SRR022868": {
+                "readsets": {
+                        "1": [
+                                "/home/haars001/scratch/projects/VLPB/test_data/Staphylococcus_aureus/Data.original/frag_1.fastq.gz",
+                                "/home/haars001/scratch/projects/VLPB/test_data/Staphylococcus_aureus/Data.original/frag_2.fastq.gz"
+                                ]
+                        },
+                "type": "pe",
+                "insertSize": "180",
+                "insertSizeStDev": "",
+                "platform": "illumina"
+            },
+            "SRR022865": {
+                "readsets": {
+                        "1": [
+                                "/home/haars001/scratch/projects/VLPB/test_data/Staphylococcus_aureus/Data.original/shortjump_1.fastq.gz",
+                                "/home/haars001/scratch/projects/VLPB/test_data/Staphylococcus_aureus/Data.original/shortjump_2.fastq.gz"
+                                ]
+                        },
+                "type": "mp",
+                "insertSize": "3500",
+                "insertSizeStDev": "",
+                "platform": "illumina"
+            }
         }
     }
 }
