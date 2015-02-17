@@ -4,11 +4,11 @@
 		"working_dir": "{base_dir}TEMP_MAKER",
 		"maker_bashrc": "{base_dir}{executables}maker.bashrc",
 		"maker_perl": "{base_dir}bin/maker/src/",
-		"perl_brew" : "{home_dir}perl5/perlbrew/", 
+		"perl_brew" : "{home_dir}perl5/perlbrew/",
 		"perl_install": "{home_dir}perl5/perlbrew/perls/perl-5.18.0/",
 		"perl_version": "5.18.0",
 		"perl_cpanm_options" : "--force --notest ",
-		"perl_brew_options" : "-j 6 --notest --noman --thread --force ", 
+		"perl_brew_options" : "-j 6 --notest --noman --thread --force ",
 		"perl_libs":
 		[
 			"forks",
@@ -29,7 +29,8 @@
 			"forks::shared",
 			"IO::All",
 			"IO::Prompt",
-			"DBD::SQLite"
+			"DBD::SQLite",
+			"LWP::Simple"
 		]
 	},
 
