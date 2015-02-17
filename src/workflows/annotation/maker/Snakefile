@@ -41,7 +41,7 @@ include: ruleDir + "/annotation/Maker.rules"
 rule all:
     input:
         CONFIG['base']['maker_bashrc'], # Needs to be separate defined always !
-        rules.perl_libs.output
+        rules.install_perl_libs.output
         ,rules.maker_installation.output
         ,rules.maker.output
         #,rules.get_predicted_proteins.output

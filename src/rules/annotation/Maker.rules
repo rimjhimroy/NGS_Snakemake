@@ -160,57 +160,35 @@ rule repeatmasker_installation:
 
 # Install perl if version is too low (as on our cluster)
 rule install_perl:
-    output: CONFIG["executables"]["perl"]
-    params:
-            dir = strip_path_level(CONFIG["executables"]["perl"],2),
-            topdir = strip_path_level(CONFIG["executables"]["perl"],1)
-    shell:
-        "source {rules.maker_bashrc.output} && "
-        "TEMPDIR=`mktemp -d` && "
-        "cd $TEMPDIR && "
-        "wget"+CONFIG['executable_sources']['wget_options']+CONFIG['executable_sources']['perl_URL']+" && "
-        "tar xzf ActivePerl-5* && "
-        "cd ActivePerl-5* && "
-        "rmdir {params.topdir} && "
-        "rmdir {params.dir} && "
-        "sh install.sh --prefix={params.dir} --no-install-html --license-accepted && "
-        "cd - && "
-        "rm -rf ActivePerl-5* && "
-        "cd / && rm -rf $TEMPDIR &&"
-        "touch {output} && "
-        "echo 'export PATH='`readlink -f {params.topdir}`':$PATH' >> {rules.maker_bashrc.output} && "
+   output: CONFIG["executables"]["perl"]
+   shell:
+        "wget --no-check-certificate -O - http://install.perlbrew.pl | bash && "
+        "source " + CONFIG["base"]["perl_brew"] + "etc/bashrc && "
+        "perlbrew " + CONFIG["base"]["perl_brew_options"] + " install " + CONFIG["base"]["perl_version"] + " && "
+        "perlbrew switch " + CONFIG["base"]["perl_version"] + " && "
+        "cat " + CONFIG["base"]["perl_brew"] + "etc/bashrc >> {rules.maker_bashrc.output} && "
+        "echo 'perlbrew switch " + CONFIG["base"]["perl_version"] + "' >>  {rules.maker_bashrc.output} && "
         "touch {output};"
 
 # Create local Perl library
-rule install_perl_locallib:
+rule install_perl_cpanm:
     input:
         PERL=rules.install_perl.output
     output: CONFIG["executables"]["cpanm"]
-    params :
-        dir = strip_path_level(CONFIG["executables"]["cpanm"],1),
-        libdir = strip_path_level(CONFIG["executables"]["cpanm"],2)
     shell:
         "source {rules.maker_bashrc.output} && "
-        "mkdir -p {params.dir} && "
-        "cd {params.dir} && "
-        "wget --no-check-certificate http://xrl.us/cpanm && "
-        "chmod +x cpanm && "
-        "cpanm --local-lib={params.libdir} local::lib && "
-        "eval $({input.PERL} -I {params.libdir}/lib/perl5/ -Mlocal::lib) && "
-        "echo $PERL_MM_OPT && "
-        "echo $MODULEBUILDRC && "
-        "echo 'eval $({input.PERL} -I{params.libdir}/lib/perl5 -Mlocal::lib)' >> {rules.maker_bashrc.output} && "
+        "perlbrew install-cpanm && "
         "touch {output}"
 
 # Install necessary Perl libraries
-rule perl_libs:
+rule install_perl_libs:
     input:
-        rules.install_perl_locallib.output,
+        rules.install_perl_cpanm.output,
         rules.install_perl.output
     output: CONFIG["base"]["perl_install"] + "lib/done"
     run:
         for lib in CONFIG["base"]["perl_libs"]:
-            shell("source  {rules.maker_bashrc.output} ; " + CONFIG["base"]["perl_install"] + "bin/cpanm " + CONFIG["base"]["perl_cpanm_options"] + " " + lib)
+            shell("source  {rules.maker_bashrc.output} ; cpanm "+ CONFIG["base"]["perl_cpanm_options"] + " " + lib)
         shell("touch " + CONFIG["base"]["perl_install"] + "lib/done")
 
 #  Download and install Maker
@@ -223,7 +201,7 @@ rule maker_installation:
         rules.snap_installation.output,
         rules.exonerate_installation.output,
         rules.augustus_installation.output,
-        rules.perl_libs.output,
+        rules.install_perl_libs.output,
         PERL=rules.install_perl.output
     params: dir = strip_path_level(CONFIG["executables"]["maker"],2)
     output: CONFIG["executables"]["maker"]

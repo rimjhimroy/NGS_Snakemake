@@ -4,8 +4,11 @@
 		"working_dir": "{base_dir}TEMP_MAKER",
 		"maker_bashrc": "{base_dir}{executables}maker.bashrc",
 		"maker_perl": "{base_dir}bin/maker/src/",
-		"perl_install": "{home_dir}perl5/",
-		"perl_cpanm_options" : "--force --notest --local-lib-contained {home_dir}perl5/ --local-lib {home_dir}perl5/",
+		"perl_brew" : "{home_dir}perl5/perlbrew/", 
+		"perl_install": "{home_dir}perl5/perlbrew/perls/perl-5.18.0/",
+		"perl_version": "5.18.0",
+		"perl_cpanm_options" : "--force --notest ",
+		"perl_brew_options" : "-j 6 --notest --noman --thread --force ", 
 		"perl_libs":
 		[
 			"forks",
@@ -26,7 +29,6 @@
 			"forks::shared",
 			"IO::All",
 			"IO::Prompt",
-			"DBD::Pg",
 			"DBD::SQLite"
 		]
 	},
@@ -71,8 +73,8 @@
 		"trf": "{base_dir}{executables}trf/trf",
 		"repbase": "{base_dir}{executables}repbase/",
 		"maker": "{base_dir}{executables}/maker/bin/maker",
-		"perl" : "{home_dir}perl5/bin/perl",
-		"cpanm" : "{home_dir}perl5/bin/cpanm"
+		"perl" : "{home_dir}perl5/perlbrew/perls/perl-5.18.0/bin/perl",
+		"cpanm" : "{home_dir}perl5/perlbrew/bin/cpanm"
 	},
 
 	"executable_sources":
