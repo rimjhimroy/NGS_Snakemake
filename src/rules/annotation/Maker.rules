@@ -355,7 +355,7 @@ rule install_uniprot:
         "TEMPDIR=`mktemp -d` && "
         "cd $TEMPDIR && "
         "wget -m -R 'xml.gz' " + CONFIG["functional_annotation"]["uniprot_url"] + " && "
-        "gunzip -vk uniref100.fasta.gz && "
+        "gunzip -v uniref100.fasta.gz && "
         'TITLE="UniRef100 - "`cat uniref100.release_note | grep Release | sed \'s/^[ \\t]*//\'` && '
         '' + CONFIG["executables"]['makeblastdb'] + ' -in uniref100.fasta -dbtype prot -out uniref -title "$TITLE" -parse_seqids && '
         "mkdir -p {output} && "
