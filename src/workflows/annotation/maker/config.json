@@ -141,7 +141,7 @@
 		"uniprot": "{base_dir}{databases}/uniprot",
 		"uniprot_url": "ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/uniref/",
 		"uniprot_db": "uniref50",
-		"interproscan": "/media/sven/extData/sven/interproscan/interproscan-5.8-49.0",
+		"interproscan": "{base_dir}{executables}interproscan/interproscan-5.8-49.0",
 		"interproscan_url": "ftp://ftp.ebi.ac.uk/pub/databases/interpro/iprscan/5/5.8-49.0/interproscan-5.8-49.0-64-bit.tar.gz",
 		"panther_url" : "ftp://ftp.ebi.ac.uk/pub/software/unix/iprscan/5/data/panther-data-9.0.tar.gz"
 	}
