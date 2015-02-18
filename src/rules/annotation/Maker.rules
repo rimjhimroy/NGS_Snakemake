@@ -37,7 +37,7 @@ rule augustus_installation:
     output: CONFIG["executables"]["augustus"]
     params: dir = strip_path_level(CONFIG["executables"]["augustus"],2)
     shell:
-        "TEMPDIR=`mktemp -d` && "
+        "TEMPDIR=`mktemp -p " + CONFIG["base"]["download_dir"] + " -d` && "
         "cd $TEMPDIR && "
         "wget"+CONFIG['executable_sources']['wget_options']+CONFIG['executable_sources']['augustus_URL']+" && "
         "tar xzf augustus* && "
@@ -53,7 +53,7 @@ rule exonerate_installation:
     output: CONFIG["executables"]["exonerate"]
     params: dir = strip_path_level(CONFIG["executables"]["exonerate"],2)
     shell:
-        "TEMPDIR=`mktemp -d` && "
+        "TEMPDIR=`mktemp -p " + CONFIG["base"]["download_dir"] + " -d` && "
         "cd $TEMPDIR && "
         "wget"+CONFIG['executable_sources']['wget_options']+CONFIG['executable_sources']['exonerate_URL']+" && "
         "tar xzf exonerate* && "
@@ -67,7 +67,7 @@ rule snap_installation:
     output: CONFIG["executables"]["snap"]
     params: dir = strip_path_level(CONFIG["executables"]["snap"],1)
     shell:
-        "TEMPDIR=`mktemp -d` && "
+        "TEMPDIR=`mktemp -p " + CONFIG["base"]["download_dir"] + " -d` && "
         "cd $TEMPDIR && "
         "wget"+CONFIG['executable_sources']['wget_options']+CONFIG['executable_sources']['snap_URL']+" && "
         "tar xzf snap* && "
@@ -95,7 +95,7 @@ rule blast_plus_installation:
     output: CONFIG["executables"]["blastn"]
     params: dir = strip_path_level(CONFIG["executables"]["blastn"],2)
     shell:
-        "TEMPDIR=`mktemp -d` && "
+        "TEMPDIR=`mktemp -p " + CONFIG["base"]["download_dir"] + " -d` && "
         "cd $TEMPDIR && "
         "wget"+CONFIG['executable_sources']['wget_options']+CONFIG['executable_sources']['blast+_URL']+" && "
         "tar xzf ncbi* && "
@@ -109,7 +109,7 @@ rule rmblast_installation:
     output: CONFIG["executables"]["rmblast"]
     params: dir = strip_path_level(CONFIG["executables"]["rmblast"],2)
     shell:
-        "TEMPDIR=`mktemp -d` && "
+        "TEMPDIR=`mktemp -p " + CONFIG["base"]["download_dir"] + " -d` && "
         "cd $TEMPDIR;"
         "wget"+CONFIG['executable_sources']['wget_options']+CONFIG['executable_sources']['rmblast_URL']+" && "
         "tar xzf ncbi-blast* && "
@@ -123,7 +123,7 @@ rule rmblast_installation:
 rule repbase_installation:
     output: CONFIG["executables"]["repbase"]
     shell:
-        "TEMPDIR=`mktemp -d` && "
+        "TEMPDIR=`mktemp -p " + CONFIG["base"]["download_dir"] + " -d` && "
         "cd $TEMPDIR && "
         "curl --remote-name --anyauth --netrc-file "+CONFIG['executable_sources']['repeatmaskerlibraries_URL_netrc']+" "+CONFIG['executable_sources']['repeatmaskerlibraries_URL']+" && "
         "tar xzf repeatmaskerlibraries* && "
@@ -142,7 +142,7 @@ rule repeatmasker_installation:
     output: CONFIG["executables"]["RepeatMasker"]
     params: dir = strip_path_level(CONFIG["executables"]["RepeatMasker"],1), RMBLAST = strip_path_level(CONFIG["executables"]["rmblast"],1)
     shell:
-        "TEMPDIR=`mktemp -d` && "
+        "TEMPDIR=`mktemp -p " + CONFIG["base"]["download_dir"] + " -d` && "
         "cd $TEMPDIR && "
         "wget"+CONFIG['executable_sources']['wget_options']+CONFIG['executable_sources']['repeatmasker_URL']+" && "
         "tar xzf RepeatMasker-open-* && "
@@ -206,7 +206,7 @@ rule maker_installation:
     params: dir = strip_path_level(CONFIG["executables"]["maker"],2)
     output: CONFIG["executables"]["maker"]
     shell:
-        "TEMPDIR=`mktemp -d` && "
+        "TEMPDIR=`mktemp -p " + CONFIG["base"]["download_dir"] + " -d` && "
         "cd $TEMPDIR && "
         "wget"+CONFIG['executable_sources']['wget_options']+CONFIG['executable_sources']['maker_URL']+" && "
         "tar xzf maker* && "
@@ -328,9 +328,9 @@ rule install_interproscan:
     output: CONFIG["functional_annotation"]["interproscan"]
     shell:
         "source {rules.maker_bashrc.output} && "
-        "TEMPDIR=`mktemp -d` && "
+        "TEMPDIR=`mktemp -p " + CONFIG["base"]["download_dir"] + " -d` && "
         "cd $TEMPDIR && "
-        "wget " + CONFIG["functional_annotation"]["interproscan_url"] + " && "
+        "wget -nd " + CONFIG["functional_annotation"]["interproscan_url"] + " && "
         "tar zxvf *.gz && "
         "mkdir -p {output} && "
         "cp -R -v */* {output} && "
@@ -344,20 +344,22 @@ rule install_panther:
     shell:
         "source {rules.maker_bashrc.output} && "
         "cd {input.INTERPRO}/data && "
-        "wget " + CONFIG["functional_annotation"]["panther_url"] + " && "
+        "wget -nd " + CONFIG["functional_annotation"]["panther_url"] + " && "
         "tar zxvf panther*.gz && touch " + CONFIG["functional_annotation"]["interproscan"] + "/data/panther && "
         "rm panther*.gz"
 
 rule install_uniprot:
     output: CONFIG["functional_annotation"]["uniprot"]
+    params : url = CONFIG["functional_annotation"]["uniprot_url"],
+        db = CONFIG["functional_annotation"]["uniprot_db"]
     shell:
         "source {rules.maker_bashrc.output} && "
-        "TEMPDIR=`mktemp -d` && "
+        "TEMPDIR=`mktemp -p " + CONFIG["base"]["download_dir"] + " -d` && "
         "cd $TEMPDIR && "
-        "wget -m -R 'xml.gz' " + CONFIG["functional_annotation"]["uniprot_url"] + " && "
-        "gunzip -v uniref100.fasta.gz && "
-        'TITLE="UniRef100 - "`cat uniref100.release_note | grep Release | sed \'s/^[ \\t]*//\'` && '
-        '' + CONFIG["executables"]['makeblastdb'] + ' -in uniref100.fasta -dbtype prot -out uniref -title "$TITLE" -parse_seqids && '
+        "wget -nd -m -R 'xml.gz' {params.url}/{params.db} && "
+        "gunzip -v {params.db}.fasta.gz && "
+        'TITLE="UniRef - "`cat {params.db}.release_note | grep Release | sed \'s/^[ \\t]*//\'` && '
+        '' + CONFIG["executables"]['makeblastdb'] + ' -in {params.db}.fasta -dbtype prot -out {params.db} -title "$TITLE" -parse_seqids && '
         "mkdir -p {output} && "
         "cp -R -v * {output} && "
         "cd - && rm -rf $TEMPDIR"
@@ -380,5 +382,5 @@ rule uniprot:
         "-num_threads 4 -outformat 7 "
         "-max_target_seqs 1 "
         "-query {input.PROTEINS} "
-        "-db {input.UNIPROT}/uniref && "
+        "-db {input.UNIPROT}/" + CONFIG["functional_annotation"]["uniprot_db"] + " && "
         "touch {output}"

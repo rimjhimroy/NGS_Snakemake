@@ -3,6 +3,7 @@
 	{
 		"working_dir": "{base_dir}TEMP_MAKER",
 		"maker_bashrc": "{base_dir}{executables}maker.bashrc",
+		"download_dir":"{download_dir}",
 		"maker_perl": "{base_dir}bin/maker/src/",
 		"perl_brew" : "{home_dir}perl5/perlbrew/",
 		"perl_install": "{home_dir}perl5/perlbrew/perls/perl-5.18.0/",
@@ -138,7 +139,8 @@
 	"functional_annotation":
 	{
 		"uniprot": "{base_dir}{databases}/uniprot",
-		"uniprot_url": "ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/uniref/uniref50/",
+		"uniprot_url": "ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/uniref/",
+		"uniprot_db": "uniref50",
 		"interproscan": "/media/sven/extData/sven/interproscan/interproscan-5.8-49.0",
 		"interproscan_url": "ftp://ftp.ebi.ac.uk/pub/databases/interpro/iprscan/5/5.8-49.0/interproscan-5.8-49.0-64-bit.tar.gz",
 		"panther_url" : "ftp://ftp.ebi.ac.uk/pub/software/unix/iprscan/5/data/panther-data-9.0.tar.gz"
