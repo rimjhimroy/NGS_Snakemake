@@ -346,7 +346,7 @@ rule install_panther:
         "cd {input.INTERPRO}/data && "
         "wget -nd " + CONFIG["functional_annotation"]["panther_url"] + " && "
         "tar zxvf panther*.gz && touch " + CONFIG["functional_annotation"]["interproscan"] + "/data/panther && "
-        "rm panther*.gz"
+        "rm -f panther*.gz"
 
 rule install_uniprot:
     output: CONFIG["functional_annotation"]["uniprot"]
@@ -367,6 +367,7 @@ rule install_uniprot:
 rule interproscan:
     input:
         INTERPRO = rules.install_interproscan.output,
+        PANTHER = rules.install_panther.output,
         PROTEINS = rules.get_predicted_proteins.output
     output: CONFIG['base']['working_dir'] + "/protein_annotation.tsv"
     shell:
