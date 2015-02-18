@@ -378,8 +378,8 @@ rule uniprot:
         UNIPROT = rules.install_uniprot.output,
         PROTEINS = rules.get_predicted_proteins.output
     output: CONFIG['base']['working_dir'] + "/protein_uniprot.csv"
-    shell: CONFIG["executables"]['blastp'] + " -out {output}"
-        "-num_threads 4 -outformat 7 "
+    shell: CONFIG["executables"]['blastp'] + " -out {output} "
+        "-num_threads 4 -outfmt 7 "
         "-max_target_seqs 1 "
         "-query {input.PROTEINS} "
         "-db {input.UNIPROT}/" + CONFIG["functional_annotation"]["uniprot_db"] + " && "
