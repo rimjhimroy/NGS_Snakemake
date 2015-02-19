@@ -1,11 +1,14 @@
-"""
-#edited workflow
+from src.utils import CreateSymlinkReads
 
-"""
 import json, os, inspect, sys
 import shutil
 
 ruleDir = os.path.dirname(inspect.getframeinfo(inspect.currentframe()).filename) + "/../../../rules/"
+
+#sys.path.append(ruleDir + "fastqProcessors/")
+#import CreateSymlinkReads
+
+
 
 # Add qualityControl to pythonpath
 
@@ -51,35 +54,43 @@ try: #will work only when called from galaxy
 except:
     pass 
 
+#create symlinks to the readfiles in structured folders, original locations of reads in JSON
+CreateSymlinkReads.createSymlinks(CONFIG)
+
 include: ruleDir + "utils/Unzip.rules"
 include: ruleDir + "utils/ExtensionChanger.rules"
 include: ruleDir + "mappers/Bwa.rules"
-include: ruleDir + "fastqProcessing/Trimmomatic.rules"
-include: ruleDir + "mappers/PicardTools.rules"
-include: ruleDir + "mappers/Samtools.rules"
-include: ruleDir + "variantCalling/Freebayes.rules"
+include: ruleDir + "fastqProcessors/Trimmomatic.rules"
+#include: ruleDir + "mappers/PicardTools.rules"
+#include: ruleDir + "mappers/Samtools.rules"
+#include: ruleDir + "variantCalling/Freebayes.rules"
 
 #rule all:
 #    input: "report/report.xpdf"
 
+#create symlinks to the readfiles in structured folders, original locations of reads in JSON
+#CreateSymlinkReads.createSymlinks(CONFIG)
 
+#SAMPLES,=glob_wildcards("raw_reads/{samples}.fastq.gz")
 
-#SAMPLES,=glob_wildcards("raw_reads/{sample}_1.fastq.gz")
-SAMPLES=CONFIG["samples"]
+SAMPLES, =glob_wildcards("reads/{samples}.fastq.gz")
 
 """Some galaxy specific code:"""
+#./trimmed_reads/{sample}/{lib}/{readset}/trim.{name}_1.fastq.gz
     
 rule all:
+    input: expand("./trimmed_reads/{samples}.fastq.gz", samples=SAMPLES)	
+    #input: expand("./reads/{samples}/{libs}/{readsets}/trim.{readfile}.fastq", samples=SAMPLES  )
     #input: expand("processed/trim.{samples}.fastq", samples=SAMPLES)
     #input: expand("mapped/bwaMem.{samples}.sam", samples=SAMPLES)
     #input: expand("processedbam/RG.noDup.sorted.bwaMem.{samples}.bam", samples=SAMPLES)
     #input: expand("variantCalling/fb.{sample}.vcf", samples=SAMPLES)
-    input: expand("variantCalling/fb.RG.noDup.sorted.bwaMem.{samples}.vcf", samples=SAMPLES)
-    run:
-        if "GALAXY_OUTPUT" in CONFIG:
-            for s in SAMPLES:
-                os.rename(current_path + "variantCalling/fb.RG.noDup.sorted.bwaMem.{0}.vcf".format(s), CONFIG["GALAXY_OUTPUT"])
-                os.rename(current_path + "processedbam/RG.noDup.sorted.bwaMem.{0}.bam".format(s), CONFIG["GALAXY_BAM"])
+    #input: expand("variantCalling/fb.RG.noDup.sorted.bwaMem.{samples}.vcf", samples=SAMPLES)
+    #run:
+    #    if "GALAXY_OUTPUT" in CONFIG:
+    #        for s in SAMPLES:
+    #            os.rename(current_path + "variantCalling/fb.RG.noDup.sorted.bwaMem.{0}.vcf".format(s), CONFIG["GALAXY_OUTPUT"])
+    #            os.rename(current_path + "processedbam/RG.noDup.sorted.bwaMem.{0}.bam".format(s), CONFIG["GALAXY_BAM"])
 
 #DATASETS,=glob_wildcards("./processed/{sample}.fastq")
 #rule all:
