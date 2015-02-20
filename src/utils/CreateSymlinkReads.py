@@ -4,8 +4,8 @@
 #################
 
 #"""
-#renames the readfiles indicated in the JSON file to symlinks in the read_dir folder 
-#These renamed filenames are the basis of the pipeline 
+#renames the readfiles indicated in the JSON file to symlinks in the read_dir folder
+#These renamed filenames are the basis of the pipeline
 #
 #Sample definition in JSON file (example):
 #{
@@ -45,29 +45,24 @@ import sys
 import json
 import os
 
-def createSymlinks(CONFIG): 
-
+def createSymlinks(CONFIG):
     for sample in CONFIG["samples"]:
         for lib in CONFIG["samples"][sample]:
-           for readsets in CONFIG["samples"][sample][lib]["readsets"]:
-                i=1
-                for paths in CONFIG["samples"][sample][lib]["readsets"][readsets]:
-                    i+=1
-                    splitpath=paths.split("/")
-                    dir="./reads/" + sample + "/" + lib + "/" + readsets
+           for readset in CONFIG["samples"][sample][lib]["readsets"]:
+                for path in CONFIG["samples"][sample][lib]["readsets"][readset]:
+                    splitpath=path.split("/")
+                    dir="./reads/" + sample + "/" + lib + "/" + readset
                     try:
                         os.stat(dir)
                     except:
+                        print("Creating " + dir)
                         os.makedirs(dir)
-                    print("dir " + dir)
                     newpath=dir + "/" + splitpath[-1]
-                    print("new " + newpath)
-                    oldpath=paths
-                    print("original path: " + paths)
-                    commandstring="ln -fs " + oldpath + " " + newpath
+                    oldpath=path
+                    print(oldpath," -> ",newpath)
                     os.symlink(oldpath, newpath)
 
 if __name__ == "__main__":
     with open(sys.argv[1]) as f:
         config = json.load(f)
-        createSymlinks(config)    
+        createSymlinks(config)
