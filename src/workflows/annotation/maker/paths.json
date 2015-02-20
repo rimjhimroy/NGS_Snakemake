@@ -3,6 +3,6 @@
 	"executables": "bin/maker_helpers/",
 	"databases":"databases/",
 	"web_host":"http://assembly.ab.wurnet.nl/~jvh/",
-	"home_dir":"/home/sven/",
+	"home_dir":"/home/haars001/",
 	"download_dir":"/tmp/"
 }
