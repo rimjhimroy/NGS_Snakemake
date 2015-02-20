@@ -59,8 +59,12 @@ def createSymlinks(CONFIG):
                         os.makedirs(dir)
                     newpath=dir + "/" + splitpath[-1]
                     oldpath=path
-                    print(oldpath," -> ",newpath)
-                    os.symlink(oldpath, newpath)
+                    try:
+                        os.stat(newpath)
+                        print(newpath,"already exists, skipping")
+                    except:
+                        print(oldpath," -> ",newpath)
+                        os.symlink(oldpath, newpath)
 
 if __name__ == "__main__":
     with open(sys.argv[1]) as f:
