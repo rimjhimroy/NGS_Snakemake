@@ -3,10 +3,13 @@
 """
 import json, os, inspect
 
-# Get lib configuration
 # Set PYTHONPATH before running Snakemake :
 # export PYTHONPATH=$PYTHONPATH:/home/haars001/scratch/projects/VLPB/
+# Install snakemake like this :
+# virtualenv --python=python3 venv && source venv/bin/activate && pip3 install snakemake biopython
+# Get lib configuration
 from SnakeMakeVlpb import VLPB_LIB_PATH
+from SnakeMakeVlpb.src.utils.CreateSymlinkReads import createSymlinks
 
 ruleDir = VLPB_LIB_PATH + "rules/"
 
@@ -31,14 +34,7 @@ with open("config.json") as conf:
 
 ## Create a symlink so the data is perfectly fit for all rules. All reads contain the name of their library.
 ## All forward reads are {library name}_1.fastq and all reversed reads are {library name}_2.fastq
-for sample in CONFIG["libraries"]:
-    for i in range(len(CONFIG["libraries"][sample]["reads"])):
-        try:
-            if os.path.exists("preprocessing") == False:
-                os.mkdir("preprocessing")
-            os.symlink(CONFIG["libraries"][sample]["reads"][i], "preprocessing/"+ sample +"_" + str(i+1) + ".fastq")
-        except FileExistsError:
-            pass
+createSymlinks(CONFIG)
 
 #Preprocessing
 include: ruleDir + "fastqProcessors/Trimmomatic.rules"
@@ -49,5 +45,5 @@ include: ruleDir + "fastqProcessors/ContaminationFiltering.rules"
 #Assembly
 include: ruleDir + "assemblers/Wgs.rules"
 
-rule all:
-    input: "assembly/wgs.contigs.fasta"
+# rule all:
+#     input: "assembly/wgs.contigs.fasta"
