@@ -32,42 +32,47 @@ _2.fastq (reversed reads).
 ###############
 ##  Imports  ##
 ###############
-from qualityControl.files import FastqFile
 import collections, subprocess
+from Trimmomatic import *
 
 ###################
 ##  Trimmomatic  ##
 ###################
-ruleorder: trimmomaticPaired > trimmomaticSingle
+#ruleorder: trimmomaticPaired > trimmomaticSingle
 
 # Download and install Trimmomatic
 rule trimmomatic_installation:
     output:
-        TRIMMOMATIC=CONFIG["trimmomatic"]["jar"],
+        TRIMMOMATIC=CONFIG["executables"]["trimmomatic"],
         ADAPTERFILE=CONFIG["illuminaAdapters"]
+    params : dir = strip_path_level(CONFIG['executables']['trimmomatic'],1)
     shell:
+        "set -o xtrace"
+        "set -o verbose"
         "TEMPDIR=`mktemp -d`;"
         "cd $TEMPDIR;"
-        "wget " + CONFIG['trimmomatic']['URL'] + " -O trimmomatic.zip && "
+        "wget " + CONFIG['executable_sources']['trimmomatic_URL'] + " -O trimmomatic.zip && "
         "unzip trimmomatic.zip && "
         "rm trimmomatic.zip && "
-        "mkdir -p " + CONFIG["trimmomatic"]["path"] + " && "
-        "mv -b Trimmomatic*/* " + CONFIG["trimmomatic"]["path"] + " &&"
-        "touch " + CONFIG["trimmomatic"]["path"] + "/* && "
-        "rmdir Trimmomatic* && "
-        "cd / && rmdir $TEMPDIR;"
+        "mkdir -p {dir} && "
+        "cd Trimmomatic* && "
+        "mv *.jar {output.TRIMMOMATIC} && "
+        "mv adapters {params.dir} &&"
+        "touch {output.TRIMMOMATIC} && "
+        "cd / && rm -rf $TEMPDIR;"
+
 
 rule trimmomaticPaired:
     input:
         TRIMMOMATIC=rules.trimmomatic_installation.output["TRIMMOMATIC"],
         ADAPTERFILE=rules.trimmomatic_installation.output["ADAPTERFILE"],
-        forward = "raw_reads/{sample}_1.fastq",
-        reversed = "raw_reads/{sample}_2.fastq"
+        forward = "reads/{sample}/{lib}/{readset}/{name}_1.fastq.gz",
+        reversed = "reads/{sample}/{lib}/{readset}/{name}_2.fastq.gz"
     output:
-        forward = "processed/trim.{sample}_1.fastq",
-        reversed = "processed/trim.{sample}_2.fastq",
-        forwardUnpaired = "processed/trim.{sample}_unpaired_1.fastq",
-        reversedUnpaired = "processed/trim.{sample}_unpaired_2.fastq"
+        forward = "./trimmed_reads/{sample}/{lib}/{readset}/{name}_1.fastq.gz",
+        reversed = "./trimmed_reads/{sample}/{lib}/{readset}/{name}_2.fastq.gz",
+        forwardUnpaired ="./trimmed_reads/{sample}/{lib}/{readset}/{name}.unpaired_1.fastq.gz",
+        reversedUnpaired ="./trimmed_reads/{sample}/{lib}/{readset}/{name}.unpaired_2.fastq.gz"
     threads: 20
     run:
         TrimOpts = collections.namedtuple("TrimOpts", CONFIG["trimmomatic"].keys())
@@ -80,8 +85,8 @@ rule trimmomaticPaired:
             "SLIDINGWINDOW:{trimOpts.windowSize}:{trimOpts.avgMinQual} "
             "MINLEN:{trimOpts.minReadLen}"
             )
-        FastqFile.FastqFile(output.forward, output.reversed).isValid(dna=True)
 
+"""
 rule trimmomaticSingle:
     input:
         TRIMMOMATIC=rules.trimmomatic_installation.output["TRIMMOMATIC"],
@@ -101,3 +106,5 @@ rule trimmomaticSingle:
             "MINLEN:{trimOpts.minReadLen}"
             )
         FastqFile.FastqFile(output[0]).isValid(dna=True)
+
+"""
