@@ -261,7 +261,7 @@ rule maker:
     shell:
         "cd " + CONFIG['base']['working_dir'] + " && "
         "source {rules.maker_bashrc.output} && "
-        "{input.MAKER} && "
+        "{input.MAKER} -fix_nucleotides && "
         "touch {output}"
 
 rule copy_gffs:
