@@ -33,7 +33,7 @@ _2.fastq (reversed reads).
 ##  Imports  ##
 ###############
 import collections, subprocess
-from Trimmomatic import *
+from SnakeMakeVlpb import strip_path_level
 
 ###################
 ##  Trimmomatic  ##
