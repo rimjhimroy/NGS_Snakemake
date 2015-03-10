@@ -3,17 +3,17 @@
         "bashrc": "{base_dir}{executables}bashrc"
     },
     "executables":{
-        "trimmomatic": "{executables}/trimmomatic/trimmomatic.jar"
+        "trimmomatic": "{executables}trimmomatic/trimmomatic.jar"
         },
     "executable_sources":{
         "wget_options": " -c --proxy=off --no-verbose ",
         "wgs_URL": "http://downloads.sourceforge.net/project/wgs-assembler/wgs-assembler/wgs-8.2/wgs-8.2-Linux_amd64.tar.bz2?r=http%3A%2F%2Fsourceforge.net%2Fprojects%2Fwgs-assembler%2Ffiles%2Fwgs-assembler%2Fwgs-8.2%2Fwgs-8.2-Linux_amd64.tar.bz2%2Fdownload&ts=1424174727&use_mirror=heanet",
         "trimmomatic_URL" : "http://www.usadellab.org/cms/uploads/supplementary/Trimmomatic/Trimmomatic-0.33.zip"
     },
-    "default_threads": 999,
+    "default_threads": "999",
     "wgs":{},
     "samples": {
-        "Staphylococcus aureus (SRS004751,SRS004751)": {
+        "Staphylococcus_aureus_SRS004751_SRS004751": {
             "SRR022868": {
                 "readsets": {
                         "1": [
@@ -40,17 +40,17 @@
             }
         }
     },
-    "illuminaAdapters": "{executables}/trimmomatic/adapters/TruSeq2-PE.fa",
+    "illuminaAdapters": "{executables}trimmomatic/adapters/TruSeq2-PE.fa",
     "trimmomatic":{
-        "jar": "/home/jaco001/programs/trimmomatic-0.32.jar",
-        "seedMisMatches": 2,
-        "palindromeClipTreshold": 30,
-        "simpleClipThreshhold": 10,
-        "LeadMinTrimQual": 3,
-        "TrailMinTrimQual": 3,
-        "windowSize": 4,
-        "avgMinQual": 15,
-        "minReadLen": 36,
+        "jar": "{executables}/trimmomatic/trimmomatic.jar",
+        "seedMisMatches": "2",
+        "palindromeClipTreshold": "30",
+        "simpleClipThreshhold": "10",
+        "LeadMinTrimQual": "3",
+        "TrailMinTrimQual": "3",
+        "windowSize": "4",
+        "avgMinQual": "15",
+        "minReadLen": "36",
         "phred" : "-phred33"
     }
 }
