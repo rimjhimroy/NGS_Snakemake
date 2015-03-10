@@ -44,10 +44,10 @@ rule all:
         rules.install_perl_libs.output
         ,rules.maker_installation.output
         ,rules.maker.output
-        #,rules.get_predicted_proteins.output
-        #,rules.concatenate_gffs.output
-        #,rules.interproscan.output
-        #,rules.uniprot.output
+        ,rules.get_predicted_proteins.output
+        ,rules.concatenate_gffs.output
+        ,rules.interproscan.output
+        ,rules.uniprot.output
 #rule all:
 #    input:
 #       expand("{working_dir}/maker_done.txt", working_dir=working_dir),
