@@ -1,0 +1,79 @@
+"""
+@author: Jan van Haarst
+@version: 0.1
+
+"
+https://github.com/lh3/bfc :
+
+BFC is a standalone high-performance tool for correcting sequencing errors from
+Illumina sequencing data. It is specifically designed for high-coverage
+whole-genome human data, though also performs well for small genomes.
+
+The BFC algorithm is a variant of the classical spectrum alignment algorithm
+introduced by [Pevzner et al (2001)][Euler]. It uses an exhaustive search to
+find a k-mer path through a read that minimizes a heuristic objective function
+jointly considering penalties on correction, quality and k-mer support. This
+algorithm was first implemented in my fermi assembler and then refined a few
+times in fermi, fermi2 and now in BFC. In the k-mer counting phase, BFC uses a
+blocked bloom filter to filter out most singleton k-mers and keeps the rest in a
+hash table ([Melsted and Pritchard, 2011][bfcounter]). The use of bloom filter
+is how BFC is named, though other correctors such as [Lighter][lighter] and
+[Bless][bless] actually rely more on bloom filter than BFC.
+"
+Usage: bfc [options] <to-count.fq> [to-correct.fq]
+Options:
+  -s FLOAT     approx genome size (k/m/g allowed; change -k and -b) [unset]
+  -k INT       k-mer length [33]
+  -t INT       number of threads [1]
+  -b INT       set Bloom filter size to pow(2,INT) bits [33]
+  -H INT       use INT hash functions for Bloom filter [4]
+  -d FILE      dump hash table to FILE [null]
+  -E           skip error correction
+  -R           refine bfc-corrected reads
+  -r FILE      restore hash table from FILE [null]
+  -w INT       no more than 5 ec or 2 highQ ec in INT-bp window [10]
+  -c INT       min k-mer coverage [3]
+  -Q           force FASTA output
+  -1           drop reads containing unique k-mers
+  -v           show version number
+  -h           show command line help
+
+Flow:
+- Concatenate all reads (so we use all information for correction)
+- Correct all reads using that larger set, not removing reads with unique k-mers
+
+(later we can decide to remove reads, but then we would have to check for broken pairs)
+
+Expects a global variable CONFIG (e.g. parsed from json) of at least the following structure:
+{
+    "bfc":{
+        "kmer_length": 55,
+        "genome_size": "1g",
+        "optionalOpts": ""
+    }
+
+}
+"""
+###############
+##  Imports  ##
+###############
+import collections, subprocess
+from SnakeMakeVlpb import strip_path_level
+
+# Download and install bfc
+rule bcf_installation:
+    output: CONFIG["executables"]["bfc"]
+    params : dir = strip_path_level(CONFIG['executables']['bfc'],1)
+    threads : 999
+    shell:
+        #"set -o xtrace;"
+        #"set -o verbose;"
+        "TEMPDIR=`mktemp -d`;"
+        "cd $TEMPDIR;"
+        "git clone " + CONFIG['executable_sources']['bfc_URL'] + " && "
+        "cd bfc && "
+        "make -j {threads} && "
+        "mkdir -p {params.dir} && "
+        "mv bfc {output} && "
+        "touch {output} && "
+        "cd / && rm -rf $TEMPDIR;"

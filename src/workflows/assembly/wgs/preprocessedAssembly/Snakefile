@@ -41,6 +41,7 @@ createSymlinks(CONFIG)
 NAMES, = glob_wildcards("reads/{name}_1.fastq.gz")
 #Preprocessing
 include: ruleDir + "fastqProcessors/Trimmomatic.rules"
+include: ruleDir + "fastqProcessors/bfc.rules"
 # include: ruleDir + "fastqProcessors/Quake.rules"
 # include: ruleDir + "fastqProcessors/FastqMcf.rules"
 # include: ruleDir + "fastqProcessors/ContaminationFiltering.rules"
@@ -48,6 +49,9 @@ include: ruleDir + "fastqProcessors/Trimmomatic.rules"
 #Assembly
 #include: ruleDir + "assemblers/Wgs.rules"
 
+
 rule all:
     input:
-        expand("reads/{name}_1.trimmed.fastq.gz", name=NAMES)
+        expand("reads/{name}_1.trimmed.fastq.gz", name=NAMES),
+        CONFIG["executables"]["bfc"]
+
