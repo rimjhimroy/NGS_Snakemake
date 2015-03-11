@@ -47,8 +47,8 @@ rule trimmomatic_installation:
         ADAPTERFILE=CONFIG["illuminaAdapters"]
     params : dir = strip_path_level(CONFIG['executables']['trimmomatic'],1)
     shell:
-        "#set -o xtrace;"
-        "#set -o verbose;"
+        #"set -o xtrace;"
+        #"set -o verbose;"
         "TEMPDIR=`mktemp -d`;"
         "cd $TEMPDIR;"
         "wget " + CONFIG['executable_sources']['trimmomatic_URL'] + " -O trimmomatic.zip && "
