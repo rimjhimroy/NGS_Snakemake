@@ -42,6 +42,10 @@ Flow:
 - Concatenate all reads (so we use all information for correction)
 - Correct all reads using that larger set, not removing reads with unique k-mers
 
+The author uses a lenght of 55% of the readlength, so:
+100 -> 55
+37 -> 21
+
 (later we can decide to remove reads, but then we would have to check for broken pairs)
 
 Expects a global variable CONFIG (e.g. parsed from json) of at least the following structure:
@@ -61,7 +65,7 @@ import collections, subprocess
 from SnakeMakeVlpb import strip_path_level
 
 # Download and install bfc
-rule bcf_installation:
+rule bfc_installation:
     output: CONFIG["executables"]["bfc"]
     params : dir = strip_path_level(CONFIG['executables']['bfc'],1)
     threads : 999
@@ -77,3 +81,30 @@ rule bcf_installation:
         "mv bfc {output} && "
         "touch {output} && "
         "cd / && rm -rf $TEMPDIR;"
+
+def merge_input(wildcards):
+     samples, = glob_wildcards("reads/{S}.fastq.gz")
+     return sorted(expand("trimmed/{S}.fastq.gz", S=samples))
+
+rule bfc_merge:
+     input:
+         merge_input
+     output:
+         temp("trimmed/all_reads.fastq.gz")
+     shell:
+         "pv -bart {input} >> {output}"
+
+rule bfc_cleaning:
+    input:
+        CORRECTING_READS=rules.bfc_merge.output,
+        reads = "trimmed/{sample}/{library}/{readset}/{name}_{r}.fastq.gz",
+        BFC=rules.bfc_installation.output
+    params:
+        GENOME_SIZE=CONFIG["bfc"]["genome_size"],
+        OPTIONAL_OPTS = CONFIG["bfc"]["optional_opts"],
+        KMER_LENGTH = CONFIG["bfc"]["kmer_length"]
+    output:
+        temp("cleaned/{sample}/{library}/{readset}/{name}_{r}.fastq.gz")
+    threads: 999
+    shell:
+        "{input.BFC} {params.OPTIONAL_OPTS} -s {params.GENOME_SIZE} -k {params.KMER_LENGTH} -t {threads} {input.reads} {input.CORRECTING_READS} | gzip -1 > {output}"
