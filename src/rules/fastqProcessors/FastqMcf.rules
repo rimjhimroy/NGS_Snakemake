@@ -146,8 +146,8 @@ rule fastqMcfPaired:
 rule fastqMcfSingle:
     input:
         FASTQMCF = rules.fastqmcf_installation.output,
-        READS = "cleaned/{sample}/{library}/{readset}/{name,[^_]}.fastq.gz",
-    output: temp("dedup/{sample}/{library}/{readset}/{name,[^_]}.fastq.gz")
+        READS = "cleaned/{sample}/{library}/{readset}/{name}.fastq.gz",
+    output: temp("dedup/{sample}/{library}/{readset}/{name}.fastq.gz")
     params:
         OPTIONALPARAMS=CONFIG["fastqmcf"]["optionalOptions"],
         DUPLEN = CONFIG["fastqmcf"]["dupLen"],
