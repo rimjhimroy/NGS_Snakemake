@@ -4,13 +4,15 @@
     },
     "executables":{
         "trimmomatic": "{executables}trimmomatic/trimmomatic.jar",
-        "bfc" : "{executables}bfc/bfc"
+        "bfc" : "{executables}bfc/bfc",
+        "fastq-mcf" : "{executables}ea-utils/bin/fastq-mcf"
         },
     "executable_sources":{
         "wget_options": " -c --proxy=off --no-verbose ",
         "wgs_URL": "http://downloads.sourceforge.net/project/wgs-assembler/wgs-assembler/wgs-8.2/wgs-8.2-Linux_amd64.tar.bz2?r=http%3A%2F%2Fsourceforge.net%2Fprojects%2Fwgs-assembler%2Ffiles%2Fwgs-assembler%2Fwgs-8.2%2Fwgs-8.2-Linux_amd64.tar.bz2%2Fdownload&ts=1424174727&use_mirror=heanet",
         "trimmomatic_URL" : "http://www.usadellab.org/cms/uploads/supplementary/Trimmomatic/Trimmomatic-0.33.zip",
-        "bfc_URL":"https://github.com/lh3/bfc.git"
+        "bfc_URL":"https://github.com/lh3/bfc.git",
+        "fastqmcf_URL":"http://ea-utils.googlecode.com/svn/trunk/"
     },
     "default_threads": "999",
     "wgs":{},
@@ -42,6 +44,37 @@
             }
         }
     },
+    "samples_": {
+        "Staphylococcus_aureus_SRS004751_SRS004751": ["SRR022868","SRR022865"]
+    },
+    "libraries" :{
+        "SRR022868":"1",
+        "SRR022865":"2"
+    },
+    "readsets" :{
+        "1": [
+            "/home/haars001/scratch/projects/VLPB/test_data/Staphylococcus_aureus/Data.original/frag_1.fastq.gz",
+            "/home/haars001/scratch/projects/VLPB/test_data/Staphylococcus_aureus/Data.original/frag_2.fastq.gz"
+            ],
+        "2" :[
+            "/home/haars001/scratch/projects/VLPB/test_data/Staphylococcus_aureus/Data.original/shortjump_1.fastq.gz",
+            "/home/haars001/scratch/projects/VLPB/test_data/Staphylococcus_aureus/Data.original/shortjump_2.fastq.gz"
+            ]
+    },
+    "libraries_info":{
+        "SRR022868": {
+                "type": "pe",
+                "insertSize": "180",
+                "insertSizeStDev": "",
+                "platform": "illumina"
+        },
+        "SRR022865": {
+                "type": "mp",
+                "insertSize": "3500",
+                "insertSizeStDev": "",
+                "platform": "illumina"
+        }
+    },
     "illuminaAdapters": "{executables}trimmomatic/adapters/TruSeq2-PE.fa",
     "trimmomatic":{
         "jar": "{executables}/trimmomatic/trimmomatic.jar",
@@ -56,8 +89,12 @@
         "phred" : "-phred33"
     },
     "bfc":{
-        "kmer_length": 55,
-        "genome_size": "1g",
-        "optionalOpts": ""
+        "kmer_length": "21",
+        "genome_size": "3m",
+        "optional_opts": ""
+    },
+    "fastqmcf":{
+        "dupLen": "60",
+        "optionalOptions": ""
     }
 }

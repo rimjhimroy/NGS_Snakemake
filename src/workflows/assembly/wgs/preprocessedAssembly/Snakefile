@@ -1,7 +1,7 @@
 """
 
 """
-import json, os, inspect
+import json, os, inspect, sys
 
 # Set PYTHONPATH before running Snakemake :
 # export PYTHONPATH=$PYTHONPATH:/home/haars001/scratch/projects/VLPB/
@@ -36,14 +36,14 @@ with open("config.json") as conf:
 ## All forward reads are {library name}_1.fastq and all reversed reads are {library name}_2.fastq
 createSymlinks(CONFIG)
 
-# Get the list of files that we need as input.
+# List of samples
+samples, = glob_wildcards("reads/{S}.fastq.gz")
 
-NAMES, = glob_wildcards("reads/{name}_1.fastq.gz")
+
 #Preprocessing
-include: ruleDir + "fastqProcessors/Trimmomatic.rules"
-include: ruleDir + "fastqProcessors/bfc.rules"
-# include: ruleDir + "fastqProcessors/Quake.rules"
-# include: ruleDir + "fastqProcessors/FastqMcf.rules"
+include: ruleDir + "fastqProcessors/Trimmomatic.rules"                  # Trimmomatic performs a variety of useful trimming tasks for illumina paired-end and single ended data.
+include: ruleDir + "fastqProcessors/bfc.rules"                          # Clean reads
+include: ruleDir + "fastqProcessors/FastqMcf.rules"
 # include: ruleDir + "fastqProcessors/ContaminationFiltering.rules"
 
 #Assembly
@@ -52,6 +52,5 @@ include: ruleDir + "fastqProcessors/bfc.rules"
 
 rule all:
     input:
-        expand("reads/{name}_1.trimmed.fastq.gz", name=NAMES),
-        CONFIG["executables"]["bfc"]
+        sorted(expand("dedup/{S}.fastq.gz", S=samples))
 
