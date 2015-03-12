@@ -66,7 +66,7 @@ rule trimmomaticPaired:
     input:
         TRIMMOMATIC=rules.trimmomatic_installation.output["TRIMMOMATIC"],
         ADAPTERFILE=rules.trimmomatic_installation.output["ADAPTERFILE"],
-        forward  = "reads/{sample}/{library}/{readset}/{name}_1.fastq.gz",
+        forward   = "reads/{sample}/{library}/{readset}/{name}_1.fastq.gz",
         reversed  = "reads/{sample}/{library}/{readset}/{name}_2.fastq.gz"
     output:
         forward  = temp("trimmed/{sample}/{library}/{readset}/{name}_1.fastq.gz"),
