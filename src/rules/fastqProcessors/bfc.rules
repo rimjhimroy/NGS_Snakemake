@@ -92,7 +92,7 @@ rule bfc_merge:
      output:
          temp("trimmed/all_reads.fastq.gz")
      shell:
-         "pv -bart {input} >> {output}"
+         "cat {input} >> {output}"
 
 rule bfc_cleaning:
     input:
