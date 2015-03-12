@@ -57,7 +57,7 @@ rule trimmomatic_installation:
         "mkdir -p {params.dir} && "
         "cd Trimmomatic* && "
         "mv *.jar {output.TRIMMOMATIC} && "
-        "mv adapters {params.dir} &&"
+        "mv adapters {params.dir} && "
         "touch {output.TRIMMOMATIC} && "
         "cd / && rm -rf $TEMPDIR;"
 
@@ -66,13 +66,13 @@ rule trimmomaticPaired:
     input:
         TRIMMOMATIC=rules.trimmomatic_installation.output["TRIMMOMATIC"],
         ADAPTERFILE=rules.trimmomatic_installation.output["ADAPTERFILE"],
-        forward  = "{name}_1.fastq.gz",
-        reversed = "{name}_2.fastq.gz"
+        forward  = "reads/{sample}/{library}/{readset}/{name}_1.fastq.gz",
+        reversed  = "reads/{sample}/{library}/{readset}/{name}_2.fastq.gz"
     output:
-        forward  = "{name}_1.trimmed.fastq.gz",
-        reversed = "{name}_2.trimmed.fastq.gz",
-        forwardUnpaired  ="{name}.unpaired_1.trimmed.fastq.gz",
-        reversedUnpaired ="{name}.unpaired_2.trimmed.fastq.gz"
+        forward  = temp("trimmed/{sample}/{library}/{readset}/{name}_1.fastq.gz"),
+        reversed = temp("trimmed/{sample}/{library}/{readset}/{name}_2.fastq.gz"),
+        forwardUnpaired  = temp("trimmed/{sample}/{library}/{readset}/{name}.unpaired_1.fastq.gz"),
+        reversedUnpaired = temp("trimmed/{sample}/{library}/{readset}/{name}.unpaired_2.fastq.gz")
     params :
         seedMisMatches =            CONFIG['trimmomatic']['seedMisMatches'],
         palindromeClipTreshold =    CONFIG['trimmomatic']['palindromeClipTreshold'],
