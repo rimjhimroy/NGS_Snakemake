@@ -42,7 +42,6 @@ import subprocess
 ###############################
 ##  Contamination filtering  ##
 ###############################
-BOWTIE_VERSION = re.compile("version (.*?)\n").search(subprocess.check_output("bowtie2 --version", shell=True).decode("utf-8")).group(1).strip()
 
 rule filterPaired:
     input:
