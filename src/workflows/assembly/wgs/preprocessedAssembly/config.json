@@ -5,14 +5,16 @@
     "executables":{
         "trimmomatic": "{executables}trimmomatic/trimmomatic.jar",
         "bfc" : "{executables}bfc/bfc",
-        "fastq-mcf" : "{executables}ea-utils/bin/fastq-mcf"
+        "fastq-mcf" : "{executables}ea-utils/bin/fastq-mcf",
+        "bowtie2" : "{executables}bowtie2/bowtie2"
         },
     "executable_sources":{
         "wget_options": " -c --proxy=off --no-verbose ",
         "wgs_URL": "http://downloads.sourceforge.net/project/wgs-assembler/wgs-assembler/wgs-8.2/wgs-8.2-Linux_amd64.tar.bz2?r=http%3A%2F%2Fsourceforge.net%2Fprojects%2Fwgs-assembler%2Ffiles%2Fwgs-assembler%2Fwgs-8.2%2Fwgs-8.2-Linux_amd64.tar.bz2%2Fdownload&ts=1424174727&use_mirror=heanet",
         "trimmomatic_URL" : "http://www.usadellab.org/cms/uploads/supplementary/Trimmomatic/Trimmomatic-0.33.zip",
         "bfc_URL":"https://github.com/lh3/bfc.git",
-        "fastqmcf_URL":"http://ea-utils.googlecode.com/svn/trunk/"
+        "fastqmcf_URL":"http://ea-utils.googlecode.com/svn/trunk/",
+        "bowtie2_URL" :"http://downloads.sourceforge.net/project/bowtie-bio/bowtie2/2.2.5/bowtie2-2.2.5-linux-x86_64.zip?r=http%3A%2F%2Fsourceforge.net%2Fprojects%2Fbowtie-bio%2Ffiles%2Fbowtie2%2F2.2.5%2F&ts=1426587785&use_mirror=heanet"
     },
     "default_threads": "999",
     "wgs":{},
@@ -75,6 +77,7 @@
                 "platform": "illumina"
         }
     },
+    "refGenome" :"",
     "illuminaAdapters": "{executables}trimmomatic/adapters/TruSeq2-PE.fa",
     "trimmomatic":{
         "jar": "{executables}/trimmomatic/trimmomatic.jar",

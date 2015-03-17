@@ -43,7 +43,9 @@ samples, = glob_wildcards("reads/{S}.fastq.gz")
 #Preprocessing
 include: ruleDir + "fastqProcessors/Trimmomatic.rules"                  # Trimmomatic performs a variety of useful trimming tasks for illumina paired-end and single ended data.
 include: ruleDir + "fastqProcessors/bfc.rules"                          # Clean reads
-include: ruleDir + "fastqProcessors/FastqMcf.rules"
+include: ruleDir + "fastqProcessors/FastqMcf.rules"                     # Deduplicate and filter reads
+include: ruleDir + "mappers/Bowtie.rules"                               # Needed for next step
+
 # include: ruleDir + "fastqProcessors/ContaminationFiltering.rules"
 
 #Assembly
@@ -52,5 +54,7 @@ include: ruleDir + "fastqProcessors/FastqMcf.rules"
 
 rule all:
     input:
-        sorted(expand("dedup/{S}.fastq.gz", S=samples))
+        sorted(expand("trimmed/{S}.fastq.gz", S=samples))
+        ,sorted(expand("cleaned/{S}.fastq.gz", S=samples))
+        # ,sorted(expand("dedup/{S}.fastq.gz", S=samples))
 

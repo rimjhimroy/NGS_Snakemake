@@ -18,38 +18,57 @@ TODO test bowtieSingle
 import subprocess
 
 ################
-##  Indexing  ##
-################
-rule bowtieIndex:
-    input: inFile = "{ref}.fasta"
-    output: outFile = "{ref}.fasta.1.bt2"
-    shell: "bowtie2-build {input.inFile} {input.inFile}"
-
-################
 ##  Bowtie 2  ##
 ################
 # BOWTIE_VERSION = re.compile("version (.*?)\n").search(subprocess.check_output("bowtie2 --version", shell=True).decode("utf-8")).group(1).strip()
 
 ruleorder: bowtiePaired > bowtieSingle
 
+
+# Download and install fastq-mcf
+rule bowtie_installation:
+    output: CONFIG["executables"]["bowtie2"]
+    params : dir = strip_path_level(CONFIG['executables']['bowtie2'],1)
+    threads : 999
+    shell:
+        # "set -o xtrace;"
+        # "set -o verbose;"
+        "TEMPDIR=`mktemp -d`;"
+        "cd $TEMPDIR;"
+        "wget --trust-server-names '" + CONFIG['executable_sources']['bowtie2_URL'] + "' && "
+        "unzip bowtie*.zip && "
+        "mkdir -p {params.dir} && "
+        "mv --target-directory={params.dir} bowtie2*/*  && "
+        "touch {output} && "
+        "cd / && rm -rf $TEMPDIR;"
+
+rule bowtieIndex:
+    input:
+        inFile = "{ref}.fasta",
+        BOWTIE2=rules.bowtie_installation.output
+    output: "{ref}.fasta.1.bt2"
+    shell: "{input.BOWTIE2}-build {input.inFile} {input.inFile}"
+
 rule bowtiePaired:
     input:
         forward = "preprocessing/{sample}_1.fastq",
         reversed = "preprocessing/{sample}_2.fastq",
         reference = CONFIG["refGenome"],
-        index = CONFIG["refGenome"] + ".1.bt2"
+        index = CONFIG["refGenome"] + ".1.bt2",
+        BOWTIE2=rules.bowtie_installation.output
+    output: "mapped/bowtie2.{sample}.sam"
     threads: 999
     # version: BOWTIE_VERSION
-    output: "mapped/bowtie2.{sample}.sam"
-    shell: "bowtie2 -p {threads} -x {input.reference} -1 {input.forward} -2 {input.reversed} -S {output[0]}"
+    shell: "{input.BOWTIE2} -p {threads} -x {input.reference} -1 {input.forward} -2 {input.reversed} -S {output}"
 
 rule bowtieSingle:
     input:
         reads = "preprocessing/{sample}.fastq",
         reference = CONFIG["refGenome"],
-        index = CONFIG["refGenome"] + ".1.bt2"
+        index = CONFIG["refGenome"] + ".1.bt2",
+        BOWTIE2=rules.bowtie_installation.output
     output: "mapped/{sample}.sam"
     threads: 999
     # version: BOWTIE_VERSION
-    shell: "bowtie2 -p {threads} -x {input.reference} -U {input.reads} -S {output[0]}"
+    shell: "{input.BOWTIE2} -p {threads} -x {input.reference} -U {input.reads} -S {output}"
 
