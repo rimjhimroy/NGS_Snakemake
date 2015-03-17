@@ -69,10 +69,10 @@ rule trimmomaticPaired:
         forward  = "reads/{sample}/{library}/{readset}/{name}_1.fastq.gz",
         reversed  = "reads/{sample}/{library}/{readset}/{name}_2.fastq.gz"
     output:
-        forward  = temp("trimmed/{sample}/{library}/{readset}/{name}_1.fastq.gz"),
-        reversed = temp("trimmed/{sample}/{library}/{readset}/{name}_2.fastq.gz"),
-        forwardUnpaired  = temp("trimmed/{sample}/{library}/{readset}/{name}.unpaired_1.fastq.gz"),
-        reversedUnpaired = temp("trimmed/{sample}/{library}/{readset}/{name}.unpaired_2.fastq.gz")
+        forward  = "trimmed/{sample}/{library}/{readset}/{name}_1.fastq.gz",
+        reversed = "trimmed/{sample}/{library}/{readset}/{name}_2.fastq.gz",
+        forwardUnpaired  = "trimmed/{sample}/{library}/{readset}/{name}.unpaired_1.fastq.gz",
+        reversedUnpaired = "trimmed/{sample}/{library}/{readset}/{name}.unpaired_2.fastq.gz"
     params :
         seedMisMatches =            CONFIG['trimmomatic']['seedMisMatches'],
         palindromeClipTreshold =    CONFIG['trimmomatic']['palindromeClipTreshold'],
