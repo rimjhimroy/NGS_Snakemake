@@ -119,16 +119,17 @@ rule fastqmcf_installation:
         "touch {output} && "
         "cd / && rm -rf $TEMPDIR;"
 
-ruleorder: fastqMcfPaired > fastqMcfSingle
+# ruleorder: fastqMcfPaired > fastqMcfSingle
 
 rule fastqMcfPaired:
     input:
         FASTQMCF = rules.fastqmcf_installation.output,
-        forward = "cleaned/{sample}/{library}/{readset}/{name}_1.fastq.gz",
+        forward  = "cleaned/{sample}/{library}/{readset}/{name}_1.fastq.gz",
         reversed = "cleaned/{sample}/{library}/{readset}/{name}_2.fastq.gz"
+    priority: 5000
     output:
-        forward = temp("dedup/{sample}/{library}/{readset}/{name}_1.fastq"),
-        reversed = temp("dedup/{sample}/{library}/{readset}/{name}_2.fastq")
+        forward  = "dedup/{sample}/{library}/{readset}/{name}_1.fastq",
+        reversed = "dedup/{sample}/{library}/{readset}/{name}_2.fastq"
     params:
         OPTIONALPARAMS=CONFIG["fastqmcf"]["optionalOptions"],
         DUPLEN = CONFIG["fastqmcf"]["dupLen"],
@@ -139,23 +140,23 @@ rule fastqMcfPaired:
         "-D {params.DUPLEN} "
         "-o {output.forward} "
         "-o {output.reversed} "
-        "{ADAPTERFILE} "
+        "{params.ADAPTERFILE} "
         "{input.forward} "
         "{input.reversed}"
 
-rule fastqMcfSingle:
-    input:
-        FASTQMCF = rules.fastqmcf_installation.output,
-        READS = "cleaned/{sample}/{library}/{readset}/{name}.fastq.gz",
-    output: temp("dedup/{sample}/{library}/{readset}/{name}.fastq.gz")
-    params:
-        OPTIONALPARAMS=CONFIG["fastqmcf"]["optionalOptions"],
-        DUPLEN = CONFIG["fastqmcf"]["dupLen"],
-        ADAPTERFILE = CONFIG["illuminaAdapters"]
-    shell:
-        "{input.FASTQMCF} "
-        "{params.OPTIONALPARAMS} "
-        "-D {params.DUPLEN} "
-        "-o {output} "
-        "{params.ADAPTERFILE} "
-        "{input.READS}"
+# rule fastqMcfSingle:
+#     input:
+#         FASTQMCF = rules.fastqmcf_installation.output,
+#         READS = "cleaned/{sample}/{library}/{readset}/{name}.fastq.gz",
+#     output: temp("dedup/{sample}/{library}/{readset}/{name}.fastq.gz")
+#     params:
+#         OPTIONALPARAMS=CONFIG["fastqmcf"]["optionalOptions"],
+#         DUPLEN = CONFIG["fastqmcf"]["dupLen"],
+#         ADAPTERFILE = CONFIG["illuminaAdapters"]
+#     shell:
+#         "{input.FASTQMCF} "
+#         "{params.OPTIONALPARAMS} "
+#         "-D {params.DUPLEN} "
+#         "-o {output} "
+#         "{params.ADAPTERFILE} "
+#         "{input.READS}"
