@@ -48,14 +48,15 @@ rule filterPaired:
         forward = "preprocessing/{sample}_1.fastq",
         reversed = "preprocessing/{sample}_2.fastq",
         reference = lambda wildcards: CONFIG["contaminationRefGenomes"][wildcards.org],
-        index = lambda wildcards: CONFIG["contaminationRefGenomes"][wildcards.org] + ".1.bt2"
+        index = lambda wildcards: CONFIG["contaminationRefGenomes"][wildcards.org] + ".1.bt2",
+        BOWTIE2=rules.bowtie_installation.output
     output:
         forward = "preprocessing/{org}Filtered.{sample}_1.fastq",
         reversed = "preprocessing/{org}Filtered.{sample}_2.fastq"
     threads: 999
     run:
         insertSize = int(CONFIG["libraries"][wildcards.sample]["insertSize"])
-        print("bowtie2 -p {threads} -x {input.reference} "
+        print("{input.BOWTIE2} -p {threads} -x {input.reference} "
               "--un-conc {output.forward}_tmp_unmapppedPhix.fastq "
               "-I {minInsert} -X {maxInsert} "
               "-1 {input.forward} -2 {input.reversed} -S /dev/null".format(threads=threads,
@@ -70,10 +71,11 @@ rule filterSingle:
     input:
         fastq = "preprocessing/{sample}.fastq",
         reference = lambda wildcards: CONFIG["contaminationRefGenomes"][wildcards.org],
-        index = lambda wildcards: CONFIG["contaminationRefGenomes"][wildcards.org] + ".1.bt2"
+        index = lambda wildcards: CONFIG["contaminationRefGenomes"][wildcards.org] + ".1.bt2",
+        BOWTIE2=rules.bowtie_installation.output
     output: "preprocessing/{org}_filtered.{sample}.fastq"
     run:
-        print("bowtie2 -p {threads} -x {input.reference} "
+        print("{input.BOWTIE2} -p {threads} -x {input.reference} "
               "--un {output[0]} "
               "-I {minInsert} -X {maxInsert} "
               "-U {input.fastq} -S /dev/null".format(threads=threads,
