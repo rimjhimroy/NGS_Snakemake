@@ -104,7 +104,7 @@ rule bfc_cleaning:
         OPTIONAL_OPTS = CONFIG["bfc"]["optional_opts"],
         KMER_LENGTH = CONFIG["bfc"]["kmer_length"]
     output:
-        temp("cleaned/{sample}/{library}/{readset}/{name}_{r}.fastq.gz")
+        "cleaned/{sample}/{library}/{readset}/{name}_{r}.fastq.gz"
     threads: 999
     shell:
         "{input.BFC} {params.OPTIONAL_OPTS} -s {params.GENOME_SIZE} -k {params.KMER_LENGTH} -t {threads} {input.reads} {input.CORRECTING_READS} | gzip -1 > {output}"
