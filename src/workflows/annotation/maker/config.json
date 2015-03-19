@@ -69,37 +69,20 @@
 		"blastx": "{base_dir}{executables}blast_plus/bin/blastx",
 		"tblastx": "{base_dir}{executables}blast_plus/bin/tblastx",
 		"RepeatMasker": "{base_dir}{executables}repeatmasker/RepeatMasker",
+		"repeatscout": "{base_dir}{executables}repeatscout/",
+		"repeatmodeler": "{base_dir}{executables}repeatmodeler/",
 		"exonerate": "{base_dir}{executables}exonerate/bin/exonerate",
 		"snap": "{base_dir}{executables}snap/snap",
 		"augustus": "{base_dir}{executables}augustus/bin/augustus",
 		"trf": "{base_dir}{executables}trf/trf",
 		"repbase": "{base_dir}{executables}repbase/",
-		"maker": "{base_dir}{executables}/maker/bin/maker",
+		"maker": "{base_dir}{executables}maker/bin/maker",
 		"perl" : "{home_dir}perl5/perlbrew/perls/perl-5.18.0/bin/perl",
+		"recon" : "{base_dir}{executables}recon/bin",
 		"cpanm" : "{home_dir}perl5/perlbrew/bin/cpanm"
 	},
 
 	"executable_sources":
-	{
-		"maker_URL": "{web_host}maker_test.nobackup/maker-2.31.6.tgz",
-		"version": "2.31.6",
-		"wget_options": " -c --proxy=off --no-verbose ",
-		"augustus_URL": "{web_host}maker_test.nobackup/augustus.2.5.5.tar.gz",
-		"exonerate_URL": "{web_host}maker_test.nobackup/exonerate-2.2.0-x86_64.tar.gz",
-		"snap_URL": "{web_host}maker_test.nobackup/snap-2013-11-29.tar.gz",
-		"trf_URL": "{web_host}maker_test.nobackup/trf407b.linux64",
-		"blast+_URL": "{web_host}maker_test.nobackup/ncbi-blast-2.2.29+-x64-linux.tar.gz",
-		"rmblast_URL": "{web_host}maker_test.nobackup/ncbi-rmblastn-2.2.28-x64-linux.tar.gz {web_host}maker_test.nobackup/ncbi-blast-2.2.28+-x64-linux.tar.gz",
-		"repeatmasker_URL": "{web_host}maker_test.nobackup/RepeatMasker-open-4-0-5.tar.gz",
-		"repeatmaskerlibraries_URL": "{web_host}repbase.nobackup/repeatmaskerlibraries-20140131.tar.gz",
-		"repeatmaskerlibraries_URL_netrc": "{home_dir}/.netrc",
-		"recon_URL": "{web_host}maker_test.nobackup/RECON-1.08.tar.gz",
-		"repeatscout_URL": "{web_host}maker_test.nobackup/RepeatScout-1.0.5.tar.gz",
-		"repeatmodeler_URL": "{web_host}maker_test.nobackup/RepeatModeler-open-1-0-8.tar.gz",
-		"perl_URL": "{web_host}maker_test.nobackup/ActivePerl-5.18.4.1803-x86_64-linux-glibc-2.5-298573.tar.gz"
-	},
-
-	"maker_installation_production":
 	{
 		"maker_URL": "{web_host}maker-2.31.6.tgz",
 		"version": "2.31.6",
@@ -114,7 +97,7 @@
 		"repeatmaskerlibraries_URL": "http://assembly.ab.wurnet.nl/~jvh/repbase/repeatmaskerlibraries-20140131.tar.gz",
 		"repeatmaskerlibraries_URL_org": "http://www.girinst.org/server/RepBase/protected/repeatmaskerlibraries/repeatmaskerlibraries-20140131.tar.gz",
 		"repeatmaskerlibraries_URL_netrc": "{home_dir}/.netrc",
-		"recon_URL": "http://www.repeatmasker.org/RECON-1.08.tar.gz",
+ 		"recon_URL": "http://www.repeatmasker.org/RECON-1.08.tar.gz",
 		"repeatscout_URL": "http://repeatscout.bioprojects.org/RepeatScout-1.0.5.tar.gz",
 		"repeatmodeler_URL": "http://www.repeatmasker.org/RepeatModeler-open-1-0-8.tar.gz",
 		"perl_URL": "http://downloads.activestate.com/ActivePerl/releases/5.18.4.1803/ActivePerl-5.18.4.1803-x86_64-linux-glibc-2.5-298573.tar.gz"

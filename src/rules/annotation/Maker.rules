@@ -119,6 +119,33 @@ rule rmblast_installation:
         "cd / && rm -rf $TEMPDIR && "
         "touch {output};"
 
+rule recon_installation:
+    output: CONFIG["executables"]["recon"]
+    shell:
+        "TEMPDIR=`mktemp -p " + CONFIG["base"]["download_dir"] + " -d` && "
+        "cd $TEMPDIR && "
+        "wget"+CONFIG['executable_sources']['wget_options']+CONFIG['executable_sources']['recon_URL']+" && "
+        "tar zxf RECON-1.08.tar.gz && "
+        "cd RECON-1.08/src && "
+        "make install && "
+        "mkdir -p {output} && "
+        "echo 'export PATH='`readlink -f {output}`':$PATH' >> {rules.maker_bashrc.output} && "
+        "cp -R ../bin/* {output} && cd / && rm -rf $TEMPDIR && touch {output}"
+    
+rule repeatscout_installation:
+    output: CONFIG["executables"]["repeatscout"]
+    shell:
+        "TEMPDIR=`mktemp -p " + CONFIG["base"]["download_dir"] + " -d` && "
+        "cd $TEMPDIR && "
+        "wget"+CONFIG['executable_sources']['wget_options']+CONFIG['executable_sources']['repeatscout_URL']+" && "
+        "tar zxf RepeatScout*.tar.gz && "
+        "cd RepeatScout-1 && "
+        "make install && "
+        "mkdir -p {output} && "
+        "echo 'export PATH='`readlink -f {output}`':$PATH' >> {rules.maker_bashrc.output} && "
+        "cp * {output} && cd / && rm -rf $TEMPDIR && touch {output}"
+
+
 # Download and install GIRI RepBase
 rule repbase_installation:
     output: CONFIG["executables"]["repbase"]
@@ -131,7 +158,6 @@ rule repbase_installation:
         "cp -R repeatmaskerlibraries* {output} && "
         "cd / && rm -rf $TEMPDIR && "
         "touch {output};"
-
 
 # Download and install Repeatmasker
 rule repeatmasker_installation:
@@ -157,6 +183,32 @@ rule repeatmasker_installation:
         "echo 'export PATH='`readlink -f {params.dir}`':$PATH' >> {rules.maker_bashrc.output} && "
         "cd / && rm -rf $TEMPDIR && "
         "touch {output}"
+
+rule repeatmodeler_installation:
+    input: SCOUT = rules.repeatscout_installation.output,
+        TRF = rules.trf_installation.output,
+        RECON = rules.recon_installation.output,
+        RM = rules.rmblast_installation.output,
+        REPEAT = rules.repeatmasker_installation
+    output: CONFIG["executables"]["repeatmodeler"]
+    shell:
+        "TEMPDIR=`mktemp -p " + CONFIG["base"]["download_dir"] + " -d` && "
+        "cd $TEMPDIR && "
+        "wget"+CONFIG['executable_sources']['wget_options']+CONFIG['executable_sources']['repeatmodeller_URL']+" && "
+        "tar zxf RepeatModeler*.tar.gz && "
+        "cd RepeatModeler && "
+
+        "cp RepModelConfig.pm.tmpl RepModelConfig.pm && chmod -x RepModelConfig.pm && "
+        
+        'sed -i \'s|REPEATMASKER_DIR\s\+=.*|REPEATMASKER_DIR = "{input.REPEAT}";|\' RepModelConfig.pm && '
+        'sed -i \'s|RMBLAST_DIR\s\+=.*|RMBLAST_DIR = "{input.RM}";|\' RepModelConfig.pm && '
+        'sed -i \'s|TRF_PRGM\s\+=.*|TRF_PRGM = "' + "{input.TRF}" + '";|\' RepModelConfig.pm && '
+        'sed -i \'s|RECON_DIR\s\+=.*|RECON_DIR = "' + "{input.RECON}" + '";|\' RepModelConfig.pm && '
+        'sed -i \'s|RECON_DIR\s\+=.*|RSCOUT_DIR = "' + "{input.SCOUT}" + '";|\' RepModelConfig.pm && '
+
+        "mkdir -p {output} && "
+        "echo 'export PATH='`readlink -f {output}`':$PATH' >> {rules.maker_bashrc.output} && "
+        "cp * {output} && cd / && rm -rf $TEMPDIR && touch {output}"
 
 # Install perl if version is too low (as on our cluster)
 rule install_perl:
