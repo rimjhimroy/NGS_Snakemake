@@ -187,8 +187,7 @@ rule repeatmasker_installation:
     input:
         #REPBASE=rules.repbase_installation.output,
         RMBLAST=rules.rmblast_installation.output,
-        TRF=rules.trf_installation.output,
-        MODELER=rules.repeatmodeler_installation.output
+        TRF=rules.trf_installation.output
     output: CONFIG["executables"]["RepeatMasker"]
     params: dir = strip_path_level(CONFIG["executables"]["RepeatMasker"],1), RMBLAST = strip_path_level(CONFIG["executables"]["rmblast"],1)
     shell:
@@ -248,6 +247,7 @@ rule install_perl_libs:
 
 rule maker_installation:
     input:
+        rules.repeatmodeler_installation.output,
         rules.repeatmasker_installation.output,
         rules.blast_plus_installation.output,
         rules.snap_installation.output,
