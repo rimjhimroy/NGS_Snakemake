@@ -205,6 +205,34 @@ rule repeatmodeler_installation:
         "mkdir -p {output} && "
         "echo 'export PATH='`readlink -f {output}`':$PATH' >> {rules.maker_bashrc.output} && "
         "cp -R * {output} && cd / && rm -rf $TEMPDIR && touch {output}"
+<<<<<<< HEAD
+=======
+
+# Download and install Repeatmasker
+rule repeatmasker_installation:
+    input:
+        #REPBASE=rules.repbase_installation.output,
+        RMBLAST=rules.rmblast_installation.output,
+        TRF=rules.trf_installation.output
+    output: CONFIG["executables"]["RepeatMasker"]
+    params: dir = strip_path_level(CONFIG["executables"]["RepeatMasker"],1), RMBLAST = strip_path_level(CONFIG["executables"]["rmblast"],1)
+    shell:
+        "TEMPDIR=`mktemp -p " + CONFIG["base"]["download_dir"] + " -d` && "
+        "cd $TEMPDIR && "
+        "wget"+CONFIG['executable_sources']['wget_options']+CONFIG['executable_sources']['repeatmasker_URL']+" && "
+        "tar xzf RepeatMasker-open-* && "
+        "rm *.tar.* && "
+        "cp -R RepeatMasker*/* {params.dir} && "
+        "cd {params.dir} && grep -l -r '#!/u1' * | xargs -I '%' sed -i 's|/u1/local/bin/perl|/usr/bin/env perl|' % && "
+        "cp RepeatMaskerConfig.tmpl RepeatMaskerConfig.pm && chmod -x RepeatMaskerConfig.pm && "
+        'sed -i \'s|DEFAULT_SEARCH_ENGINE\s\+=.*|DEFAULT_SEARCH_ENGINE = "ncbi";|\' RepeatMaskerConfig.pm && '
+        'sed -i \'s|TRF_PRGM\s\+=.*|TRF_PRGM = "' + "{input.TRF}" + '";|\' RepeatMaskerConfig.pm && '
+        'sed -i \'s|RMBLAST_DIR\s\+=.*|RMBLAST_DIR = "' + "{params.RMBLAST}" + '";|\' RepeatMaskerConfig.pm && '
+#        "cp {input.REPBASE}Libraries/RepeatMaskerLib.embl Libraries/ ; "
+        "echo 'export PATH='`readlink -f {params.dir}`':$PATH' >> {rules.maker_bashrc.output} && "
+        "cd / && rm -rf $TEMPDIR && "
+        "touch {output}"
+>>>>>>> refs/remotes/origin/master
 
 
 
