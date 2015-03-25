@@ -190,6 +190,10 @@ rule repeatmodeler_installation:
         RM = rules.rmblast_installation.output,
         REPEAT = rules.repeatmasker_installation.output
     output: CONFIG["executables"]["repeatmodeler"]
+    params: REPEAT = strip_path_level(CONFIG["executables"]["RepeatMasker"],1), 
+        RM = strip_path_level(CONFIG["executables"]["rmblast"],1),
+        RECON = strip_path_level(CONFIG["executables"]["recon"],1),
+        SCOUT = strip_path_level(CONFIG["executables"]["repeatscout"],1)
     shell:
         "TEMPDIR=`mktemp -p " + CONFIG["base"]["download_dir"] + " -d` && "
         "cd $TEMPDIR && "
@@ -198,11 +202,11 @@ rule repeatmodeler_installation:
         "cd RepeatModeler && "
         "grep -l -r '#!/u1' * | xargs -I '%' sed -i 's|/u1/local/bin/perl|/usr/bin/env perl|' % && "
         "cp RepModelConfig.pm.tmpl RepModelConfig.pm && chmod -x RepModelConfig.pm && "
-        'sed -i \'s|REPEATMASKER_DIR\s\+=.*|REPEATMASKER_DIR = "{input.REPEAT}";|\' RepModelConfig.pm && '
-        'sed -i \'s|RMBLAST_DIR\s\+=.*|RMBLAST_DIR = "{input.RM}";|\' RepModelConfig.pm && '
+        'sed -i \'s|REPEATMASKER_DIR\s\+=.*|REPEATMASKER_DIR = "{params.REPEAT}";|\' RepModelConfig.pm && '
+        'sed -i \'s|RMBLAST_DIR\s\+=.*|RMBLAST_DIR = "{params.RM}";|\' RepModelConfig.pm && '
         'sed -i \'s|TRF_PRGM\s\+=.*|TRF_PRGM = "' + "{input.TRF}" + '";|\' RepModelConfig.pm && '
-        'sed -i \'s|RECON_DIR\s\+=.*|RECON_DIR = "' + "{input.RECON}" + '";|\' RepModelConfig.pm && '
-        'sed -i \'s|RSCOUT_DIR\s\+=.*|RSCOUT_DIR = "' + "{input.SCOUT}" + '";|\' RepModelConfig.pm && '
+        'sed -i \'s|RECON_DIR\s\+=.*|RECON_DIR = "' + "{params.RECON}" + '";|\' RepModelConfig.pm && '
+        'sed -i \'s|RSCOUT_DIR\s\+=.*|RSCOUT_DIR = "' + "{params.SCOUT}" + '";|\' RepModelConfig.pm && '
         "mkdir -p {output} && "
         "echo 'export PATH='`readlink -f {output}`':$PATH' >> {rules.maker_bashrc.output} && "
         "cp -R * {output} && cd / && rm -rf $TEMPDIR && touch {output}"
@@ -270,6 +274,16 @@ rule maker_installation:
         "chmod ugo+w {output} && "
         "touch {output}"
 
+""" Run repeat modeler """
+rule repeatmodeler:
+    input:
+        MASKER = rules.repeatmasker_installation.output,
+        MODEL = rules.repeatmodeler_installation.output
+    output: CONFIG["maker_opts"]["repeat"]
+    shell:
+        "{input.MODEL}/BuildDatabase -name repeat_db " + CONFIG["maker_opts"]["genome"]
+        
+
 """ create the maker_bopts.ctl file """
 rule maker_bopts:
     input: rules.maker_installation.output
@@ -306,6 +320,7 @@ rule maker:
         rules.maker_bopts.output,
         rules.maker_opts.output,
         rules.maker_exe.output,
+        rules.repeatmodeler.output,
         MAKER=rules.maker_installation.output
     output: CONFIG['base']['working_dir'] + "/maker_done.txt"
     shell:
