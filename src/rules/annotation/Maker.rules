@@ -201,6 +201,7 @@ rule repeatmodeler_installation:
         "tar zxf RepeatModeler*.tar.gz && "
         "cd RepeatModeler && "
         "grep -l -r '#!/u1' * | xargs -I '%' sed -i 's|/u1/local/bin/perl|/usr/bin/env perl|' % && "
+        "grep -l -r '#!/usr/local/bin/perl' * | xargs -I '%' sed -i 's|/usr/local/bin/perl|/usr/bin/env perl|' % && "
         "cp RepModelConfig.pm.tmpl RepModelConfig.pm && chmod -x RepModelConfig.pm && "
         'sed -i \'s|REPEATMASKER_DIR\s\+=.*|REPEATMASKER_DIR = "{params.REPEAT}";|\' RepModelConfig.pm && '
         'sed -i \'s|RMBLAST_DIR\s\+=.*|RMBLAST_DIR = "{params.RM}";|\' RepModelConfig.pm && '
@@ -279,9 +280,15 @@ rule repeatmodeler:
     input:
         MASKER = rules.repeatmasker_installation.output,
         MODEL = rules.repeatmodeler_installation.output
-    output: CONFIG["maker_opts"]["repeat"]
+    output: CONFIG["maker_opts"]["rmlib"]
+    threads: 8
     shell:
-        "{input.MODEL}/BuildDatabase -name repeat_db " + CONFIG["maker_opts"]["genome"]
+        "TEMPDIR=`mktemp -p " + CONFIG["base"]["download_dir"] + " -d` && "
+        "cd $TEMPDIR && "
+        "{input.MODEL}/BuildDatabase -name repeat_db -engine ncbi " + CONFIG["maker_opts"]["genome"] + " && "
+        "{input.MODEL}/RepeatModeler -database repeat_db -engine ncbi -pa {threads} && "
+        "cp consensi.fa.classified {output} && "
+        "cd / && rm -rf $TEMPDIR;"
         
 
 """ create the maker_bopts.ctl file """
