@@ -285,9 +285,9 @@ rule repeatmodeler:
     shell:
         "TEMPDIR=`mktemp -p " + CONFIG["base"]["download_dir"] + " -d` && "
         "cd $TEMPDIR && "
-        "{input.MODEL}/BuildDatabase -name repeat_db -engine ncbi " + CONFIG["maker_opts"]["genome"] + " && "
+        "{input.MODEL}/BuildDatabase -name repeat_db -engine ncbi " + CONFIG["maker_opts"]["genome"] if len(CONFIG["maker_opts"]["rmlib_genome"]) == 0 else CONFIG["maker_opts"]["rmlib_genome"]  + " && "
         "{input.MODEL}/RepeatModeler -database repeat_db -engine ncbi -pa {threads} && "
-        "cp consensi.fa.classified {output} && "
+        "find . -maxdepth 1 -name 'RM_*' -type d | xargs -I {} cat {}/consensi.fa >> {output} && "
         "cd / && rm -rf $TEMPDIR;"
         
 

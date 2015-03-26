@@ -46,6 +46,7 @@
 		"organism_type": "eukaryotic",
 		"est": "{base_dir}{executables}maker/data/dpp_est.fasta",
 		"rmlib" : "{base_dir}{executables}repeatmasker/repeat_db.fa",
+		"rmlib_genome" : "",
 		"protein": "{base_dir}{executables}maker/data/dpp_protein.fasta",
 		"repeat_protein": "{base_dir}{executables}maker/data/te_proteins.fasta",
 		"model_org": "all",
