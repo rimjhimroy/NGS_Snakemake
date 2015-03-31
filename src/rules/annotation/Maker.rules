@@ -281,12 +281,11 @@ rule repeatmodeler:
         MASKER = rules.repeatmasker_installation.output,
         MODEL = rules.repeatmodeler_installation.output
     output: CONFIG["maker_opts"]["rmlib"]
-    threads: 8
     shell:
         "TEMPDIR=`mktemp -p " + CONFIG["base"]["download_dir"] + " -d` && "
         "cd $TEMPDIR && "
         "{input.MODEL}/BuildDatabase -name repeat_db -engine ncbi " + CONFIG["maker_opts"]["rmlib_genome"]  + " && "
-        "{input.MODEL}/RepeatModeler -database repeat_db -engine ncbi -pa {threads} && "
+        "{input.MODEL}/RepeatModeler -database repeat_db -engine ncbi -pa " +CONFIG["maker_opts"]["cpus"]+ " && "
         "find . -maxdepth 1 -name 'RM_*' -type d | xargs -I '%' cat %/consensi.fa >> {output} && "
         "cd / && rm -rf $TEMPDIR;"
         
