@@ -49,7 +49,7 @@
 		"rmlib_genome" : "{base_dir}{executables}maker/data/dpp_contig.fasta",
 		"protein": "{base_dir}{executables}maker/data/dpp_protein.fasta",
 		"repeat_protein": "{base_dir}{executables}maker/data/te_proteins.fasta",
-		"model_org": "all",
+		"model_org": "",
 		"snaphmm": "{base_dir}{executables}snap/HMM/D.melanogaster.hmm",
 		"augustus_species": "fly",
 		"est2genome": "1",
