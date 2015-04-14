@@ -1,0 +1,52 @@
+{
+	"base":
+	{
+		"working_dir": "{base_dir}TEMP_MAKER",
+		"braker_bashrc": "{base_dir}{executables}maker.bashrc",
+		"download_dir":"{download_dir}",
+		"perl_brew" : "{home_dir}perl5/perlbrew/",
+		"perl_install": "{home_dir}perl5/perlbrew/perls/perl-5.18.0/",
+		"perl_version": "5.18.0",
+		"perl_cpanm_options" : "--force --notest ",
+		"perl_brew_options" : "-j 6 --notest --noman --thread --force ",
+		"perl_libs":
+		[
+			"File::Spec::Functions",
+            "Hash::Merge",
+            "List::Util",
+            "Logger::Simple",
+            "Module::Load::Conditional",
+            "Parallel::ForkManager",
+            "POSIX",
+            "Scalar::Util::Numeric",
+            "YAML" 
+		]
+	},
+
+	"braker_opts":
+	{
+		"genome": "{base_dir}{executables}maker/data/dpp_contig.fasta",
+		"cpus": "8"
+	},
+
+
+	"executables":
+	{
+		"augustus": "{base_dir}{executables}augustus/bin/augustus",
+		"braker": "{base_dir}{executables}braker/braker.pl",
+		"perl" : "{home_dir}perl5/perlbrew/perls/perl-5.18.0/bin/perl",
+		"cpanm" : "{home_dir}perl5/perlbrew/bin/cpanm",
+		"genemark" :"{base_dir}{executables}Genemark",
+		"bamtools" :"{base_dir}{executables}bamtools"
+	},
+
+	"executable_sources":
+	{
+		"braker_URL": "http://bioinf.uni-greifswald.de/augustus/binaries/BRAKER1.tar.gz",
+		"wget_options": " -c --proxy=off ",
+		"augustus_URL": "http://bioinf.uni-greifswald.de/augustus/binaries/augustus-3.0.3.tar.gz",
+		"genemark_URL": "",
+		"bamtools_URL": "",
+		"perl_URL": "http://downloads.activestate.com/ActivePerl/releases/5.18.4.1803/ActivePerl-5.18.4.1803-x86_64-linux-glibc-2.5-298573.tar.gz"
+	},
+}

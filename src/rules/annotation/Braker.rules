@@ -1,0 +1,120 @@
+#############
+##  Maker  ##
+#############
+
+import os, subprocess
+import configparser
+
+""" use this rule to clean-up all the data produced by maker """
+rule clean_data:
+    shell: "rm -rf " + CONFIG['base']['working_dir']
+
+rule clean_perl:
+    shell: "rm -rf " + CONFIG["base"]["perl_install"]
+
+# Install maker dependencies :
+
+# Create .bashrc to store settings and paths
+rule braker_bashrc:
+    output : CONFIG['base']['braker_bashrc']
+    params : dir = strip_path_level(CONFIG['base']['braker_bashrc'],1)
+    priority: 5000
+    shell :
+        "mkdir -p {params.dir} && "
+        "touch {output}"
+
+# Download and install Augustus
+rule augustus_installation:
+    output: CONFIG["executables"]["augustus"]
+    params: dir = strip_path_level(CONFIG["executables"]["augustus"],2)
+    shell:
+        "TEMPDIR=`mktemp -p " + CONFIG["base"]["download_dir"] + " -d` && "
+        "cd $TEMPDIR && "
+        "wget"+CONFIG['executable_sources']['wget_options']+CONFIG['executable_sources']['augustus_URL']+" && "
+        "tar xzf augustus* && "
+        "rm *.tar.* && "
+        "cp -R augustus*/* {params.dir} && "
+        "echo 'export PATH='`readlink -f {params.dir}/bin/`':$PATH' >> {rules.braker_bashrc.output} && "
+        "echo 'export AUGUSTUS_CONFIG_PATH='`readlink -f {params.dir}/config/`  >> {rules.braker_bashrc.output}  && "
+        "cd / && rm -rf $TEMPDIR && "
+        "touch {output};"
+
+rule bamtools_installation:
+    output: CONFIG["executables"]["bamtools"]
+
+rule genemark_installation:
+    output: CONFIG["executables"]["genemark"]
+
+# Install perl if version is too low (as on our cluster)
+rule install_perl:
+   output: CONFIG["executables"]["perl"]
+   shell:
+        "wget --no-check-certificate -O - http://install.perlbrew.pl | bash && "
+        "source " + CONFIG["base"]["perl_brew"] + "etc/bashrc && "
+        "perlbrew " + CONFIG["base"]["perl_brew_options"] + " install " + CONFIG["base"]["perl_version"] + " && "
+        "perlbrew switch " + CONFIG["base"]["perl_version"] + " && "
+        "cat " + CONFIG["base"]["perl_brew"] + "etc/bashrc >> {rules.braker_bashrc.output} && "
+        "echo 'perlbrew switch " + CONFIG["base"]["perl_version"] + "' >>  {rules.braker_bashrc.output} && "
+        "touch {output};"
+
+# Create local Perl library
+rule install_perl_cpanm:
+    input:
+        PERL=rules.install_perl.output
+    output: CONFIG["executables"]["cpanm"]
+    shell:
+        "source {rules.braker_bashrc.output} && "
+        "perlbrew install-cpanm && "
+        "touch {output}"
+
+# Install necessary Perl libraries
+rule install_perl_libs:
+    input:
+        rules.install_perl_cpanm.output,
+        rules.install_perl.output
+    output: CONFIG["base"]["perl_install"] + "lib/done"
+    run:
+        for lib in CONFIG["base"]["perl_libs"]:
+            shell("source  {rules.braker_bashrc.output} ; cpanm "+ CONFIG["base"]["perl_cpanm_options"] + " " + lib)
+        shell("touch " + CONFIG["base"]["perl_install"] + "lib/done")
+
+
+
+rule braker_installation:
+    input:
+        rules.augustus_installation.output,
+        rules.genemark_installation.output,
+        rules.bamtools_installation.output,
+        rules.install_perl_libs.output,
+        PERL=rules.install_perl.output
+    params: dir = strip_path_level(CONFIG["executables"]["braker"],1)
+    output: CONFIG["executables"]["braker"]
+    shell:
+        "TEMPDIR=`mktemp -p " + CONFIG["base"]["download_dir"] + " -d` && "
+        "cd $TEMPDIR && "
+        "wget"+CONFIG['executable_sources']['wget_options']+CONFIG['executable_sources']['braker_URL']+" && "
+        "tar xzf maker* && "
+        "rm maker*.tgz && "
+        "touch maker && "
+        "cp --recursive maker/* {params.dir} && "
+        "cd / && rm -rf $TEMPDIR;"
+        "cd {params.dir}/src && source {rules.maker_bashrc.output} && "
+        "{input.PERL} Build.PL && "
+        "{input.PERL} Build install && "
+        "chmod ugo+w {output} && "
+        "touch {output}"
+
+"""" rule to run braker based on the given configuration """
+rule braker:
+    input:
+        rules.maker_bopts.output,
+        rules.maker_opts.output,
+        rules.maker_exe.output,
+        rules.repeatmodeler.output,
+        MAKER=rules.maker_installation.output
+    output: CONFIG['base']['working_dir'] + "/maker_done.txt"
+    shell:
+        "cd " + CONFIG['base']['working_dir'] + " && "
+        "source {rules.maker_bashrc.output} && "
+        "{input.MAKER} -fix_nucleotides && "
+        "touch {output}"
