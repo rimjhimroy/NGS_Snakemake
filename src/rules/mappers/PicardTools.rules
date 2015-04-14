@@ -36,12 +36,13 @@ rule addHeaderline:
 rule removeDuplicates:
     input:
         PICARD=rules.picardtools_installation.output,
-        BAM="mapped/sorted.{sample}.bam"
-    output: "mapped/noDup.sorted.{sample}.bam"
+        BAM="mapped/{sample}.bam"
+    output: temp("mapped/noDup.{sample}.bam")
     params:
         path=CONFIG["picardTools"]["path"]
     shell: "java -jar {input.PICARD} MarkDuplicates INPUT={input.BAM} ASSUME_SORTED=true VALIDATION_STRINGENCY=SILENT OUTPUT={output} REMOVE_DUPLICATES=true METRICS_FILE=/dev/null"
 
+#missing input : processedbam/noDup.merged.sort.ST_sample1.bam
 rule AddRGtag:
     input:
         PICARD=rules.picardtools_installation.output,

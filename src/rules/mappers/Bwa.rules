@@ -1,7 +1,6 @@
 """
 @version: 0.1
 @author: Jetse
-@attention: Untested!
 
 Mapping with BWA.
 """
@@ -9,7 +8,7 @@ Mapping with BWA.
 from qualityControl.files import BamFile
 import subprocess
 
-ruleorder: bwaMemPaired > bwaMemSingle
+#ruleorder: bwaMemPaired > bwaMemSingle
 
 # Download and install bwa
 rule bwa_installation:
@@ -27,13 +26,15 @@ rule bwa_installation:
 rule bwaSampe:
     input:
         BWA=rules.bwa_installation.output,
-        forward = "processed/{prefix}_1.fastq",
-        reversed = "processed/{prefix}_2.fastq",
+        #forward = "processed/{prefix}_1.fastq",
+        #reversed = "processed/{prefix}_2.fastq",
+        #forward = "trimmed_reads/{sample}_1.fastq.gz"
+        #reverse = "trimmed_reads/{sample}_2.fastq.gz
         forwardSai = "mapped/{prefix}_1.sai",
         reversedSai = "mapped/{prefix}_2.sai",
         refGenome = CONFIG["refGenome"],
         refGenomeIndex = CONFIG["refGenome"] + ".pac"
-    output: temp("mapped/bwaSampe.{prefix}.sam")
+    output: temp("mapped/bwaSampe.{sample}/{lib}/{readset}/{name}.sam")
     params:
         optionalOpts = CONFIG["bwaSampe"]["optionalOpts"]
     run:
@@ -77,24 +78,24 @@ rule bwaIndex:
 rule bwaMemPaired:
     input:
         BWA=rules.bwa_installation.output,
-        forward = "processed/trim.{sample}_1.fastq",
-        reversed = "processed/trim.{sample}_2.fastq",
+        forward = "trimmed/{sample}/{lib}/{readset}/{name}_1.fastq.gz",
+        reversed = "trimmed/{sample}/{lib}/{readset}/{name}_2.fastq.gz",
         refGenome = CONFIG["refGenome"],
         refGenomeIndex = CONFIG["refGenome"] + ".pac"
-    output: temp("mapped/bwaMem.{sample}.sam")
+    output: temp("mapped/{sample}/{lib}/{readset}/{name}.sam")
     threads: 8
     params:
         optionalOpts = CONFIG["bwaMem"]["optionalOpts"]
     shell: "{input.BWA} mem -t {threads} {params.optionalOpts} {input.refGenome} {input.forward} {input.reversed} > {output[0]}"
 
-rule bwaMemSingle:
-    input:
-        BWA=rules.bwa_installation.output,
-        reads = "processed/{prefix}.fastq",
-        refGenome = CONFIG["refGenome"],
-        refGenomeIndex = CONFIG["refGenome"] + ".pac"
-    output: temp("mapped/bwaMem.{prefix}.sam")
-    threads: 8
-    params:
-        optionalOpts = CONFIG["bwaMem"]["optionalOpts"]
-    shell: "{input.BWA} mem -t {threads} {input.refGenome} {input.reads} > {output[0]}"
+#rule bwaMemSingle:
+#    input:
+#        BWA=rules.bwa_installation.output,
+#        reads = "trimmed_reads/{sample}/{lib}/{readset}/{name}_se.fastq.gz",
+#        refGenome = CONFIG["refGenome"],
+#        refGenomeIndex = CONFIG["refGenome"] + ".pac"
+#    output: temp("mapped/{sample}/{lib}/{readset}/{name}.sam")
+#    threads: 8
+#    params:
+#        optionalOpts = CONFIG["bwaMem"]["optionalOpts"]
+#    shell: "{input.BWA} mem -t {threads} {input.refGenome} {input.reads} > {output[0]}"

@@ -20,7 +20,7 @@ rule samtools_installation:
         "TEMPDIR=`mktemp -d`;"
         "cd $TEMPDIR;"
         "git clone " +CONFIG['samtools']['URL'] + " && "
-        "git clone " +CONFIG['htslib']['URL'] + " && "
+        #"git clone " +CONFIG['htslib']['URL'] + " && "
         "cd samtools && "
         "make && "
         "mv samtools {output} &&"
@@ -30,42 +30,51 @@ rule samtools_installation:
 rule samToBam:
     input:
         SAMTOOLS=rules.samtools_installation.output,
-        BAM="mapped/{sample}.sam"
-    output: temp("mapped/{sample}.bam")
-    shell: "{input.SAMTOOLS} view -bS {input.BAM} > {output}"
+        SAM="mapped/{sample}/{lib}/{readset}/{name}.sam"
+    output: temp("mapped/{sample}/{lib}/{readset}/{name}.bam")
+    shell: "{input.SAMTOOLS} view -bS {input.SAM} > {output}"
 
 rule indexBam:
     input:
         SAMTOOLS=rules.samtools_installation.output,
-        BAM="{prefix}.bam"
-    output: "{prefix}.bam.bai"
+        BAM="processedbam/{prefix}.bam"
+    output: "processedbam/{prefix}.bam.bai"
     shell: "{input.SAMTOOLS} index {input.BAM}"
 
 rule sortBam:
     input:
         SAMTOOLS=rules.samtools_installation.output,
-        BAM="mapped/{sample}.bam"
-    output: "mapped/sorted.{sample}.bam"
+        BAM="mapped/{sample}/{lib}/{readset}/{name}.bam"
+    output: "mapped.sorted/{sample}/{lib}/{readset}/{name}.bam"
     shell: "{input.SAMTOOLS} sort -o {input.BAM} {output} > {output}"
 
+def selectBam(wildcards):
+#    bams, = glob_wildcards("mapped/"+str(wildcards)+"/{bams}.bam")
+    bams, = glob_wildcards("reads/"+str(wildcards)+"/{bams}_1.fastq.gz")
+    return expand("mapped.sorted/{S}/{B}.bam", S=wildcards, B=bams)
+     
 rule mergeBam:
     input:
         SAMTOOLS=rules.samtools_installation.output,
-        BAM='expand(",".join("/processedbam/{sample}.bam", sample=SAMPLES)'
-    output: "processedbam/allMerged.bam"
-    shell: "{input.SAMTOOLS} merge {output} {input.BAM}"
+	BAM=selectBam
+    output: "mapped/merged.sort.{sample}.bam"
+    run: 
+        if len(input.BAM) < 2:
+            shell("cp {input.BAM} {output}")
+        else:
+            shell("{input.SAMTOOLS} merge {output} {input.BAM}") 
 
-rule addMdTag:
-    input:
-        SAMTOOLS=rules.samtools_installation.output,
-        BAM="mapped/{sample}.bam",
-        REFERENCE=CONFIG["refGenome"]
-    output: "mapped/md.{sample}.bam"
-    shell: "{input.SAMTOOLS} calmd {input.BAM} {input.REFERENCE} > {output}"
+#rule addMdTag:
+#    input:
+#        SAMTOOLS=rules.samtools_installation.output,
+#        BAM="mapped/merged.{sample}.bam",
+#        REFERENCE=CONFIG["refGenome"]
+#    output: "mapped/MD.merged.{sample}.bam"
+#    shell: "{input.SAMTOOLS} calmd {input.BAM} {input.REFERENCE} > {output}"
 
 rule faidX:
     input:
         SAMTOOLS=rules.samtools_installation.output,
-        FASTA="{prefix}.fasta"
-    output: "{prefix}.fasta.fai"
+        FASTA=CONFIG["refGenome"]
+    output: CONFIG["refGenome"] + ".fai"
     shell: "{input.SAMTOOLS} faidx {input.FASTA}"
