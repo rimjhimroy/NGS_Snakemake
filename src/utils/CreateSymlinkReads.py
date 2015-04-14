@@ -70,3 +70,4 @@ if __name__ == "__main__":
     with open(sys.argv[1]) as f:
         config = json.load(f)
         createSymlinks(config)
+
