@@ -283,10 +283,10 @@ rule repeatmodeler:
     output: CONFIG["maker_opts"]["rmlib"]
     shell:
         "TEMPDIR=`mktemp -p " + CONFIG["base"]["download_dir"] + " -d` && "
-        "cd $TEMPDIR && "
+        "cd $TEMPDIR && rm -f {output} && touch {output} && "
         "{input.MODEL}/BuildDatabase -name repeat_db -engine ncbi " + CONFIG["maker_opts"]["rmlib_genome"]  + " && "
         "{input.MODEL}/RepeatModeler -database repeat_db -engine ncbi -pa " +CONFIG["maker_opts"]["cpus"]+ " && "
-        "find . -maxdepth 1 -name 'RM_*' -type d | xargs -I '%' cat %/consensi.fa >> {output} && "
+        "find . -maxdepth 2 -name '*consensi.fa' -type f -exec cat {{}} >> {output} \; && "
         "cd / && rm -rf $TEMPDIR;"
         
 
@@ -440,9 +440,9 @@ rule interproscan:
         INTERPRO = rules.install_interproscan.output,
         PANTHER = rules.install_panther.output,
         PROTEINS = rules.get_predicted_proteins.output
-    output: CONFIG['base']['working_dir'] + "/protein_annotation.tsv"
+    output: CONFIG['base']['working_dir'] + "protein_annotation"
     shell:
-        "{input.INTERPRO}/interproscan.sh -i {input.PROTEINS} -f tsv -o {output} && "
+        "{input.INTERPRO}/interproscan.sh -i {input.PROTEINS} -f tsv -f GFF3 -f HTML -f XML -b {output} && "
         "touch {output}"
 
 rule uniprot:
