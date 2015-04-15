@@ -4,6 +4,7 @@
 
 import os, subprocess
 import configparser
+from Maker import *
 
 """ use this rule to clean-up all the data produced by maker """
 rule clean_data:
@@ -13,7 +14,6 @@ rule clean_perl:
     shell: "rm -rf " + CONFIG["base"]["perl_install"]
 
 # Install maker dependencies :
-
 # Create .bashrc to store settings and paths
 rule braker_bashrc:
     output : CONFIG['base']['braker_bashrc']
@@ -22,7 +22,19 @@ rule braker_bashrc:
     shell :
         "mkdir -p {params.dir} && "
         "touch {output}"
-
+        
+rule tophat2_installation:
+    output: CONFIG["executables"]["tophat2"]
+    params: dir = strip_path_level(CONFIG["executables"]["tophat2"],1)
+    shell:
+        "TEMPDIR=`mktemp -p " + CONFIG["base"]["download_dir"] + " -d` && "
+        "cd $TEMPDIR && "
+        "wget"+CONFIG['executable_sources']['wget_options']+CONFIG['executable_sources']['tophat2_URL']+" && "
+        "tar xzf *.tar.gz && "
+        "cp -R tophat*/* {params.dir} && "
+        "cd / && rm -rf $TEMPDIR && "
+        "touch {output};"
+        
 # Download and install Augustus
 rule augustus_installation:
     output: CONFIG["executables"]["augustus"]
@@ -34,16 +46,32 @@ rule augustus_installation:
         "tar xzf augustus* && "
         "rm *.tar.* && "
         "cp -R augustus*/* {params.dir} && "
-        "echo 'export PATH='`readlink -f {params.dir}/bin/`':$PATH' >> {rules.braker_bashrc.output} && "
-        "echo 'export AUGUSTUS_CONFIG_PATH='`readlink -f {params.dir}/config/`  >> {rules.braker_bashrc.output}  && "
         "cd / && rm -rf $TEMPDIR && "
         "touch {output};"
 
 rule bamtools_installation:
     output: CONFIG["executables"]["bamtools"]
-
+    params: dir = strip_path_level(CONFIG["executables"]["bamtools"],1)
+    shell:
+        "mkdir -p {params.dir} && cd {params.dir} && "
+        "git clone " + CONFIG["executable_sources"]["bamtools_URL"] + " && "
+        "mkdir build && cd build && cmake .. && cd .. && make "
+  
 rule genemark_installation:
     output: CONFIG["executables"]["genemark"]
+    params: dir = CONFIG["executables"]["genemark"]
+    shell:
+        "TEMPDIR=`mktemp -p " + CONFIG["base"]["download_dir"] + " -d` && "
+        "cd $TEMPDIR && "
+        "wget"+CONFIG['executable_sources']['wget_options']+CONFIG['executable_sources']['genemark_URL']+" && "
+        "tar zxf *.tar.gz && "
+        "cd gm_et_linux_64/gmes_petap && "
+        "grep -l -r '#!/usr' *.pl | xargs -I '%' sed -i 's|/usr/bin/perl|/usr/bin/env perl|' % &&"
+        "mkdir -p {params.dir} && " 
+        "cp -R * " + CONFIG["executables"]["genemark"] + " && "
+        "cp gm_key " + CONFIG["base"]["home_dir"] + ".gm_key && "
+        "cd / && rm -rf $TEMPDIR && "
+        "touch {output};"
 
 # Install perl if version is too low (as on our cluster)
 rule install_perl:
@@ -72,12 +100,11 @@ rule install_perl_libs:
     input:
         rules.install_perl_cpanm.output,
         rules.install_perl.output
-    output: CONFIG["base"]["perl_install"] + "lib/done"
+    output: CONFIG["base"]["perl_install"] + "lib/done_braker"
     run:
         for lib in CONFIG["base"]["perl_libs"]:
             shell("source  {rules.braker_bashrc.output} ; cpanm "+ CONFIG["base"]["perl_cpanm_options"] + " " + lib)
-        shell("touch " + CONFIG["base"]["perl_install"] + "lib/done")
-
+        shell("touch " + CONFIG["base"]["perl_install"] + "lib/done_braker")
 
 
 rule braker_installation:
@@ -90,31 +117,37 @@ rule braker_installation:
     params: dir = strip_path_level(CONFIG["executables"]["braker"],1)
     output: CONFIG["executables"]["braker"]
     shell:
-        "TEMPDIR=`mktemp -p " + CONFIG["base"]["download_dir"] + " -d` && "
-        "cd $TEMPDIR && "
+        "mkdir -p {params.dir} && "
+        "cd {params.dir} && "
         "wget"+CONFIG['executable_sources']['wget_options']+CONFIG['executable_sources']['braker_URL']+" && "
-        "tar xzf maker* && "
-        "rm maker*.tgz && "
-        "touch maker && "
-        "cp --recursive maker/* {params.dir} && "
-        "cd / && rm -rf $TEMPDIR;"
-        "cd {params.dir}/src && source {rules.maker_bashrc.output} && "
-        "{input.PERL} Build.PL && "
-        "{input.PERL} Build install && "
-        "chmod ugo+w {output} && "
+        "tar xzf *.tar.gz && "
+        "grep -l -r '#!/usr' *.pl | xargs -I '%' sed -i 's|/usr/bin/perl|/usr/bin/env perl|' % &&"
         "touch {output}"
+rule tophat2:
+    input:
+        rules.tophat2_installation.output
+    output: CONFIG["tophat2_opts"]["output"]
+    shell:
+        "{rules.tophat2_installation.output} -o " + CONFIG["tophat2_opts"]["output"] + " "
+        " " + CONFIG["tophat2_opts"]["cl_options"] + " "
+        " " + CONFIG["braker_opts"]["genome"] + " "
+        " " + CONFIG["tophat2_opts"]["reads"]
 
-"""" rule to run braker based on the given configuration """
 rule braker:
     input:
-        rules.maker_bopts.output,
-        rules.maker_opts.output,
-        rules.maker_exe.output,
-        rules.repeatmodeler.output,
-        MAKER=rules.maker_installation.output
-    output: CONFIG['base']['working_dir'] + "/maker_done.txt"
+        rules.braker_bashrc.output,
+        TOPHAT2 = rules.tophat2.output,
+        BRAKER=rules.braker_installation.output
+    params: augustus = strip_path_level(CONFIG["executables"]["augustus"],2) 
+    output: CONFIG['base']['working_dir'] + CONFIG['braker_opts']['model_name'] 
     shell:
-        "cd " + CONFIG['base']['working_dir'] + " && "
-        "source {rules.maker_bashrc.output} && "
-        "{input.MAKER} -fix_nucleotides && "
-        "touch {output}"
+        "mkdir -p " + CONFIG['base']['working_dir'] + " && cd " + CONFIG['base']['working_dir'] + " && "
+        "source {rules.braker_bashrc.output} && "
+        "{input.BRAKER} " + CONFIG["braker_opts"]["cl_options"] + " --CPU=" + CONFIG['braker_opts']['cpus'] + " "
+        "--workingdir=" + CONFIG['base']['working_dir'] + " "
+        "--SAMTOOLS_PATH=" + CONFIG['executables']['samtools'] + " "
+        "--GENEMARK_PATH=" + CONFIG['executables']['genemark'] + " " 
+        "--BAMTOOLS_PATH=" + CONFIG['executables']['bamtools'] + "/bin " 
+        "--AUGUSTUS_CONFIG_PATH={params.augustus}/config " 
+        "--genome=" + CONFIG['braker_opts']['genome'] + " "
+        "--bam={input.TOPHAT2}/accepted_hits.bam"

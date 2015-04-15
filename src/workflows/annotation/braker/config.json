@@ -4,6 +4,7 @@
 		"working_dir": "{base_dir}TEMP_MAKER",
 		"braker_bashrc": "{base_dir}{executables}maker.bashrc",
 		"download_dir":"{download_dir}",
+		"home_dir" : "{home_dir}", 
 		"perl_brew" : "{home_dir}perl5/perlbrew/",
 		"perl_install": "{home_dir}perl5/perlbrew/perls/perl-5.18.0/",
 		"perl_version": "5.18.0",
@@ -23,20 +24,31 @@
 		]
 	},
 
+	"tophat2_opts": 
+	{
+		"reads" : "my_rna_1.fq,my_rna_2.fq",
+		"cl_options": " -p 48 -r 0 --no-coverage-search --min-segment-intron 4 --min-intron-length 4 --max-intron-length 1000 ",
+		"output" : "tophat2"
+	},
+
 	"braker_opts":
 	{
 		"genome": "{base_dir}{executables}maker/data/dpp_contig.fasta",
+		"model_name": "my_model",
+		"cl_options" : "--fungus",
 		"cpus": "8"
 	},
 
 
 	"executables":
 	{
+		"tophat2" : "{base_dir}{executables}tophat2/tophat2",
 		"augustus": "{base_dir}{executables}augustus/bin/augustus",
 		"braker": "{base_dir}{executables}braker/braker.pl",
 		"perl" : "{home_dir}perl5/perlbrew/perls/perl-5.18.0/bin/perl",
 		"cpanm" : "{home_dir}perl5/perlbrew/bin/cpanm",
-		"genemark" :"{base_dir}{executables}Genemark",
+		"genemark" :"{base_dir}{executables}GeneMark",
+		"samtools" : "/usr/bin/samtools",
 		"bamtools" :"{base_dir}{executables}bamtools"
 	},
 
@@ -45,8 +57,9 @@
 		"braker_URL": "http://bioinf.uni-greifswald.de/augustus/binaries/BRAKER1.tar.gz",
 		"wget_options": " -c --proxy=off ",
 		"augustus_URL": "http://bioinf.uni-greifswald.de/augustus/binaries/augustus-3.0.3.tar.gz",
-		"genemark_URL": "",
-		"bamtools_URL": "",
+		"genemark_URL": "http://topaz.gatech.edu/GeneMark/tmp/GMtool_ZBbon/gm_et_linux_64.tar.gz",
+		"bamtools_URL": "https://github.com/pezmaster31/bamtools.git",
+		"tophat2_URL" : "http://ccb.jhu.edu/software/tophat/downloads/tophat-2.0.14.Linux_x86_64.tar.gz",
 		"perl_URL": "http://downloads.activestate.com/ActivePerl/releases/5.18.4.1803/ActivePerl-5.18.4.1803-x86_64-linux-glibc-2.5-298573.tar.gz"
-	},
+	}
 }

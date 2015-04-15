@@ -37,6 +37,7 @@ with open("config.json") as conf:
 
 # Include necessary rules
 include: ruleDir + "/annotation/Braker.rules"
+
 rule all:
     input:
         CONFIG['base']['braker_bashrc'], # Needs to be separate defined always !
