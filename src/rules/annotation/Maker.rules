@@ -440,9 +440,9 @@ rule interproscan:
         INTERPRO = rules.install_interproscan.output,
         PANTHER = rules.install_panther.output,
         PROTEINS = rules.get_predicted_proteins.output
-    output: CONFIG['base']['working_dir'] + "/protein_annotation.tsv"
+    output: CONFIG['base']['working_dir'] + "protein_annotation"
     shell:
-        "{input.INTERPRO}/interproscan.sh -i {input.PROTEINS} -f tsv -o {output} && "
+        "{input.INTERPRO}/interproscan.sh -i {input.PROTEINS} -f tsv -f GFF3 -f HTML -f XML -b {output} && "
         "touch {output}"
 
 rule uniprot:
