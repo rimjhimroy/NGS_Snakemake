@@ -76,14 +76,14 @@ rule trimmomaticPaired:
         reversedUnpaired = "trimmed/{sample}/{library}/{readset}/{name}.unpaired_2.fastq.gz"
     params :
         seedMisMatches =            CONFIG['trimmomatic']['seedMisMatches'],
-        palindromeClipTreshold =    CONFIG['trimmomatic']['palindromeClipTreshold'],
-        simpleClipThreshhold =      CONFIG['trimmomatic']['simpleClipThreshhold'],
-        LeadMinTrimQual =           CONFIG['trimmomatic']['LeadMinTrimQual'],
-        TrailMinTrimQual =          CONFIG['trimmomatic']['TrailMinTrimQual'],
-        windowSize =                CONFIG['trimmomatic']['windowSize'],
-        avgMinQual =                CONFIG['trimmomatic']['avgMinQual'],
-        minReadLen =                CONFIG['trimmomatic']['minReadLen'],
-        phred =                     CONFIG['trimmomatic']['phred']
+        palindromeClipTreshold =    str(CONFIG['trimmomatic']['palindromeClipTreshold']),
+        simpleClipThreshhold =      str(CONFIG['trimmomatic']['simpleClipThreshhold']),
+        LeadMinTrimQual =           str(CONFIG['trimmomatic']['LeadMinTrimQual']),
+        TrailMinTrimQual =          str(CONFIG['trimmomatic']['TrailMinTrimQual']),
+        windowSize =                str(CONFIG['trimmomatic']['windowSize']),
+        avgMinQual =                str(CONFIG['trimmomatic']['avgMinQual']),
+        minReadLen =                str(CONFIG['trimmomatic']['minReadLen']),
+        phred =                     str(CONFIG['trimmomatic']['phred'])
     threads: 12
     shell:
         "java -jar {input.TRIMMOMATIC} PE {params.phred} -threads {threads} "
@@ -95,6 +95,8 @@ rule trimmomaticPaired:
         "TRAILING:{params.TrailMinTrimQual} "
         "SLIDINGWINDOW:{params.windowSize}:{params.avgMinQual} "
         "MINLEN:{params.minReadLen}"
+
+
 
 #        FastqFile.FastqFile(output.forward, output.reversed).isValid(dna=True)
 

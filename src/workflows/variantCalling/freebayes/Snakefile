@@ -4,6 +4,8 @@ import shutil
 
 ruleDir = os.path.dirname(inspect.getframeinfo(inspect.currentframe()).filename) + "/../../../rules/"
 
+from SnakeMakeVlpb import VLPB_LIB_PATH
+
 
 # Add qualityControl to pythonpath
 
