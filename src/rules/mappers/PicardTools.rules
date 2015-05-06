@@ -12,15 +12,16 @@ import subprocess
 
 # Download and install picardtools
 rule picardtools_installation:
-    output: CONFIG["picardTools"]["path"] + "picard.jar"
+    #output: CONFIG["picardTools"]["path"] + "picard.jar"
+    output: CONFIG["executables"]["picardTools"] + "picard.jar"
     shell:
         "TEMPDIR=`mktemp -d`;"
         "cd $TEMPDIR;"
-        "wget "+CONFIG['picardTools']['URL']+" -O picard.zip && "
+        "wget "+CONFIG["executable_sources"]['picardTools_URL'] +" -O picard.zip && "
         "unzip picard.zip && "
         "rm picard.zip && "
-        "mv picard*/* " + CONFIG["picardTools"]["path"] + " &&"
-        "touch " + CONFIG["picardTools"]["path"]+ "/* && "
+        "mv picard*/* " + CONFIG["executables"]["picardTools"] + " &&"
+        "touch " + CONFIG["executables"]["picardTools"] + "/* && "
         "rmdir picard* && "
         "cd / && rmdir $TEMPDIR;"
 
@@ -29,7 +30,7 @@ rule addHeaderline:
         PICARD=rules.picardtools_installation.output,
         BAM="mapped/{sample}.bam"
     params:
-        path=CONFIG["picardTools"]["path"]
+        path=CONFIG["executables"]["picardTools"]
     output: "mapped/headered.{sample}.bam"
     shell: "java -jar {input.PICARD} AddOrReplaceReadGroups INPUT={input.BAM} VALIDATION_STRINGENCY=SILENT OUTPUT={output} LB={wildcards.sample} PL=illumina PU=lane SM={wildcards.sample}"
 
@@ -39,7 +40,7 @@ rule removeDuplicates:
         BAM="mapped/{sample}.bam"
     output: temp("mapped/noDup.{sample}.bam")
     params:
-        path=CONFIG["picardTools"]["path"]
+        path=CONFIG["executables"]["picardTools"]
     shell: "java -jar {input.PICARD} MarkDuplicates INPUT={input.BAM} ASSUME_SORTED=true VALIDATION_STRINGENCY=SILENT OUTPUT={output} REMOVE_DUPLICATES=true METRICS_FILE=/dev/null"
 
 #missing input : processedbam/noDup.merged.sort.ST_sample1.bam
@@ -49,6 +50,6 @@ rule AddRGtag:
         BAM="mapped/{sample}.bam"
     output: "processedbam/RG.{sample}.bam"
     params:
-        path=CONFIG["picardTools"]["path"]
+        path=CONFIG["executables"]["picardTools"]
     shell: "java -jar {input.PICARD} AddOrReplaceReadGroups INPUT={input.BAM} RGID={input.BAM} RGLB=ga RGPL=illumina RGPU=unit RGSM={input.BAM} OUTPUT={output}"
 

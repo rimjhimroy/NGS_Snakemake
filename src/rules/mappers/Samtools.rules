@@ -15,11 +15,11 @@ import subprocess, re
 
 # Download and install samtools
 rule samtools_installation:
-    output: CONFIG["samtools"]["path"] + 'samtools'
+    output: CONFIG["executables"]["samtools"] + 'samtools'
     shell:
         "TEMPDIR=`mktemp -d`;"
         "cd $TEMPDIR;"
-        "git clone " +CONFIG['samtools']['URL'] + " && "
+        "git clone " +CONFIG["executable_sources"]['samtools_URL'] + " && "
         #"git clone " +CONFIG['htslib']['URL'] + " && "
         "cd samtools && "
         "make && "

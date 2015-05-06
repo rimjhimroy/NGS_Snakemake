@@ -12,61 +12,61 @@ import subprocess
 
 # Download and install bwa
 rule bwa_installation:
-    output: CONFIG["bwa"]["path"] + 'bwa'
+#    output: CONFIG["bwa"]["path"] + 'bwa'
+    output: CONFIG["executables"]["bwaMem"] + "bwa"
     shell:
         "TEMPDIR=`mktemp -d`;"
         "cd $TEMPDIR;"
-        "git clone "+CONFIG['bwa']['URL']+" && "
+        "git clone "+CONFIG['executable_sources']['bwa_URL']+" && "
         "cd bwa && "
         "make && "
         "mv bwa {output} &&"
         "touch {output} && "
         "cd / && rm -rf $TEMPDIR;"
 
-rule bwaSampe:
-    input:
-        BWA=rules.bwa_installation.output,
+#rule bwaSampe:
+#    input:
+#        BWA=rules.bwa_installation.output,
         #forward = "processed/{prefix}_1.fastq",
         #reversed = "processed/{prefix}_2.fastq",
         #forward = "trimmed_reads/{sample}_1.fastq.gz"
         #reverse = "trimmed_reads/{sample}_2.fastq.gz
-        forwardSai = "mapped/{prefix}_1.sai",
-        reversedSai = "mapped/{prefix}_2.sai",
-        refGenome = CONFIG["refGenome"],
-        refGenomeIndex = CONFIG["refGenome"] + ".pac"
-    output: temp("mapped/bwaSampe.{sample}/{lib}/{readset}/{name}.sam")
-    params:
-        optionalOpts = CONFIG["bwaSampe"]["optionalOpts"]
-    run:
-        shell("{input.BWA} sampe {params.optionalOpts} {input.refGenome}  "
-              "{input.forwardSai} {input.reversedSai} {input.forward} {input.reversed} > {output[0]}".format(params=params, input=input, output=output))
-        BamFile.BamFile(output[0], sam=True).isValid()
+#        forwardSai = "mapped/{prefix}_1.sai",
+#        reversedSai = "mapped/{prefix}_2.sai",
+#        refGenome = CONFIG["refGenome"],
+#        refGenomeIndex = CONFIG["refGenome"] + ".pac"
+#    output: temp("mapped/bwaSampe.{sample}/{lib}/{readset}/{name}.sam")
+#    params:
+#        optionalOpts = CONFIG["bwaSampe"]["optionalOpts"]
+#    run:
+#        shell("{input.BWA} sampe {params.optionalOpts} {input.refGenome}  "
+#              "{input.forwardSai} {input.reversedSai} {input.forward} {input.reversed} > {output[0]}".format(params=params, input=input, output=output))
+#        BamFile.BamFile(output[0], sam=True).isValid()
 
-rule bwaSamse:
-    input:
-        BWA=rules.bwa_installation.output,
-        reads = "processed/{prefix}.fastq",
-        readsSai = "mapped/{prefix}.sai",
-        refGenome = CONFIG["refGenome"],
-        refGenomeIndex = CONFIG["refGenome"] + ".pac"
-    output: temp("mapped/bwaSamse.{prefix}.sam")
-    params:
-        optionalOpts = CONFIG["bwaSamse"]["optionalOpts"]
-    run:
-        shell("{input.BWA} samse {params.optionalOpts} {input.refGenome}  "
-              "{input.readsSai} {input.reads} > {output[0]".format(params=params, input=input))
-        BamFile.BamFile(output[0], sam=True).isValid()
+#rule bwaSamse:
+#    input:
+#       reads = "processed/{prefix}.fastq",
+#       readsSai = "mapped/{prefix}.sai",
+#        refGenome = CONFIG["refGenome"],
+#        refGenomeIndex = CONFIG["refGenome"] + ".pac"
+#    output: temp("mapped/bwaSamse.{prefix}.sam")
+#    params:
+#        optionalOpts = CONFIG["bwaSamse"]["optionalOpts"]
+#    run:
+#        shell("{input.BWA} samse {params.optionalOpts} {input.refGenome}  "
+#              "{input.readsSai} {input.reads} > {output[0]".format(params=params, input=input))
+#        BamFile.BamFile(output[0], sam=True).isValid()
 
-rule bwaAln:
-    input:
-        BWA=rules.bwa_installation.output,
-        reads = "processed/{prefix}.fastq",
-        refGenome = CONFIG["refGenome"],
-        refGenomeIndex = CONFIG["refGenome"] + ".pac"
-    output: "mapped/{prefix}.sai"
-    params:
-        optionalOpts = CONFIG["bwaAln"]["optionalOpts"]
-    shell: "{input.BWA} aln -t {threads} {input.refGenome} {input.reads} > {output[0]}"
+#rule bwaAln:
+#    input:
+#        BWA=rules.bwa_installation.output,
+#        reads = "processed/{prefix}.fastq",
+#        refGenome = CONFIG["refGenome"],
+#        refGenomeIndex = CONFIG["refGenome"] + ".pac"
+#    output: "mapped/{prefix}.sai"
+#    params:
+#        optionalOpts = CONFIG["bwaAln"]["optionalOpts"]
+#    shell: "{input.BWA} aln -t {threads} {input.refGenome} {input.reads} > {output[0]}"
 
 rule bwaIndex:
     input:
