@@ -4,12 +4,7 @@
 
 The Samtools module contains all rules for manipulating bam files with samtools.
 
-A configuration file like the following is expected in a global CONFIG variable:
-{
-    "mapping":{
-        "referenceGenome":"/path/to/referenceGenome.fasta
-    }
-}
+
 """
 import subprocess, re
 
@@ -20,7 +15,7 @@ rule samtools_installation:
         "TEMPDIR=`mktemp -d`;"
         "cd $TEMPDIR;"
         "git clone " +CONFIG["executable_sources"]['samtools_URL'] + " && "
-        #"git clone " +CONFIG['htslib']['URL'] + " && "
+        "git clone " +CONFIG['executable_sources']['htslib_URL'] + " && "
         "cd samtools && "
         "make && "
         "mv samtools {output} &&"

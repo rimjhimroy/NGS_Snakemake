@@ -12,7 +12,6 @@ Expects a global variable CONFIG (e.g. parsed from json) of at least the followi
     "illuminaAdapters": "/path/to/adapters",
 
     "trimmomatic":{
-        "jar": "/home/jaco001/programs/trimmomatic-0.32.jar",
         "seedMisMatches": 2,
         "palindromeClipTreshold": 30,
         "simpleClipThreshhold": 10,
@@ -25,8 +24,8 @@ Expects a global variable CONFIG (e.g. parsed from json) of at least the followi
     }
 
 }
-Expects the input files in the working directory. For paired end data the files have to end with _1.fastq (forward reads) and
-_2.fastq (reversed reads).
+Expects the input files in the working directory. For paired end data the files have to end with _1.fastq.gz (forward reads) and
+_2.fastq.gz (reversed reads).
 
 """
 ###############
@@ -98,7 +97,7 @@ rule trimmomaticPaired:
 
 
 
-#        FastqFile.FastqFile(output.forward, output.reversed).isValid(dna=True)
+#     TODO  TrimmomaticSingle
 
 """
 rule trimmomaticSingle:

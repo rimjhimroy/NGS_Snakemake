@@ -19,10 +19,10 @@ if 'config' in globals() and "GALAXY_OUTPUT" in config: #The output from galaxy 
     json_file = config["json"]
     current_path = '/'.join(json_file.split("/")[:-1]) + "/" # found out where we are
     try: #setup data from galaxy as required by the pipeline 
-        os.makedirs(current_path + "raw_reads") 
+        os.makedirs(current_path + "reads") 
         os.makedirs(current_path + "refGenome")
-        shutil.copy(config["forward"], current_path + "raw_reads/" + config["samples"][0] + "_1.fastq" )
-        shutil.copy(config["reverse"], current_path + "raw_reads/" + config["samples"][0] + "_2.fastq" )
+        shutil.copy(config["forward"], current_path + "reads/" + config["samples"][0] + "_1.fastq" )
+        shutil.copy(config["reverse"], current_path + "reads/" + config["samples"][0] + "_2.fastq" )
         shutil.copy(config["refGenome"], current_path + "refGenome/" + config["samples"][0] + ".fasta")
         shutil.copy(config["gff"], current_path + "refGenome/" + config["samples"][0] + ".gff" )
         config['refGenome'] = current_path + "refGenome/" + config["samples"][0] + ".fasta"
@@ -72,14 +72,8 @@ rule all:
 
     
     #testing purpose:
-    #input: expand("./trimmed_reads/{samples}.fastq.gz", samples=SAMPLES)	
-    #input: expand("trimmed_reads/{samples}.fastq.gz", samples=SAMPLES)
-    #input: expand("mapped/{samplebases}.bwamem.sam", samplebases=SAMPLEBASE)
-    #input: expand("mapped/{samplebases}.bwamem.sort.bam", samplebases=SAMPLEBASE)
-    #input: "mapped/{sample}/{lib}/{readset}/{name}.sort.bam"
     #input: expand("mapped/merged.sort.{samples}.bam", samples=SAMPLES)
     #input: expand("processedbam/RG.noDup.merged.sort.{samples}.bam", samples=SAMPLES)
-    #input: expand("processedbam/RG.noDup.merged.sort.{samples}.bam.bai", samples=SAMPLES)
     #input: expand("variantCalling/fb.RG.noDup.merged.sort.{samples}.vcf", samples=SAMPLES)
     
       run:

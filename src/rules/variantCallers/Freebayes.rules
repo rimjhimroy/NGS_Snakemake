@@ -44,15 +44,15 @@ param_str = " ".join(items)
 parameters = param_str
 
 rule freebayes_installation:
-    output: CONFIG["freebayes"]["path"] + 'freebayes'
+    output: CONFIG["executables"]["freebayes"]  + 'freebayes'
     threads: 20
     shell:
         "TEMPDIR=`mktemp -d`;"
         "cd $TEMPDIR;"
-        "git clone --recursive " + CONFIG['freebayes']['URL'] +  " && "
+        "git clone --recursive " + CONFIG['executable_sources']['freebayes_URL'] +  " && "
         "cd freebayes && "
         "make -j {threads} && "
-        "mv bin/freebayes bin/bamleftalign " + CONFIG["freebayes"]["path"] + " &&"
+        "mv bin/freebayes bin/bamleftalign " + CONFIG["executables"]["freebayes"] + " &&"
         "touch {output} && "
         "cd / && rm -rf $TEMPDIR;"
 
@@ -65,16 +65,13 @@ rule FreebayesCalling:
         REFGENOMEINDEX = CONFIG["refGenome"] + '.fai'
     output: "variantCalling/fb.{sample}.vcf"
     #version: FREEBAYES_VERSION
-    shell: ("{input.FREEBAYES} -f {input.REFGENOME} -b {input.BAM} -v {output} {parameters} > {output}")
+    shell: "{input.FREEBAYES} -f {input.REFGENOME} -b {input.BAM} -v {output} {parameters} > {output}" + " && "
+      "rm -rf ./mapped" + " && "
+      "rm -rf ./mapped.sorted" + " && "
+      "rm -rf ./trimmed"
 
 """
 #TODO: work on SNPfiltering
-
-rule bcftoolsView:
-    input: "variantCalling/{prefix}.mpileup"
-    output: "variantCalling/{prefix}.vcf"
-    #version: SAMTOOLS_VERSION
-    shell: "bcftools view -vcg {input[0]} > {output[0]}"
 
 rule filterVcf:
     input:

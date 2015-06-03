@@ -2,8 +2,8 @@
 
 Required JSON:
 {
-    "picardTools":{
-        "path":"/path/to/picardtools"
+    "executables":{
+        "picardtools":"/path/to/picardtools/picard.jar"
     }
 }
 
@@ -12,7 +12,6 @@ import subprocess
 
 # Download and install picardtools
 rule picardtools_installation:
-    #output: CONFIG["picardTools"]["path"] + "picard.jar"
     output: CONFIG["executables"]["picardTools"] + "picard.jar"
     shell:
         "TEMPDIR=`mktemp -d`;"
@@ -43,7 +42,7 @@ rule removeDuplicates:
         path=CONFIG["executables"]["picardTools"]
     shell: "java -jar {input.PICARD} MarkDuplicates INPUT={input.BAM} ASSUME_SORTED=true VALIDATION_STRINGENCY=SILENT OUTPUT={output} REMOVE_DUPLICATES=true METRICS_FILE=/dev/null"
 
-#missing input : processedbam/noDup.merged.sort.ST_sample1.bam
+
 rule AddRGtag:
     input:
         PICARD=rules.picardtools_installation.output,

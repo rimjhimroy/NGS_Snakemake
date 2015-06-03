@@ -1,0 +1,76 @@
+{
+   "samples":{
+      "CUSTOM_SAMPLE_NAME_1":{
+         "CUSTOM_LIB_NAME":{
+            "readsets":{
+               "CUSTOM_READSET_NAME":[
+                  "/PathTo/Solanum_tuberosum/raw_reads/ST_sample001_1.fastq.gz",
+                  "/PathTo/Solanum_tuberosum/raw_reads/ST_sample001_2.fastq.gz"
+               ]
+            },
+            "type":"pe",
+            "platform":"illumina"
+         }
+      },
+      "CUSTOM_SAMPLE_NAME_2":{
+         "CUSTOM_LIB_NAME":{
+            "readsets":{
+               "CUSTOM_READSET_NAME":[
+                  "/PathTo/Solanum_tuberosum/raw_reads/ST_sample002_1.fastq.gz",
+                  "/PathTo/Solanum_tuberosum/raw_reads/ST_sample002_2.fastq.gz"
+               ]
+            },
+            "type":"pe",
+            "platform":"illumina"
+         }
+      }
+   },
+   "executables":{
+      "trimmomatic": "/PATH_TO_TRIMMOMATIC/trimmomatic-0.32.jar",
+      "bwaMem" : "/PATH_TO_BWA/bwa-0.7.7/",
+      "samtools" : "/PATH_TO_SAMTOOLS/bin/",
+      "picardTools" : "/PATH_TO_PICARDTOOLS/",
+      "freebayes" : "/PATH_TO_FREEBAYES/bin/"
+   },
+   "executable_sources":{
+        "wget_options": " -c --proxy=off --no-verbose ",
+        "samtools_URL": "git@github.com:samtools/samtools.git",
+        "htslib_URL": "git@github.com:samtools/htslib.git",
+        "bwa_URL" : "git@github.com:lh3/bwa.git",
+        "trimmomatic_URL" : "http://www.usadellab.org/cms/uploads/supplementary/Trimmomatic/Trimmomatic-0.33.zip",
+        "picardTools_URL":"https://github.com/broadinstitute/picard/releases/download/1.129/picard-tools-1.129.zip",
+        "fastqmcf_URL":"",
+        "freebayes_URL" :"git@github.com:ekg/freebayes.git"
+      },
+   "gffFile":"/PathTo/refgenome/ST4.03ch05.gff",
+   "java":{
+      "memUsage":"-Xmx30g"
+   },
+   "refGenome":"/PathTo/refgenome/ST4.03ch05.fasta",
+   "bwaMem":{
+         "optionalOpts":"-M"
+      },
+   "freebayes":{
+       "optionalOpts":{
+         "--ploidy":4,
+         "--read-indel-limit":3,
+         "--min-mapping-quality":30,
+         "--min-base-quality":13,
+         "--theta":0.01,
+         "--min-alternate-count":4,
+         "--min-alternate-fraction":0.15
+      }
+   },
+   "illuminaAdapters":"/PathTo/Trimmomatic-0.32/adapters/TruSeq2-PE.fa",
+   "trimmomatic":{
+      "seedMisMatches":"2",
+      "palindromeClipTreshold":"30",
+      "simpleClipThreshhold":"10",
+      "LeadMinTrimQual":"3",
+      "TrailMinTrimQual":"3",
+      "windowSize":"4",
+      "avgMinQual":"15",
+      "minReadLen":"36",
+      "phred":"-phred33"
+   }
+}
