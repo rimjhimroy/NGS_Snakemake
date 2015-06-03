@@ -1,0 +1,123 @@
+"""
+@author: Jetse
+@version: 0.1
+
+Trimming of fastq files. For usage, include this in your workflow.
+
+Required programs:
+* trimmomatic
+
+Expects a global variable CONFIG (e.g. parsed from json) of at least the following structure:
+{
+    "illuminaAdapters": "/path/to/adapters",
+
+    "trimmomatic":{
+        "seedMisMatches": 2,
+        "palindromeClipTreshold": 30,
+        "simpleClipThreshhold": 10,
+        "LeadMinTrimQual": 3,
+        "TrailMinTrimQual": 3,
+        "windowSize": 4,
+        "avgMinQual": 15,
+        "minReadLen": 36,
+        "phred" : "-phred33"
+    }
+
+}
+Expects the input files in the working directory. For paired end data the files have to end with _1.fastq.gz (forward reads) and
+_2.fastq.gz (reversed reads).
+
+"""
+###############
+##  Imports  ##
+###############
+
+import collections, subprocess
+from SnakeMakeVlpb import strip_path_level
+
+###################
+##  Trimmomatic  ##
+###################
+#ruleorder: trimmomaticPaired > trimmomaticSingle
+
+# Download and install Trimmomatic
+rule trimmomatic_installation:
+    output:
+        TRIMMOMATIC=CONFIG["executables"]["trimmomatic"],
+        ADAPTERFILE=CONFIG["illuminaAdapters"]
+    params : dir = strip_path_level(CONFIG['executables']['trimmomatic'],1)
+    shell:
+        #"set -o xtrace;"
+        #"set -o verbose;"
+        "TEMPDIR=`mktemp -d`;"
+        "cd $TEMPDIR;"
+        "wget " + CONFIG['executable_sources']['trimmomatic_URL'] + " -O trimmomatic.zip && "
+        "unzip trimmomatic.zip && "
+        "rm trimmomatic.zip && "
+        "mkdir -p {params.dir} && "
+        "cd Trimmomatic* && "
+        "mv *.jar {output.TRIMMOMATIC} && "
+        "mv adapters {params.dir} && "
+        "touch {output.TRIMMOMATIC} && "
+        "cd / && rm -rf $TEMPDIR;"
+
+
+rule trimmomaticPaired:
+    input:
+        TRIMMOMATIC=rules.trimmomatic_installation.output["TRIMMOMATIC"],
+        ADAPTERFILE=rules.trimmomatic_installation.output["ADAPTERFILE"],
+        forward  = "reads/{sample}/{library}/{readset}/{name}_1.fastq.gz",
+        reversed  = "reads/{sample}/{library}/{readset}/{name}_2.fastq.gz"
+    output:
+        forward  = "trimmed/{sample}/{library}/{readset}/{name}_1.fastq.gz",
+        reversed = "trimmed/{sample}/{library}/{readset}/{name}_2.fastq.gz",
+        forwardUnpaired  = "trimmed/{sample}/{library}/{readset}/{name}.unpaired_1.fastq.gz",
+        reversedUnpaired = "trimmed/{sample}/{library}/{readset}/{name}.unpaired_2.fastq.gz"
+    params :
+        seedMisMatches =            str(CONFIG['trimmomatic']['seedMisMatches']),
+        palindromeClipTreshold =    str(CONFIG['trimmomatic']['palindromeClipTreshold']),
+        simpleClipThreshhold =      str(CONFIG['trimmomatic']['simpleClipThreshhold']),
+        LeadMinTrimQual =           str(CONFIG['trimmomatic']['LeadMinTrimQual']),
+        TrailMinTrimQual =          str(CONFIG['trimmomatic']['TrailMinTrimQual']),
+        windowSize =                str(CONFIG['trimmomatic']['windowSize']),
+        avgMinQual =                str(CONFIG['trimmomatic']['avgMinQual']),
+        minReadLen =                str(CONFIG['trimmomatic']['minReadLen']),
+        phred =                     str(CONFIG['trimmomatic']['phred'])
+    threads: 12
+    shell:
+        "java -jar {input.TRIMMOMATIC} PE {params.phred} -threads {threads} "
+        "{input.forward} {input.reversed} "
+        "{output.forward} {output.forwardUnpaired} "
+        "{output.reversed} {output.reversedUnpaired} "
+        "ILLUMINACLIP:{input.ADAPTERFILE}:{params.seedMisMatches}:{params.palindromeClipTreshold}:{params.simpleClipThreshhold} "
+        "LEADING:{params.LeadMinTrimQual} "
+        "TRAILING:{params.TrailMinTrimQual} "
+        "SLIDINGWINDOW:{params.windowSize}:{params.avgMinQual} "
+        "MINLEN:{params.minReadLen}"
+
+
+
+#     TODO  TrimmomaticSingle
+
+"""
+rule trimmomaticSingle:
+    input:
+        TRIMMOMATIC=rules.trimmomatic_installation.output["TRIMMOMATIC"],
+        ADAPTERFILE=rules.trimmomatic_installation.output["ADAPTERFILE"],
+        FASTQ="processed/{sample}.fastq"
+    output: "processed/trim.{sample}.fastq"
+    threads: 20
+    run:
+        TrimOpts = collections.namedtuple("TrimOpts", CONFIG["trimmomatic"].keys())
+        trimOpts = TrimOpts(**CONFIG["trimmomatic"])
+        shell("java -jar {input.TRIMMOMATIC} SE {trimOpts.phred} -threads {threads} "
+            "{input.FASTQ} {output} "
+            "ILLUMINACLIP:{input.ADAPTERFILE}:{trimOpts.seedMisMatches}:{trimOpts.palindromeClipTreshold}:{trimOpts.simpleClipThreshhold} "
+            "LEADING:{trimOpts.LeadMinTrimQual} "
+            "TRAILING:{trimOpts.TrailMinTrimQual} "
+            "SLIDINGWINDOW:{trimOpts.windowSize}:{trimOpts.avgMinQual} "
+            "MINLEN:{trimOpts.minReadLen}"
+            )
+        FastqFile.FastqFile(output[0]).isValid(dna=True)
+
+"""
