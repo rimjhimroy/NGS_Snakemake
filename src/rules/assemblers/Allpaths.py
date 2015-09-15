@@ -87,7 +87,7 @@ def createInGroupsCsv(samples, outputFile):
                     row.append(library)
                     #print(name, reads)
                     if len(reads) == 2:
-                        row.append(rreplace(reads[0], "1", "?",1))
+                        row.append(rreplace(reads[0], "R1", "R?",1))
                     else:
                         row.append(reads[0])
                     i += 1
