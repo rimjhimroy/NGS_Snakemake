@@ -24,10 +24,17 @@ To let Snakemake find our code, we need to add that directory to the `PYTHONPATH
 Now we can set everything up:
 
     cd /tmp/SnakeMakeVlpb/src/workflows/assembly/allpaths/noPreprocess
-    # Install necessary modules
+
+    # Install necessary modules in a virtual environment using virtualenv and pip
     virtualenv --python=python3 venv
     source venv/bin/activate
     pip3 install snakemake biopython
+
+Or
+
+    # Install necessary modules in a virtual environment using conda and bioconda
+    conda create --name snakemake python=3 snakemake biopython
+    source activate snakemake
 
 And then we can simply start the assembly, using the default dataset, as described in `config.json`:
 
