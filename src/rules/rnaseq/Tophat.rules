@@ -1,0 +1,17 @@
+#############
+##  Maker  ##
+#############
+
+import os, subprocess
+import configparser
+from Tophat import *
+
+
+# Create .bashrc to store settings and paths
+rule maker_bashrc:
+    output : CONFIG['base']['bashrc']
+    params : dir = strip_path_level(CONFIG['base']['bashrc'],1)
+    priority: 5000
+    shell :
+        "mkdir -p {params.dir} && "
+        "touch {output}"
