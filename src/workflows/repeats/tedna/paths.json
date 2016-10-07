@@ -1,0 +1,6 @@
+{
+	"base_dir": "/home/lavri002/scratch/oudehome/lavri002/",
+	"executables": "bin/",
+	"web_host":"https://urgi.versailles.inra.fr/Tools/Tedna/",
+	"download_dir":"/tmp/"
+}

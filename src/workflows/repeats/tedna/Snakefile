@@ -8,12 +8,10 @@ import io
 
 # Get lib configuration
 # Set PYTHONPATH before running Snakemake :
-# export PYTHONPATH=$PYTHONPATH:/home/haars001/scratch/projects/VLPB/
+# export PYTHONPATH=$PYTHONPATH:/home/lavri002/scratch/
+
 from SnakeMakeVlpb import VLPB_LIB_PATH
-
 ruleDir = VLPB_LIB_PATH + "rules/"
-
-
 
 """
 Recursive function to do a string format on each of the string values in the config.
@@ -23,10 +21,10 @@ Recursive function to do a string format on each of the string values in the con
 
 def replace_paths_in_json(conf, paths):
     for item in conf:
-        if isinstance(conf[item], str): #is it a string value?
-            conf[item] = conf[item].format(**paths) #use json to replace values
-        elif isinstance(conf[item], dict): # is this a json object (dict) ?
-            replace_paths_in_json(conf[item], paths) # parse object
+        if isinstance(conf[item], str):                 # Is it a string value?
+            conf[item] = conf[item].format(**paths)     # Use json to replace values
+        elif isinstance(conf[item], dict):              # Is this a json object (dict)?
+            replace_paths_in_json(conf[item], paths)    # Parse object
 
 # Get the config file:
 with open("config.json") as conf:
@@ -35,10 +33,11 @@ with open("config.json") as conf:
         CONFIG = json.load(conf)
         replace_paths_in_json(CONFIG, PATHS)
 
-
 # Include necessary rules
-include: ruleDir + "/repeats/ReAs.rules"
+include: ruleDir + "/repeats/Tedna.rules"
+
 rule all:
     input:
-        CONFIG['base']['maker_bashrc'], # Needs to be separate defined always !
-        rules.reas_installation.output
+#        CONFIG['base']['bashrc'],                       # Needs to be separate defined always !
+        rules.tedna_installation.output
+        ,rules.tedna.output
