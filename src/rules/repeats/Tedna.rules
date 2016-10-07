@@ -1,0 +1,29 @@
+#############
+##  Tedna  ##
+#############
+
+import os, subprocess
+import configparser
+
+# Download and install Tedna
+rule tedna_installation:
+	output: CONFIG["executables"]["tedna"]
+	shell:
+		"TEMPDIR=`mktemp -p " + CONFIG["base"]["download_dir"] + "bin/" + " -d` && "
+		"cd $TEMPDIR && "
+		"wget" + CONFIG["executable_sources"]["wget_options"] + CONFIG["executable_sources"]["Tedna_URL"] + " && "
+		"chmod +x " + CONFIG["executables"]["tedna"] + " && "
+		"touch {output}"
+
+# Run Tedna
+rule tedna:
+	input:
+		TEDNA = rules.tedna_installation.output,
+		forward = CONFIG["samples"]["Pleurotus ostreatus"]["EP57"]["readsets"]["1"][0],
+		reverse = CONFIG["samples"]["Pleurotus ostreatus"]["EP57"]["readsets"]["1"][1]
+	output: CONFIG["base"]["working_dir"] + "/tedna_repeats.fasta"
+	shell:
+		"mkdir -p " + CONFIG["base"]["working_dir"] + " && "
+		"cd " + CONFIG["base"]["working_dir"] + " && "
+		"" + CONFIG["executables"]["tedna"] + " -1 {input.forward} -2 {input.reverse} " + CONFIG["tedna_opts"]["cl_options"] + "-o {output} && "
+		"touch {output}"
