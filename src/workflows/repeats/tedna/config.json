@@ -12,7 +12,7 @@
 
 	"executable_sources":
 	{
-		"Tedna_URL": "{web_host}tedna",
+		"Tedna_URL": "{web_host}content/download/3482/29406/file/tedna",
 		"version": "1.2.2",
 		"wget_options": " -c --proxy=off "
 	},
