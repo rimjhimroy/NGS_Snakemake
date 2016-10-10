@@ -9,10 +9,13 @@ import io
 # Get lib configuration
 # Set PYTHONPATH before running Snakemake :
 # export PYTHONPATH=$PYTHONPATH:/home/haars001/scratch/projects/VLPB/
+
 from SnakeMakeVlpb import VLPB_LIB_PATH
+from SnakeMakeVlpb.src.utils import CreateSymlinkReads
 
 ruleDir = VLPB_LIB_PATH + "rules/"
 
+workdir: os.getcwd()
 """
 Recursive function to do a string format on each of the string values in the config.
     Full replace on a JSON does not work: it uses '{}' for formatting, which results
@@ -31,6 +34,9 @@ with open("config.json") as conf:
         PATHS = json.load(paths)
         CONFIG = json.load(conf)
         replace_paths_in_json(CONFIG, PATHS)
+
+# Create symlinks to the readfiles in structured folders, original location of data in JSON
+CreateSymlinkReads.createSymlinks(CONFIG)
 
 
 # Include necessary rules
