@@ -6,6 +6,9 @@ import json, os, inspect
 import configparser
 import io
 
+__author__ = "Jan van Haarst"
+__email__ = "jan.vanhaarst@wur.nl"
+
 # Get lib configuration
 # Set PYTHONPATH before running Snakemake :
 # export PYTHONPATH=$PYTHONPATH:/home/haars001/scratch/projects/VLPB/
@@ -38,10 +41,19 @@ with open("config.json") as conf:
 # Create symlinks to the readfiles in structured folders, original location of data in JSON
 CreateSymlinkReads.createSymlinks(CONFIG)
 
+# Get info from symlinked files
+SAMPLES,LIBRARIES,REPLICATES,NAMES,=glob_wildcards("reads/{sample}/{library}/{replicate}/{name}.fastq.gz")
 
 # Include necessary rules
 include: ruleDir + "/rnaseq/Tophat.rules"
+include: ruleDir + "/fastqProcessors/FastQC.rules"
 
 rule all:
-    input:
-        CONFIG['base']['bashrc'] # Needs to be separate defined always !
+    input: 
+        CONFIG['base']['bashrc'], # Needs to be always separately defined !
+        expand("FASTQC/{sample}/{library}/{replicate}/{name}_fastqc.zip",
+                zip,
+                library=LIBRARIES,
+                replicate=REPLICATES,
+                name=NAMES,
+                sample=SAMPLES)
