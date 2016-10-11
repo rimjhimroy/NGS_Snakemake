@@ -6,29 +6,60 @@
 		"download_dir":"{download_dir}",
 		"home_dir" : "{home_dir}"
 	},
-
-	"tophat2_opts": 
+	"tophat2": 
 	{
-		"reads" : "my_rna_1.fq,my_rna_2.fq",
-		"cl_options": " -p 48 -r 0 --no-coverage-search --min-segment-intron 4 --min-intron-length 4 --max-intron-length 1000 ",
-		"output" : "tophat2"
+		"options": " -p 48 -r 0 --no-coverage-search --min-segment-intron 4 --min-intron-length 4 --max-intron-length 1000 "
 	},
 
 	"executables":
 	{
-		"tophat2" : "{base_dir}{executables}tophat2/tophat2",
-		"samtools" : "/usr/bin/samtools",
-		"bamtools" :"{base_dir}{executables}bamtools"
+        "kseq_count_q30": "{base_dir}{executables}readfq/bin/kseq_count_q30"
 	},
-
 	"executable_sources":
 	{
-		"braker_URL": "http://bioinf.uni-greifswald.de/augustus/binaries/BRAKER1.tar.gz",
-		"wget_options": " -c --proxy=off ",
-		"augustus_URL": "http://bioinf.uni-greifswald.de/augustus/binaries/augustus-3.0.3.tar.gz",
-		"genemark_URL": "http://topaz.gatech.edu/GeneMark/tmp/GMtool_ZBbon/gm_et_linux_64.tar.gz",
-		"bamtools_URL": "https://github.com/pezmaster31/bamtools.git",
-		"tophat2_URL" : "http://ccb.jhu.edu/software/tophat/downloads/tophat-2.0.14.Linux_x86_64.tar.gz",
-		"perl_URL": "http://downloads.activestate.com/ActivePerl/releases/5.18.4.1803/ActivePerl-5.18.4.1803-x86_64-linux-glibc-2.5-298573.tar.gz"
-	}
+        "readfq_URL" : "https://github.com/jvhaarst/readfq.git" 
+	},
+    "refGenome":"/mnt/nexenta/reference/TAIR.nobackup/TAIR10_chr_all.fas",
+    "samples": {
+        "Arabidopsis": {
+            "jkd-leaves": {
+                "replicates": {
+                        "1": [
+                                "/mnt/scratch/haars001/projects/2016/scheres_rnaseq/data/jkd-1-leaves_S26.fastq.gz"
+                                ]
+                        ,
+						"2": [
+                                "/mnt/scratch/haars001/projects/2016/scheres_rnaseq/data/jkd-2-leaves_S27.fastq.gz"
+                                ]
+                        ,
+						"3": [
+                                "/mnt/scratch/haars001/projects/2016/scheres_rnaseq/data/jkd-3-leaves_S28.fastq.gz"
+                                ]
+                        },
+                "type": "se",
+                "insertSize": "",
+                "insertSizeStDev": "",
+                "platform": "illumina"
+            },
+            "WT-leaves": {
+                "replicates": {
+                        "1": [
+                                "/mnt/scratch/haars001/projects/2016/scheres_rnaseq/data/WT-1-leaves_S23.fastq.gz"
+                                ]
+                        ,
+						"2": [
+                                "/mnt/scratch/haars001/projects/2016/scheres_rnaseq/data/WT-2-leaves_S24.fastq.gz"
+                                ]
+                        ,
+						"3": [
+                                "/mnt/scratch/haars001/projects/2016/scheres_rnaseq/data/WT-3-leaves_S25.fastq.gz"
+                                ]
+                        },
+                "type": "se",
+                "insertSize": "",
+                "insertSizeStDev": "",
+                "platform": "illumina"
+            }
+        }
+    }
 }

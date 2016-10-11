@@ -47,11 +47,18 @@ SAMPLES,LIBRARIES,REPLICATES,NAMES,=glob_wildcards("reads/{sample}/{library}/{re
 # Include necessary rules
 include: ruleDir + "/rnaseq/Tophat.rules"
 include: ruleDir + "/fastqProcessors/FastQC.rules"
+include: ruleDir + "/fastqProcessors/readfq.rules"
 
 rule all:
     input: 
         CONFIG['base']['bashrc'], # Needs to be always separately defined !
         expand("FASTQC/{sample}/{library}/{replicate}/{name}_fastqc.zip",
+                zip,
+                library=LIBRARIES,
+                replicate=REPLICATES,
+                name=NAMES,
+                sample=SAMPLES),
+        expand("READFQ/{sample}/{library}/{replicate}/{name}.counts",
                 zip,
                 library=LIBRARIES,
                 replicate=REPLICATES,
