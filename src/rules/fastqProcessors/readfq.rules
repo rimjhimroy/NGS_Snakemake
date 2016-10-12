@@ -37,3 +37,11 @@ rule readfq_quality:
         reads = "reads/{genome}/{sample}/{replicate}/{name}.fastq.gz"
     output: "READFQ/{genome}/{sample}/{replicate}/{name}.counts"
     shell: "{input.READFQ} < {input.reads} > {output}"
+
+#GENOMES,SAMPLES,REPLICATES,NAMES,=glob_wildcards("READFQ/{genome}/{sample}/{replicate}/{name}.counts")
+#rule readfq_combine:
+#    message: """Create combined quality report of FASTQ file with readfq"""
+#    #input: expand("READFQ/{sample}/{library}/{replicate}/{name}.counts",zip,library=LIBRARIES,replicate=REPLICATES,name=NAMES,sample=SAMPLES)
+#    input : rules.readfq_quality.output
+#    output: "READFQ/counts"
+#    shell: "cat {input} >> {output} ; sort --version --output={output} {output}"
