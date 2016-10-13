@@ -39,9 +39,8 @@ rule readfq_quality:
     shell: "{input.READFQ} < {input.reads} > {output}"
 
 #GENOMES,SAMPLES,REPLICATES,NAMES,=glob_wildcards("READFQ/{genome}/{sample}/{replicate}/{name}.counts")
-#rule readfq_combine:
-#    message: """Create combined quality report of FASTQ file with readfq"""
-#    #input: expand("READFQ/{sample}/{library}/{replicate}/{name}.counts",zip,library=LIBRARIES,replicate=REPLICATES,name=NAMES,sample=SAMPLES)
-#    input : rules.readfq_quality.output
-#    output: "READFQ/counts"
-#    shell: "cat {input} >> {output} ; sort --version --output={output} {output}"
+rule readfq_combine:
+    message: """Create combined quality report of FASTQ file with readfq"""
+    input: expand("READFQ/{sample}/{library}/{replicate}/{name}.counts",zip,sample=SAMPLES,library=LIBRARIES,replicate=REPLICATES,name=NAMES)
+    output: "READFQ/counts"
+    shell: 'for name in {input} ; do echo -e -n "$name\t" | sed \'s/.*\///\' | sed \'s/.counts//\'|cat - "$name" >> {output} ; done;sort --version-sort --output={output} {output}'

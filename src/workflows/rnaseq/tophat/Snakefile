@@ -63,4 +63,5 @@ rule all:
                 library=LIBRARIES,
                 replicate=REPLICATES,
                 name=NAMES,
-                sample=SAMPLES)
+                sample=SAMPLES),
+        "READFQ/counts"
