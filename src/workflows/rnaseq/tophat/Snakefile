@@ -58,10 +58,4 @@ rule all:
                 replicate=REPLICATES,
                 name=NAMES,
                 sample=SAMPLES),
-        expand("READFQ/{sample}/{library}/{replicate}/{name}.counts",
-                zip,
-                library=LIBRARIES,
-                replicate=REPLICATES,
-                name=NAMES,
-                sample=SAMPLES),
         "READFQ/counts"
