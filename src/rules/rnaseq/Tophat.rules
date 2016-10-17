@@ -10,7 +10,6 @@ Required programs:
 
 import os, subprocess
 import configparser
-from Tophat import *
 
 __author__ = "Jan van Haarst"
 __email__ = "jan.vanhaarst@wur.nl"
