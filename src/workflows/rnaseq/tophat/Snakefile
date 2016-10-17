@@ -15,6 +15,7 @@ __email__ = "jan.vanhaarst@wur.nl"
 
 from SnakeMakeVlpb import VLPB_LIB_PATH
 from SnakeMakeVlpb.src.utils import CreateSymlinkReads
+from SnakeMakeVlpb.src.utils.StripPathLevel import strip_path_level
 
 ruleDir = VLPB_LIB_PATH + "rules/"
 
@@ -45,12 +46,13 @@ CreateSymlinkReads.createSymlinks(CONFIG)
 SAMPLES,LIBRARIES,REPLICATES,NAMES,=glob_wildcards("reads/{sample}/{library}/{replicate}/{name}.fastq.gz")
 
 # Include necessary rules
+include: ruleDir + "/mappers/Bowtie.rules"
 include: ruleDir + "/rnaseq/Tophat.rules"
 include: ruleDir + "/fastqProcessors/FastQC.rules"
 include: ruleDir + "/fastqProcessors/readfq.rules"
 
 rule all:
-    input: 
+    input:
         CONFIG['base']['bashrc'], # Needs to be always separately defined !
         expand("FASTQC/{sample}/{library}/{replicate}/{name}_fastqc.zip",
                 zip,
@@ -58,4 +60,11 @@ rule all:
                 replicate=REPLICATES,
                 name=NAMES,
                 sample=SAMPLES),
-        "READFQ/counts"
+        "READFQ/counts",
+        expand("TOPHAT/{sample}/{library}/{replicate}/{name}/accepted_hits.bam",
+            zip,
+            sample=SAMPLES,
+            library=LIBRARIES,
+            replicate=REPLICATES,
+            name=NAMES
+            )
