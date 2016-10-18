@@ -8,31 +8,41 @@
 	},
 	"tophat2": 
 	{
-		"options": " -p 48 -r 0 --no-coverage-search --min-segment-intron 4 --min-intron-length 4 --max-intron-length 1000 "
+		"options": "--read-mismatches 10 --read-gap-length 4 --read-edit-dist 10"
+	},
+	"stringtie": 
+	{
+		"options": ""
 	},
 
 	"executables":
 	{
-        "kseq_count_q30": "{base_dir}{executables}readfq/bin/kseq_count_q30"
+                "kseq_count_q30": "{base_dir}{executables}readfq/bin/kseq_count_q30",
+                "bowtie2": "{base_dir}{executables}bowtie2/bin/bowtie2"
 	},
 	"executable_sources":
 	{
-        "readfq_URL" : "https://github.com/jvhaarst/readfq.git" 
+                "wget_options": " -c --proxy=off --no-verbose ",
+                "samtools_URL": "git@github.com:samtools/samtools.git",
+                "htslib_URL": "git@github.com:samtools/htslib.git",
+                "readfq_URL" : "https://github.com/jvhaarst/readfq.git",
+                "bowtie2_URL" : "http://downloads.sourceforge.net/project/bowtie-bio/bowtie2/2.2.9/bowtie2-2.2.9-linux-x86_64.zip?r=https%3A%2F%2Fsourceforge.net%2Fprojects%2Fbowtie-bio%2Ffiles%2Fbowtie2%2F2.2.9%2F&ts=1476351390&use_mirror=freefr" 
 	},
-    "refGenome":"/mnt/nexenta/reference/TAIR.nobackup/TAIR10_chr_all.fas",
+    "refGenome":"/mnt/nexenta/reference/TAIR.nobackup/TAIR10_chr_all.fasta",
+    "refGTF" : "/mnt/nexenta/reference/Araport.nobackup/Araport11_GFF3_genes_transposons.201606.fixed.gtf",
     "samples": {
-        "Arabidopsis": {
+        "Arabidopsis-JDK": {
             "jkd-leaves": {
                 "replicates": {
                         "1": [
                                 "/mnt/scratch/haars001/projects/2016/scheres_rnaseq/data/jkd-1-leaves_S26.fastq.gz"
                                 ]
                         ,
-						"2": [
+                        "2": [
                                 "/mnt/scratch/haars001/projects/2016/scheres_rnaseq/data/jkd-2-leaves_S27.fastq.gz"
                                 ]
                         ,
-						"3": [
+                        "3": [
                                 "/mnt/scratch/haars001/projects/2016/scheres_rnaseq/data/jkd-3-leaves_S28.fastq.gz"
                                 ]
                         },
@@ -47,12 +57,165 @@
                                 "/mnt/scratch/haars001/projects/2016/scheres_rnaseq/data/WT-1-leaves_S23.fastq.gz"
                                 ]
                         ,
-						"2": [
+                        "2": [
                                 "/mnt/scratch/haars001/projects/2016/scheres_rnaseq/data/WT-2-leaves_S24.fastq.gz"
                                 ]
                         ,
-						"3": [
+                        "3": [
                                 "/mnt/scratch/haars001/projects/2016/scheres_rnaseq/data/WT-3-leaves_S25.fastq.gz"
+                                ]
+                        },
+                "type": "se",
+                "insertSize": "",
+                "insertSizeStDev": "",
+                "platform": "illumina"
+            }
+        },
+        "Arabidopsis-JA": {
+            "JA": {
+                "replicates": {
+                        "1": [
+                                "/mnt/scratch/haars001/projects/2016/scheres_rnaseq/data/JA-1_S32.fastq.gz"
+                                ]
+                        ,
+                        "2": [
+                                "/mnt/scratch/haars001/projects/2016/scheres_rnaseq/data/JA-2_S33.fastq.gz"
+                                ]
+                        ,
+                        "3": [
+                                "/mnt/scratch/haars001/projects/2016/scheres_rnaseq/data/JA-3_S34.fastq.gz"
+                                ]
+                        },
+                "type": "se",
+                "insertSize": "",
+                "insertSizeStDev": "",
+                "platform": "illumina"
+            },
+            "WT": {
+                "replicates": {
+                        "1": [
+                                "/mnt/scratch/haars001/projects/2016/scheres_rnaseq/data/WT-1-mock_S29.fastq.gz"
+                                ]
+                        ,
+                        "2": [
+                                "/mnt/scratch/haars001/projects/2016/scheres_rnaseq/data/WT-2-mock_S30.fastq.gz"
+                                ]
+                        ,
+                        "3": [
+                                "/mnt/scratch/haars001/projects/2016/scheres_rnaseq/data/WT-3-mock_S31.fastq.gz"
+                                ]
+                        },
+                "type": "se",
+                "insertSize": "",
+                "insertSizeStDev": "",
+                "platform": "illumina"
+            }
+        },
+        "Arabidopsis-SCZov": {
+            "SCZov": {
+                "replicates": {
+                        "1": [
+                                "/mnt/scratch/haars001/projects/2016/scheres_rnaseq/data/4-SCZov-root-tips_S20.fastq.gz"
+                                ]
+                        ,
+                        "2": [
+                                "/mnt/scratch/haars001/projects/2016/scheres_rnaseq/data/5-SCZov-root-tips_S21.fastq.gz"
+                                ]
+                        ,
+                        "3": [
+                                "/mnt/scratch/haars001/projects/2016/scheres_rnaseq/data/6-SCZov-root-tips_S22.fastq.gz"
+                                ]
+                        },
+                "type": "se",
+                "insertSize": "",
+                "insertSizeStDev": "",
+                "platform": "illumina"
+            },
+            "WT": {
+                "replicates": {
+                        "1": [
+                                "/mnt/scratch/haars001/projects/2016/scheres_rnaseq/data/1-col-root-tips_S17.fastq.gz"
+                                ]
+                        ,
+                        "2": [
+                                "/mnt/scratch/haars001/projects/2016/scheres_rnaseq/data/2-col-root-tips_S18.fastq.gz"
+                                ]
+                        ,
+                        "3": [
+                                "/mnt/scratch/haars001/projects/2016/scheres_rnaseq/data/3-col-root-tips_S19.fastq.gz"
+                                ]
+                        },
+                "type": "se",
+                "insertSize": "",
+                "insertSizeStDev": "",
+                "platform": "illumina"
+            }
+        },
+        "Arabidopsis-TS": {
+            "TS": {
+                "replicates": {
+                        "1": [
+                                "/mnt/scratch/haars001/projects/2016/scheres_rnaseq/data/SPG01_S1.fastq.gz"
+                                ]
+                        ,
+                        "2": [
+                                "/mnt/scratch/haars001/projects/2016/scheres_rnaseq/data/SPG02_S2.fastq.gz"
+                                ]
+                        ,
+                        "3": [
+                                "/mnt/scratch/haars001/projects/2016/scheres_rnaseq/data/SPG03_S3.fastq.gz"
+                                ]
+                        ,
+                        "4": [
+                                "/mnt/scratch/haars001/projects/2016/scheres_rnaseq/data/SPG04_S4.fastq.gz"
+                                ]
+                        ,
+                        "5": [
+                                "/mnt/scratch/haars001/projects/2016/scheres_rnaseq/data/SPG05_S5.fastq.gz"
+                                ]
+                        ,
+                        "6": [
+                                "/mnt/scratch/haars001/projects/2016/scheres_rnaseq/data/SPG06_S6.fastq.gz"
+                                ]
+                        ,
+                        "7": [
+                                "/mnt/scratch/haars001/projects/2016/scheres_rnaseq/data/SPG07_S7.fastq.gz"
+                                ]
+                        ,
+                        "8": [
+                                "/mnt/scratch/haars001/projects/2016/scheres_rnaseq/data/SPG08_S8.fastq.gz"
+                                ]
+                        ,
+                        "9": [
+                                "/mnt/scratch/haars001/projects/2016/scheres_rnaseq/data/SPG09_S9.fastq.gz"
+                                ]
+                        ,
+                        "10": [
+                                "/mnt/scratch/haars001/projects/2016/scheres_rnaseq/data/SPG10_S10.fastq.gz"
+                                ]
+                        ,
+                        "11": [
+                                "/mnt/scratch/haars001/projects/2016/scheres_rnaseq/data/SPG11_S11.fastq.gz"
+                                ]
+                        ,
+                        "12": [
+                                "/mnt/scratch/haars001/projects/2016/scheres_rnaseq/data/SPG12_S12.fastq.gz"
+                                ]
+                        ,
+                        "13": [
+                                "/mnt/scratch/haars001/projects/2016/scheres_rnaseq/data/SPG13_S13.fastq.gz"
+                                ]
+                        ,
+                        "14": [
+                                "/mnt/scratch/haars001/projects/2016/scheres_rnaseq/data/SPG14_S14.fastq.gz"
+                                ]
+                        ,
+                        "15": [
+                                "/mnt/scratch/haars001/projects/2016/scheres_rnaseq/data/SPG15_S15.fastq.gz"
+                                ]
+                        ,
+                        "16": [
+                                "/mnt/scratch/haars001/projects/2016/scheres_rnaseq/data/SPG16_S16.fastq.gz"
                                 ]
                         },
                 "type": "se",
