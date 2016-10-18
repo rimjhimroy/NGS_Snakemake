@@ -1,8 +1,9 @@
 {
 	"base":
 	{
-		"working_dir": "{base_dir}temp",
-		"download_dir": "{download_dir}"
+		"working_dir": "{base_dir}temp_repeats",
+		"download_dir": "{download_dir}",
+        "executables": "{base_dir}{executables}"
 	},
 
 	"executables":
@@ -12,13 +13,13 @@
 
 	"executable_sources":
 	{
-		"Tedna_URL": "{web_host}content/download/3482/29406/file/tedna",
+		"Tedna_URL": "https://urgi.versailles.inra.fr/content/download/3482/29406/file/tedna",
 		"version": "1.2.2",
 		"wget_options": " -c --proxy=off "
 	},
 
 	"samples": {
-        "Pleurotus ostreatus": {
+        "Pleurotus_ostreatus": {
             "EP57": {
                 "readsets": {
                         "1": [

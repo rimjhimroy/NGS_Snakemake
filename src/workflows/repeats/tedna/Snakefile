@@ -11,6 +11,8 @@ import io
 # export PYTHONPATH=$PYTHONPATH:/home/lavri002/scratch/
 
 from SnakeMakeVlpb import VLPB_LIB_PATH
+from SnakeMakeVlpb.src.utils import CreateSymlinkReads
+
 ruleDir = VLPB_LIB_PATH + "rules/"
 
 """
@@ -33,11 +35,26 @@ with open("config.json") as conf:
         CONFIG = json.load(conf)
         replace_paths_in_json(CONFIG, PATHS)
 
+# Create and change to the working directory
+workdir:  CONFIG["base"]["working_dir"]
+
+# Create symlinks to the readfiles in structured folders, original location of data in JSON
+CreateSymlinkReads.createSymlinks(CONFIG)
+
+# Get info from symlinked files
+SAMPLES, LIBRARIES, READSETS, NAMES, FORWARD_REVERSE, = glob_wildcards("reads/{sample}/{library}/{readset}/{name}_{forward_reverse}.fastq")
+print(SAMPLES), print(LIBRARIES), print(READSETS), print(NAMES), print(FORWARD_REVERSE)
+
 # Include necessary rules
 include: ruleDir + "/repeats/Tedna.rules"
 
 rule all:
     input:
-#        CONFIG['base']['bashrc'],                       # Needs to be separate defined always !
-        rules.tedna_installation.output
-        ,rules.tedna.output
+        # CONFIG['base']['bashrc'],                       # Needs to be separate defined always !
+        expand("tedna_repeats/{sample}/{library}/{readset}/{name}.fasta",
+            zip,
+            sample=SAMPLES,
+            library=LIBRARIES,
+            readset=READSETS,
+            name=NAMES)
+        # rules.tedna.output

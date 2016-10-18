@@ -1,6 +1,5 @@
 {
 	"base_dir": "/tmp/",
-	"executables": "bin/",
-	"web_host": "https://urgi.versailles.inra.fr/",
+	"executables": "bin/repeats/",
 	"download_dir":"/tmp/"
 }

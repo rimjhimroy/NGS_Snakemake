@@ -9,8 +9,8 @@ import configparser
 rule tedna_installation:
 	output: CONFIG["executables"]["tedna"]
 	shell:
-		"mkdir -p " + CONFIG["base"]["download_dir"] + "bin && "
-		"cd " + CONFIG["base"]["download_dir"] + "bin && "
+		"mkdir -p " + CONFIG["base"]["executables"] + " && "
+		"cd " + CONFIG["base"]["executables"] + " && "
 		"wget" + CONFIG["executable_sources"]["wget_options"] + CONFIG["executable_sources"]["Tedna_URL"] + " && "
 		"chmod +x " + CONFIG["executables"]["tedna"] + " && "
 		"touch {output}"
@@ -18,12 +18,9 @@ rule tedna_installation:
 # Run Tedna
 rule tedna:
 	input:
-		rules.tedna_installation.output,
-		forward = CONFIG["samples"]["Pleurotus ostreatus"]["EP57"]["readsets"]["1"][0],
-		reverse = CONFIG["samples"]["Pleurotus ostreatus"]["EP57"]["readsets"]["1"][1]
-	output: CONFIG["base"]["working_dir"] + "/tedna_repeats.fasta"
+		TEDNA = rules.tedna_installation.output,
+		forward = CONFIG["base"]["working_dir"] + "/reads/{sample}/{library}/{readset}/{name}_R1.fastq",
+		reverse = CONFIG["base"]["working_dir"] + "/reads/{sample}/{library}/{readset}/{name}_R2.fastq"
+	output: "tedna_repeats/{sample}/{library}/{readset}/{name}.fasta"
 	shell:
-		"mkdir -p " + CONFIG["base"]["working_dir"] + " && "
-		"cd " + CONFIG["base"]["working_dir"] + " && "
-		"" + CONFIG["executables"]["tedna"] + " -1 {input.forward} -2 {input.reverse} " + CONFIG["tedna_opts"]["cl_options"] + "-o {output} && "
-		"touch {output}"
+		"{input.TEDNA} -1 {input.forward} -2 {input.reverse} " + CONFIG["tedna_opts"]["cl_options"] + "-o {output}"
