@@ -1,0 +1,58 @@
+"""
+Create a repeat libarary from reads
+"""
+
+import json, os, inspect
+import configparser
+import io
+
+# Get lib configuration
+# Set PYTHONPATH before running Snakemake :
+# export PYTHONPATH=$PYTHONPATH:/home/lavri002/scratch/
+
+from SnakeMakeVlpb import VLPB_LIB_PATH
+from SnakeMakeVlpb.src.utils import CreateSymlinkReads
+from SnakeMakeVlpb.src.utils.StripPathLevel import strip_path_level
+
+
+ruleDir = VLPB_LIB_PATH + "rules/"
+
+"""
+Recursive function to do a string format on each of the string values in the config.
+    Full replace on a JSON does not work: it uses '{}' for formatting, which results
+    in errors.
+"""
+
+def replace_paths_in_json(conf, paths):
+    for item in conf:
+        if isinstance(conf[item], str):                 # Is it a string value?
+            conf[item] = conf[item].format(**paths)     # Use json to replace values
+        elif isinstance(conf[item], dict):              # Is this a json object (dict)?
+            replace_paths_in_json(conf[item], paths)    # Parse object
+
+# Get the config file:
+with open("config.json") as conf:
+    with open("paths.json") as paths:
+        PATHS = json.load(paths)
+        CONFIG = json.load(conf)
+        replace_paths_in_json(CONFIG, PATHS)
+
+# Create and change to the working directory
+workdir:  CONFIG["base"]["working_dir"]
+
+# Create symlinks to the readfiles in structured folders, original location of data in JSON
+#CreateSymlinkReads.createSymlinks(CONFIG)
+
+# Get info from symlinked files
+#SAMPLES, LIBRARIES, READSETS, NAMES, FORWARD_REVERSE, = glob_wildcards("reads/{sample}/{library}/{readset}/{name}_{forward_reverse}.fastq")
+#print(SAMPLES), print(LIBRARIES), print(READSETS), print(NAMES), print(FORWARD_REVERSE)
+
+# Include necessary rules
+include: ruleDir + "/repeats/reas.rules"
+
+rule all:
+    input:
+        # CONFIG['base']['bashrc'],                       # Needs to be separate defined always !
+        CONFIG["executables"]["reas"] + 'reas_all.pl',
+        os.path.basename(CONFIG["reads_URL"])
+

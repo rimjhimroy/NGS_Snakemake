@@ -1,0 +1,42 @@
+{
+	"base":
+	{
+		"working_dir": "{base_dir}temp_reas",
+		"download_dir": "{download_dir}",
+        	"executables": "{base_dir}{executables}"
+	},
+
+	"executables":
+	{
+		"reas": "{base_dir}{executables}reas/bin/"
+	},
+
+	"executable_sources":
+	{
+		"reas_URL": "https://git.wur.nl/haars001/reas.git",
+		"wget_options": " -c --proxy=off "
+	},
+	"reads_info" : "http://www.ebi.ac.uk/ena/data/view/ERX147330",
+	"reads_URL" : "ftp.sra.ebi.ac.uk/vol1/fastq/ERR171/ERR171441/ERR171441_1.fastq.gz",
+	"samples": 
+	{
+		"Pleurotus_ostreatus": {
+		"EP57": {
+			"readsets": {
+				"1": [
+					"/home/lavri002/scratch/oudehome/lavri002/temp/S240_05A_CHG009446-0428lane1-EP57_L004_R1.fastq",
+					"/home/lavri002/scratch/oudehome/lavri002/temp/S240_05A_CHG009446-0428lane1-EP57_L004_R2.fastq"
+					]	
+				},
+			"type": "pe",
+			"insertSize": "300",
+			"insertSizeStDev": "",
+			"platform": "illumina"
+			}
+		}
+	},
+	"reas": 
+	{
+		"options": ""
+	}
+}
