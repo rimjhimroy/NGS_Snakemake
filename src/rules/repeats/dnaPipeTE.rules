@@ -1,0 +1,76 @@
+#################
+##  dnaPipeTE  ##
+#################
+
+import os, subprocess
+import configparser
+
+# Create .bashrc to store paths
+rule dnaPipeTE_bashrc:
+	output:  CONFIG["base"]["dnaPipeTE_bashrc"]
+	priority: 1000
+	shell:
+		"mkdir -p " + CONFIG["base"]["executables"] + " && "
+		"touch {output}"
+
+# Download and install dnaPipeTE
+rule dnaPipeTE_installation:
+	output: CONFIG["executables"]["dnaPipeTE"]
+	shell:
+		"mkdir -p " + CONFIG["base"]["executables"] + " && "
+		"cd " + CONFIG["base"]["executables"] + " && "
+		"wget" + CONFIG["executable_sources"]["wget_options"] + CONFIG["executable_sources"]["dnaPipeTE_URL"] + " && "
+		"unzip master.zip && "
+		"rm master.zip && "
+		"touch {output}"
+
+# Download and install the TRF executable for Linux X64 environment 
+rule trf_installation:
+	input:
+		rules.dnaPipeTE_installation.output
+	output: CONFIG["executables"]["trf"]
+	shell:
+		"cd " + CONFIG["base"]["executables"] + "dnaPipeTE-master/bin/ && "
+		"wget" + CONFIG["executable_sources"]["wget_options"] + CONFIG["executable_sources"]["trf_URL"] + " && "
+		"mv trf409.linux64 trf && "
+		"chmod +x trf && "
+		"touch {output}"
+
+# Download and install Java version 1.7
+rule java17_installation:
+	output: CONFIG["executables"]["java"]
+	shell:
+		"mkdir -p " + CONFIG["base"]["executables"] + "java && "
+		"cd " + CONFIG["base"]["executables"] + "java && "
+		"wget --header 'Cookie: oraclelicense=accept-securebackup-cookie' " + CONFIG["executable_sources"]["java_URL"] + " && "
+		"tar zxvf " + CONFIG["executable_sources"]["java_file"] + " && "
+		"echo 'export JAVA_HOME=" + CONFIG["executables"]["java"] + "' >> {rules.dnaPipeTE_bashrc.output} && "
+		"echo 'export PATH=$JAVA_HOME/bin:$PATH' >> {rules.dnaPipeTE_bashrc.output} && "
+		"rm " + CONFIG["executable_sources"]["java_file"] + " && "
+		"touch {output}"
+
+# Run dnaPipeTE
+rule dnaPipeTE:
+	input:
+		rules.dnaPipeTE_bashrc.output,
+		rules.java17_installation.output,
+		rules.trf_installation.output,
+		forward = CONFIG["base"]["working_dir"] + "/reads/{sample}/{library}/{readset}/{name}_R1.fastq",
+		reverse = CONFIG["base"]["working_dir"] + "/reads/{sample}/{library}/{readset}/{name}_R2.fastq"
+	output:
+		"dnaPipeTE_output/{sample}/{library}/{readset}/{name}.fasta"
+	threads: 4
+	shell:
+		"TEMPFILE=$(mktemp) && "
+		"cat {input.forward} {input.reverse} > $TEMPFILE && "
+		"source {rules.dnaPipeTE_bashrc.output} && "
+		"which java && "
+		"python3 {rules.dnaPipeTE_installation.output} "
+		"-input $TEMPFILE "
+		"-output dnaPipeTE_output/{wildcards.sample}_{wildcards.library} "
+		"-cpu {threads} "
+		"-genome_size " + CONFIG["dnaPipeTE_opts"]["genome_size"] + " "
+		"-genome_coverage " + CONFIG["dnaPipeTE_opts"]["genome_coverage"] + " "
+		"-sample_number " + CONFIG["dnaPipeTE_opts"]["sample_number"] + " && "
+		"rm $TEMPFILE && "
+		"touch {output}"

@@ -1,0 +1,48 @@
+{
+	"base":
+	{
+		"working_dir": "{base_dir}temp_repeats",
+		"download_dir": "{download_dir}",
+        "dnaPipeTE_bashrc": "{base_dir}{executables}dnaPipeTE.bashrc",
+        "executables": "{base_dir}{executables}"
+	},
+
+	"executables":
+	{
+		"dnaPipeTE": "{base_dir}{executables}dnaPipeTE-master/dnaPipeTE.py",
+        "trf": "{base_dir}{executables}dnaPipeTE-master/bin/trf",
+        "java": "{base_dir}{executables}java/jre1.7.0_80"
+	},
+
+	"executable_sources":
+	{
+		"dnaPipeTE_URL": "https://github.com/clemgoub/dnaPipeTE/archive/master.zip",
+		"wget_options": " -c --proxy=off ",
+        "trf_URL": "http://tandem.bu.edu/trf/Downloads/trf409.linux64",
+        "java_URL": "http://download.oracle.com/otn-pub/java/jdk/7u80-b15/jre-7u80-linux-x64.tar.gz",
+        "java_file": "jre-7u80-linux-x64.tar.gz"
+	},
+
+	"samples": {
+        "Pleurotus_ostreatus": {
+            "EP57": {
+                "readsets": {
+                        "1": [
+                                "/home/lavri002/scratch/oudehome/lavri002/temp/S240_05A_CHG009446-0428lane1-EP57_L004_R1.fastq",
+                                "/home/lavri002/scratch/oudehome/lavri002/temp/S240_05A_CHG009446-0428lane1-EP57_L004_R2.fastq"
+                                ]
+                        },
+                "type": "pe",
+                "insertSize": "300",
+                "insertSizeStDev": "",
+                "platform": "illumina"
+    		}
+    	}
+    },
+
+    "dnaPipeTE_opts": {
+        "genome_size": "35000000",
+        "genome_coverage": "18",
+        "sample_number": "1"
+    }
+}
