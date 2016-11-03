@@ -54,5 +54,7 @@ rule all:
     input:
         # CONFIG['base']['bashrc'],                       # Needs to be separate defined always !
         CONFIG["executables"]["reas"] + 'reas_all.pl',
-        os.path.basename(CONFIG["reads_URL"])
+        os.path.basename(CONFIG["reads_URL"]),
+        os.path.basename(CONFIG["reads_pe_URLS"]["1"]),
+        os.path.basename(CONFIG["reads_pe_URLS"]["2"])
 
