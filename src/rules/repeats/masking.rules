@@ -1,0 +1,158 @@
+##  Repeat modeler * masker ##
+
+import os, subprocess
+import configparser
+
+def strip_path_level(path, level = 0):
+    head = path
+    for i in range(0, level):
+        (head, tail) = os.path.split(head)
+    return head
+
+# Create .bashrc to store settings and paths
+rule bashrc:
+    output : CONFIG['base']['bashrc']
+    params : dir = strip_path_level(CONFIG['base']['bashrc'],1)
+    priority: 5000
+    shell :
+        "mkdir -p {params.dir} && "
+        "touch {output}"
+        
+# Download and install TRF
+rule trf_installation:
+    output: CONFIG["executables"]["trf"]
+    params: dir = strip_path_level(CONFIG["executables"]["trf"],1)
+    shell:
+        "mkdir -p {params.dir} && "
+        "cd {params.dir} && "
+        "wget"+CONFIG['executable_sources']['wget_options']+CONFIG['executable_sources']['trf_URL']+" --output-document={output} && "
+        "chmod a+x {output} && "
+        "echo 'export PATH='`readlink -f {params.dir}`':$PATH' >> {rules.bashrc.output} && "
+        "touch {output};"
+
+# Download and install BLAST+
+rule blast_plus_installation:
+    output: CONFIG["executables"]["blastn"]
+    params: dir = strip_path_level(CONFIG["executables"]["blastn"],2)
+    shell:
+        "TEMPDIR=`mktemp -p " + CONFIG["base"]["download_dir"] + " -d` && "
+        "cd $TEMPDIR && "
+        "wget"+CONFIG['executable_sources']['wget_options']+CONFIG['executable_sources']['blast+_URL']+" && "
+        "tar xzf ncbi* && "
+        "cp -R ncbi*/* {params.dir} && "
+        "echo 'export PATH='`readlink -f {params.dir}/bin`':$PATH' >> {rules.bashrc.output}  && "
+        "cd / && rm -rf $TEMPDIR && "
+        "touch {output};"
+
+# Download and install RMBLAST plus corresponding BLAST+
+rule rmblast_installation:
+    output: CONFIG["executables"]["rmblast"]
+    params: dir = strip_path_level(CONFIG["executables"]["rmblast"],2)
+    shell:
+        "TEMPDIR=`mktemp -p " + CONFIG["base"]["download_dir"] + " -d` && "
+        "cd $TEMPDIR;"
+        "wget"+CONFIG['executable_sources']['wget_options']+CONFIG['executable_sources']['rmblast_URL']+" && "
+        "tar xzf ncbi-blast* && "
+        "tar xzf ncbi-rmblast* && "
+        "cp -R ncbi-rmblast*/* ncbi-blast*/ && "
+        "cp -R ncbi-blast*/* {params.dir} && "
+        "cd / && rm -rf $TEMPDIR && "
+        "touch {output};"
+
+rule recon_installation:
+    output: CONFIG["executables"]["recon"]
+    shell:
+        "TEMPDIR=`mktemp -p " + CONFIG["base"]["download_dir"] + " -d` && "
+        "cd $TEMPDIR && "
+        "wget"+CONFIG['executable_sources']['wget_options']+CONFIG['executable_sources']['recon_URL']+" && "
+        "tar zxf RECON-1.08.tar.gz && "
+        "cd RECON-1.08/src && "
+        "make install && "
+        "mkdir -p {output} && "
+        "echo 'export PATH='`readlink -f {output}`':$PATH' >> {rules.bashrc.output} && "
+        "cp -R ../bin/* {output} && cd / && rm -rf $TEMPDIR && touch {output}"
+    
+rule repeatscout_installation:
+    output: CONFIG["executables"]["repeatscout"]
+    shell:
+        "TEMPDIR=`mktemp -p " + CONFIG["base"]["download_dir"] + " -d` && "
+        "cd $TEMPDIR && "
+        "wget"+CONFIG['executable_sources']['wget_options']+CONFIG['executable_sources']['repeatscout_URL']+" && "
+        "tar zxf RepeatScout*.tar.gz && "
+        "cd RepeatScout-1 && "
+        "make && "
+        "mkdir -p {output} && "
+        "echo 'export PATH='`readlink -f {output}`':$PATH' >> {rules.bashrc.output} && "
+        "cp * {output} && cd / && rm -rf $TEMPDIR && touch {output}"
+
+
+# Download and install Repeatmasker
+rule repeatmasker_installation:
+    input:
+        RMBLAST=rules.rmblast_installation.output,
+        TRF=rules.trf_installation.output,
+        BLAST=rules.blast_plus_installation.output
+    output: CONFIG["executables"]["RepeatMasker"]
+    params: dir = strip_path_level(CONFIG["executables"]["RepeatMasker"],1), RMBLAST = strip_path_level(CONFIG["executables"]["rmblast"],1)
+    shell:
+        "TEMPDIR=`mktemp -p " + CONFIG["base"]["download_dir"] + " -d` && "
+        "cd $TEMPDIR && "
+        "wget"+CONFIG['executable_sources']['wget_options']+CONFIG['executable_sources']['repeatmasker_URL']+" && "
+        "tar xzf RepeatMasker-open-* && "
+        "rm *.tar.* && "
+        "cp -R RepeatMasker*/* {params.dir} && "
+        "cd {params.dir} && grep -l -r '#!/u1' * | xargs -I '%' sed -i 's|/u1/local/bin/perl|/usr/bin/env perl|' % && "
+        "cp RepeatMaskerConfig.tmpl RepeatMaskerConfig.pm && chmod -x RepeatMaskerConfig.pm && "
+        'sed -i \'s|DEFAULT_SEARCH_ENGINE\s\+=.*|DEFAULT_SEARCH_ENGINE = "ncbi";|\' RepeatMaskerConfig.pm && '
+        'sed -i \'s|TRF_PRGM\s\+=.*|TRF_PRGM = "' + "{input.TRF}" + '";|\' RepeatMaskerConfig.pm && '
+        'sed -i \'s|RMBLAST_DIR\s\+=.*|RMBLAST_DIR = "' + "{params.RMBLAST}" + '";|\' RepeatMaskerConfig.pm && '
+        "echo 'export PATH='`readlink -f {params.dir}`':$PATH' >> {rules.bashrc.output} && "
+        "source {rules.bashrc.output} && "
+        "cd Libraries && ../util/buildRMLibFromEMBL.pl RepeatMaskerLib.embl > RepeatMasker.lib && "
+        "makeblastdb -in RepeatMasker.lib -dbtype nucl && makeblastdb  -in RepeatPeps.lib -dbtype prot && "
+        "cd / && rm -rf $TEMPDIR && "
+        "touch {output}"
+
+rule repeatmodeler_installation:
+    input: SCOUT = rules.repeatscout_installation.output,
+        TRF = rules.trf_installation.output,
+        RECON = rules.recon_installation.output,
+        RM = rules.rmblast_installation.output,
+        REPEAT = rules.repeatmasker_installation.output
+    output: CONFIG["executables"]["repeatmodeler"]
+    params: REPEAT = strip_path_level(CONFIG["executables"]["RepeatMasker"],1), 
+        RM = strip_path_level(CONFIG["executables"]["rmblast"],1),
+        RECON = strip_path_level(CONFIG["executables"]["recon"],1),
+        SCOUT = strip_path_level(CONFIG["executables"]["repeatscout"],1)
+    shell:
+        "TEMPDIR=`mktemp -p " + CONFIG["base"]["download_dir"] + " -d` && "
+        "cd $TEMPDIR && "
+        "wget"+CONFIG['executable_sources']['wget_options']+CONFIG['executable_sources']['repeatmodeler_URL']+" && "
+        "tar zxf RepeatModeler*.tar.gz && "
+        "cd RepeatModeler && "
+        "grep -l -r '#!/u1' * | xargs -I '%' sed -i 's|/u1/local/bin/perl|/usr/bin/env perl|' % && "
+        "grep -l -r '#!/usr/local/bin/perl' * | xargs -I '%' sed -i 's|/usr/local/bin/perl|/usr/bin/env perl|' % && "
+        "cp RepModelConfig.pm.tmpl RepModelConfig.pm && chmod -x RepModelConfig.pm && "
+        'sed -i \'s|REPEATMASKER_DIR\s\+=.*|REPEATMASKER_DIR = "{params.REPEAT}";|\' RepModelConfig.pm && '
+        'sed -i \'s|RMBLAST_DIR\s\+=.*|RMBLAST_DIR = "{params.RM}";|\' RepModelConfig.pm && '
+        'sed -i \'s|TRF_PRGM\s\+=.*|TRF_PRGM = "' + "{input.TRF}" + '";|\' RepModelConfig.pm && '
+        'sed -i \'s|RECON_DIR\s\+=.*|RECON_DIR = "' + "{params.RECON}/bin" + '";|\' RepModelConfig.pm && '
+        'sed -i \'s|RSCOUT_DIR\s\+=.*|RSCOUT_DIR = "' + "{params.SCOUT}" + '";|\' RepModelConfig.pm && '
+        "mkdir -p {output} && "
+        "echo 'export PATH='`readlink -f {output}`':$PATH' >> {rules.bashrc.output} && "
+        "cp -R * {output} && cd / && rm -rf $TEMPDIR && touch {output}"
+
+
+""" Run repeat modeler """
+rule repeatmodeler:
+    input:
+        MASKER = rules.repeatmasker_installation.output,
+        MODEL = rules.repeatmodeler_installation.output
+    output: CONFIG["base"]["rmlib"]
+    shell:
+        "TEMPDIR=`mktemp -p " + CONFIG["base"]["download_dir"] + " -d` && "
+        "cd $TEMPDIR && rm -f {output} && touch {output} && "
+        "{input.MODEL}/BuildDatabase -name repeat_db -engine ncbi " + CONFIG["base"]["genome"]  + " && "
+        "{input.MODEL}/RepeatModeler -database repeat_db -engine ncbi -pa " +CONFIG["base"]["cpus"]+ " && "
+        "find . -maxdepth 2 -name '*consensi.fa' -type f -exec cat {{}} >> {output} \; && "
+        "cd / && rm -rf $TEMPDIR;"

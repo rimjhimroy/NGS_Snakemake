@@ -1,0 +1,38 @@
+{
+	"base":
+	{
+		"bashrc": "{base_dir}{executables}bashrc",
+		"download_dir":"{download_dir}",
+		"genome": "{base_dir}e.coli.fna",
+		"rmlib" : "{base_dir}{databases}repeat_db.fasta",
+		"cpus": "8"
+	},
+	"executables":
+	{
+		"rmblast": "{base_dir}{executables}rmblast/bin/rmblastn",
+		"makeblastdb": "{base_dir}{executables}blast_plus/bin/makeblastdb",
+		"blastn": "{base_dir}{executables}blast_plus/bin/blastn",
+		"blastp": "{base_dir}{executables}blast_plus/bin/blastp",
+		"blastx": "{base_dir}{executables}blast_plus/bin/blastx",
+		"tblastx": "{base_dir}{executables}blast_plus/bin/tblastx",
+		"RepeatMasker": "{base_dir}{executables}repeatmasker/RepeatMasker",
+		"repeatscout": "{base_dir}{executables}repeatscout/",
+		"repeatmodeler": "{base_dir}{executables}repeatmodeler/",
+		"trf": "{base_dir}{executables}trf/trf",
+		"repbase": "{base_dir}{executables}repbase/",
+		"recon" : "{base_dir}{executables}recon/bin"
+	},
+
+	"executable_sources":
+	{
+		"wget_options": " -c --proxy=off ",
+		"trf_URL": "http://tandem.bu.edu/trf/downloads/trf407b.linux64",
+		"blast+_URL": "ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/2.2.29/ncbi-blast-2.2.29+-x64-linux.tar.gz",
+		"rmblast_URL": "ftp://ftp.ncbi.nlm.nih.gov/blast/executables/rmblast/2.2.28/ncbi-rmblastn-2.2.28-x64-linux.tar.gz ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/2.2.28/ncbi-blast-2.2.28+-x64-linux.tar.gz",
+		"repeatmasker_URL": "http://www.repeatmasker.org/RepeatMasker-open-4-0-5.tar.gz",
+ 		"recon_URL": "http://www.repeatmasker.org/RECON-1.08.tar.gz",
+		"repeatscout_URL": "http://bix.ucsd.edu/repeatscout/RepeatScout-1.0.5.tar.gz",
+		"repeatmodeler_URL": "http://www.repeatmasker.org/RepeatModeler-open-1-0-8.tar.gz"
+	}
+
+}
