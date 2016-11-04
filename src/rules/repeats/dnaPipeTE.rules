@@ -55,8 +55,8 @@ rule dnaPipeTE:
 		rules.dnaPipeTE_bashrc.output,
 		rules.java17_installation.output,
 		rules.trf_installation.output,
-		forward = CONFIG["base"]["working_dir"] + "/reads/{sample}/{library}/{readset}/{name}_R1.fastq",
-		reverse = CONFIG["base"]["working_dir"] + "/reads/{sample}/{library}/{readset}/{name}_R2.fastq"
+		forward = CONFIG["base"]["working_dir"] + "/reads/{sample}/{library}/{readset}/{name}_1.fastq",
+		reverse = CONFIG["base"]["working_dir"] + "/reads/{sample}/{library}/{readset}/{name}_2.fastq"
 	output:
 		"dnaPipeTE_output/{sample}/{library}/{readset}/{name}.fasta"
 	threads: 4

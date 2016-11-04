@@ -23,11 +23,11 @@
             "EP57": {
                 "readsets": {
                         "1": [
-                                "/home/lavri002/scratch/oudehome/lavri002/temp/S240_05A_CHG009446-0428lane1-EP57_L004_R1.fastq",
-                                "/home/lavri002/scratch/oudehome/lavri002/temp/S240_05A_CHG009446-0428lane1-EP57_L004_R2.fastq"
+                                "/media/sven/extData/sven/VLPB/raw_reads/ST_sample001_1.fastq", 
+                                "/media/sven/extData/sven/VLPB/raw_reads/ST_sample001_2.fastq"
                                 ]	
                         },
-                "type": "pe",
+                "type": "se",
                 "insertSize": "300",
                 "insertSizeStDev": "",
                 "platform": "illumina"
@@ -35,6 +35,6 @@
     	}
     },
     "tedna_opts": {
-    	"cl_options": " -k 61 -i 300 "
+    	"cl_options": " -k 61 -i 300 -t 10 "
     }
 }

@@ -19,8 +19,8 @@ rule tedna_installation:
 rule tedna:
 	input:
 		TEDNA = rules.tedna_installation.output,
-		forward = CONFIG["base"]["working_dir"] + "/reads/{sample}/{library}/{readset}/{name}_R1.fastq",
-		reverse = CONFIG["base"]["working_dir"] + "/reads/{sample}/{library}/{readset}/{name}_R2.fastq"
+		forward = CONFIG["base"]["working_dir"] + "/reads/{sample}/{library}/{readset}/{name}_1.fastq",
+		reverse = CONFIG["base"]["working_dir"] + "/reads/{sample}/{library}/{readset}/{name}_2.fastq"
 	output: "tedna_repeats/{sample}/{library}/{readset}/{name}.fasta"
 	shell:
 		"{input.TEDNA} -1 {input.forward} -2 {input.reverse} " + CONFIG["tedna_opts"]["cl_options"] + "-o {output}"

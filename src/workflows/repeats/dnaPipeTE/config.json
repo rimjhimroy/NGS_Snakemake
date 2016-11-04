@@ -28,8 +28,8 @@
             "EP57": {
                 "readsets": {
                         "1": [
-                                "/home/lavri002/scratch/oudehome/lavri002/temp/S240_05A_CHG009446-0428lane1-EP57_L004_R1.fastq",
-                                "/home/lavri002/scratch/oudehome/lavri002/temp/S240_05A_CHG009446-0428lane1-EP57_L004_R2.fastq"
+                               "/media/sven/extData/sven/VLPB/raw_reads/ST_sample001_1.fastq", 
+                                "/media/sven/extData/sven/VLPB/raw_reads/ST_sample001_2.fastq"
                                 ]
                         },
                 "type": "pe",
@@ -41,7 +41,7 @@
     },
 
     "dnaPipeTE_opts": {
-        "genome_size": "35000000",
+        "genome_size": "35000",
         "genome_coverage": "18",
         "sample_number": "1"
     }
