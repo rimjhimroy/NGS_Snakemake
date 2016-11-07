@@ -14,7 +14,10 @@
 	{
 		"options": ""
 	},
-
+	"cuffmerge":
+	{
+		"options": ""
+	},
 	"executables":
 	{
                 "kseq_count_q30": "{base_dir}{executables}readfq/bin/kseq_count_q30",

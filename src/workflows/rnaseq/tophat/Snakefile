@@ -49,6 +49,7 @@ SAMPLES,LIBRARIES,REPLICATES,NAMES,=glob_wildcards("reads/{sample}/{library}/{re
 include: ruleDir + "/mappers/Bowtie.rules"
 include: ruleDir + "/rnaseq/Tophat.rules"
 include: ruleDir + "/rnaseq/Stringtie.rules"
+include: ruleDir + "/rnaseq/Cufflinks.rules"
 include: ruleDir + "/fastqProcessors/FastQC.rules"
 include: ruleDir + "/fastqProcessors/readfq.rules"
 
@@ -76,4 +77,4 @@ rule all:
             replicate=REPLICATES,
             name=NAMES
             ),
-        "STRINGTIE/cuffmerge_gtf_list.txt"
+        "MERGED/merged.gtf"
