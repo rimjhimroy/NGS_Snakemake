@@ -30,3 +30,8 @@ rule stringtie:
         """
         stringtie {params.options} -p {threads} -G {input.GTF} -o {output} {input.BAM}
         """
+rule cuffmerge_gtf_list:
+    message: """Create combined list of gtf files"""
+    input: expand("STRINGTIE/{sample}/{library}/{replicate}/{name}/transcripts.gtf",zip,sample=SAMPLES,library=LIBRARIES,replicate=REPLICATES,name=NAMES)
+    output: "STRINGTIE/cuffmerge_gtf_list.txt"
+    shell: 'for name in {input} ; do echo $name;done | sort -V  > {output}; sort --version-sort --output={output} {output}'

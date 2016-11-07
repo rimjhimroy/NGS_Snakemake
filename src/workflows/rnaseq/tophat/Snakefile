@@ -75,4 +75,5 @@ rule all:
             library=LIBRARIES,
             replicate=REPLICATES,
             name=NAMES
-            )
+            ),
+        "STRINGTIE/cuffmerge_gtf_list.txt"
