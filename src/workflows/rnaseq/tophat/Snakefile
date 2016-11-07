@@ -50,6 +50,7 @@ include: ruleDir + "/mappers/Bowtie.rules"
 include: ruleDir + "/rnaseq/Tophat.rules"
 include: ruleDir + "/rnaseq/Stringtie.rules"
 include: ruleDir + "/rnaseq/Cufflinks.rules"
+include: ruleDir + "/rnaseq/Samtools.rules"
 include: ruleDir + "/fastqProcessors/FastQC.rules"
 include: ruleDir + "/fastqProcessors/readfq.rules"
 
@@ -63,18 +64,4 @@ rule all:
                 name=NAMES,
                 sample=SAMPLES),
         "READFQ/counts",
-        expand("TOPHAT/{sample}/{library}/{replicate}/{name}/accepted_hits.bam",
-            zip,
-            sample=SAMPLES,
-            library=LIBRARIES,
-            replicate=REPLICATES,
-            name=NAMES
-            ),
-        expand("STRINGTIE/{sample}/{library}/{replicate}/{name}/transcripts.gtf",
-            zip,
-            sample=SAMPLES,
-            library=LIBRARIES,
-            replicate=REPLICATES,
-            name=NAMES
-            ),
         "MERGED/merged.gtf"

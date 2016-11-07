@@ -18,7 +18,7 @@ STRINGTIE_VERSION = subprocess.check_output("stringtie --version", shell=True)
 rule stringtie:
     # https://ccb.jhu.edu/software/stringtie/index.shtml
     input:
-        BAM = "TOPHAT/{sample}/{library}/{replicate}/{name}/accepted_hits.bam",
+        BAM = "TOPHAT/{sample}/{library}/{replicate}/{name}/accepted_hits.sorted.rmdup.bam",
         GTF = CONFIG["refGTF"]
     output: "STRINGTIE/{sample}/{library}/{replicate}/{name}/transcripts.gtf"
     message: """Run Stringtie on mapped data"""

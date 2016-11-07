@@ -22,9 +22,9 @@ rule indexBam:
 
 rule sortBam:
     input: "{name}.bam"
-    output: "{name}.sorted.bam"
+    output: temp("{name}.sorted.bam")
     threads : 8
-    shell: "samtools sort -@ {threads} -o {input} > {output}"
+    shell: "samtools sort --threads {threads} -o {output} {input}"
 
 rule faidX:
     input: "{name}.fasta"
@@ -33,5 +33,6 @@ rule faidX:
 
 rule rmdup:
     input:  "{name}.bam"
-    output: "{name}.rmdup.bam"
-    shell:  "samtools rmdup {input} > {output}"
+    output: temp("{name}.rmdup.bam")
+    shell:  "samtools rmdup -S {input} {output}"
+
