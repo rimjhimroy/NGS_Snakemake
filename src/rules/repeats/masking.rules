@@ -109,6 +109,7 @@ rule repeatmasker_installation:
         "echo 'export PATH='`readlink -f {params.dir}`':$PATH' >> {rules.bashrc.output} && "
         "source {rules.bashrc.output} && "
         "cd Libraries && ../util/buildRMLibFromEMBL.pl RepeatMaskerLib.embl > RepeatMasker.lib && "
+        "sed -i 's/20110419/20160101/g' RepeatMaskerLib.embl && "
         "makeblastdb -in RepeatMasker.lib -dbtype nucl && makeblastdb  -in RepeatPeps.lib -dbtype prot && "
         "cd / && rm -rf $TEMPDIR && "
         "touch {output}"
@@ -156,3 +157,13 @@ rule repeatmodeler:
         "{input.MODEL}/RepeatModeler -database repeat_db -engine ncbi -pa " +CONFIG["base"]["cpus"]+ " && "
         "find . -maxdepth 2 -name '*consensi.fa' -type f -exec cat {{}} >> {output} \; && "
         "cd / && rm -rf $TEMPDIR;"
+
+""" Run repeatmasker """
+rule repeatmasker:
+    input:
+        MASKER = rules.repeatmasker_installation.output,
+    output: "" + CONFIG["base"]["output"] + "/snakemake.done"
+    shell:
+        "rm -f {output} && touch {output} && "
+        "{input.MASKER} -dir " + CONFIG["base"]["output"] + " -lib " + CONFIG["base"]["rmlib"] + " -engine ncbi -pa " +CONFIG["base"]["cpus"]+ " " +CONFIG["base"]["cl_options"] + " " + CONFIG["base"]["genome"]
+

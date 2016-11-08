@@ -1,0 +1,6 @@
+{
+	"base_dir": "/tmp/",
+	"executables": "bin/repeats/",
+	"databases":"databases/",
+	"download_dir":"/tmp/"
+}

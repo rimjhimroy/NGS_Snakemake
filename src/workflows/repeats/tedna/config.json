@@ -27,7 +27,7 @@
                                 "/media/sven/extData/sven/VLPB/raw_reads/ST_sample001_2.fastq"
                                 ]	
                         },
-                "type": "se",
+                "type": "pe",
                 "insertSize": "300",
                 "insertSizeStDev": "",
                 "platform": "illumina"
