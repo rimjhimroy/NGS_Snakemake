@@ -55,5 +55,5 @@ rule all:
     input:
         # CONFIG['base']['bashrc'],                       # Needs to be separate defined always !
         CONFIG["executables"]["reas"] + 'reas_all.pl',
-        CONFIG["base"]["download_dir"]+'sra/'+CONFIG["sra_id"]+'_1.fastq'
+        CONFIG["base"]["reads"]
 

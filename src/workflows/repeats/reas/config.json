@@ -16,12 +16,6 @@
 		"reas_URL": "https://git.wur.nl/haars001/reas.git",
 		"wget_options": " -c --proxy=off "
 	},
-	"reads_info" : "http://www.ebi.ac.uk/ena/data/view/ERX147330",
-	"reads_URL" : "ftp.sra.ebi.ac.uk/vol1/fastq/DRR001/DRR001191/DRR001191_1.fastq.gz",
-	"reads_pe_URLS" : {
-		"1": "ftp.sra.ebi.ac.uk/vol1/fastq/ERR171/ERR171441/ERR171441_1.fastq.gz",
-		"2": "ftp.sra.ebi.ac.uk/vol1/fastq/ERR171/ERR171441/ERR171441_2.fastq.gz"
-	},
 	"sra_id" : "ERR171441",
 	"reas": 
 	{
@@ -35,5 +29,6 @@
 		"fastq-dump" : {
 			"options" : "--split-files"
 		}
-	}
+	},
+	"reads" : "{download_dir}/sra/ERR171441_1.fastq"
 }
