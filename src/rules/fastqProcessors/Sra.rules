@@ -21,7 +21,7 @@ rule sra_download:
         options = CONFIG["sra"]["sra_download"]["options"],
         directory = CONFIG["base"]["download_dir"]
     output:
-        CONFIG["base"]["download_dir"]+'sra/'+CONFIG["sra_id"]+'.sra'
+        temp(CONFIG["base"]["download_dir"]+'sra/'+CONFIG["sra_id"]+'.sra')
     shell:
         """
         # get current configuration
