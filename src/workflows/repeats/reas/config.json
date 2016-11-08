@@ -3,7 +3,7 @@
 	{
 		"working_dir": "{base_dir}temp_reas",
 		"download_dir": "{download_dir}",
-        	"executables": "{base_dir}{executables}"
+        "executables": "{base_dir}{executables}"
 	},
 
 	"executables":
@@ -22,8 +22,18 @@
 		"1": "ftp.sra.ebi.ac.uk/vol1/fastq/ERR171/ERR171441/ERR171441_1.fastq.gz",
 		"2": "ftp.sra.ebi.ac.uk/vol1/fastq/ERR171/ERR171441/ERR171441_2.fastq.gz"
 	},
+	"sra_id" : "ERR171441",
 	"reas": 
 	{
 		"options": ""
+	},
+	"sra": 
+	{
+		"sra_download" :{
+			"options": "--max-size 20G"
+		},
+		"fastq-dump" : {
+			"options" : "--split-files"
+		}
 	}
 }

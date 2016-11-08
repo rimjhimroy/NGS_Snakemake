@@ -1,5 +1,5 @@
 {
-	"base_dir": "/tmp/",
+	"base_dir": "/tmp/reas/",
 	"executables": "bin/repeats/",
-	"download_dir":"/tmp/"
+	"download_dir":"/tmp/reas/"
 }
