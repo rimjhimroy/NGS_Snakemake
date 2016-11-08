@@ -45,8 +45,8 @@ CreateSymlinkReads.createSymlinks(CONFIG)
 # Get info from symlinked files
 SAMPLES,LIBRARIES,REPLICATES,NAMES,=glob_wildcards("reads/{sample}/{library}/{replicate}/{name}.fastq.gz")
 
-# Create info for cuffdiff
-
+# Create input for cuffdiff
+import itertools
 def unique_everseen(iterable, key=None):
     "List unique elements, preserving order. Remember all elements ever seen."
     # unique_everseen('AAAABBBCCDAABBB') --> A B C D
@@ -84,9 +84,9 @@ SAMPLE_LIBRARY=expand("{sample}_{library}",
                 replicate=REPLICATES,
                 name=NAMES,
                 sample=SAMPLES)
-import itertools
 
 label_dict=dict()
+BAMFILES=list()
 for label in LABELS:
     # fill dict with info on where the different labels are in the list
     size=0
@@ -98,15 +98,14 @@ for label in LABELS:
             size = size + 1
             label_dict[label]['size']=size
     # Now create list of files per label
-    print(label)
     label_dict[label]['BAMS']=list()
     for x in itertools.islice(BAMS, label_dict[label]['end']-label_dict[label]['size']+1,label_dict[label]['end']+1):
         label_dict[label]['BAMS'].append(x)
     label_dict[label]['BAMS'].sort()
+    BAMFILES.append(','.join(label_dict[label]['BAMS']))
 
-    print(label_dict[label]['BAMS'])
-#print(label_dict)
-
+BAMS=" ".join(BAMFILES)
+LABELS=",".join(LABELS)
 
 # Include necessary rules
 include: ruleDir + "/mappers/Bowtie.rules"
@@ -127,4 +126,11 @@ rule all:
                 name=NAMES,
                 sample=SAMPLES),
         "READFQ/counts",
-        "MERGED/merged.gtf"
+        expand("TOPHAT/{sample}/{library}/{replicate}/{name}/accepted_hits.sorted.rmdup.bam",
+                zip,
+                library=LIBRARIES,
+                replicate=REPLICATES,
+                name=NAMES,
+                sample=SAMPLES),
+        "MERGED/merged.gtf",
+        "DIFF/gene_exp.diff"
