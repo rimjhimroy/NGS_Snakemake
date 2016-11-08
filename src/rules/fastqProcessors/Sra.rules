@@ -41,7 +41,7 @@ rule fastq_dump:
         options = CONFIG["sra"]["fastq-dump"]["options"],
         directory = CONFIG["base"]["download_dir"]+'sra'
     output:
-        CONFIG["base"]["download_dir"]+'sra/'+CONFIG["sra_id"]+'_1.fastq'
+        CONFIG["base"]["download_dir"]+'sra/'+CONFIG["sra_id"]+'_1.fasta'
     shell:
         """
         fastq-dump {params.options} --outdir {params.directory} {input}

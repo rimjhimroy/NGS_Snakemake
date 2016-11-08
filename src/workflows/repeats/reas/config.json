@@ -19,7 +19,7 @@
 	"sra_id" : "ERR171441",
 	"reas": 
 	{
-		"options": ""
+		"options": "--seqsize=80"
 	},
 	"sra": 
 	{
@@ -27,8 +27,8 @@
 			"options": "--max-size 20G"
 		},
 		"fastq-dump" : {
-			"options" : "--split-files"
+			"options" : "--split-files --fasta"
 		}
 	},
-	"reads" : "{download_dir}/sra/ERR171441_1.fastq"
+	"reads" : "{download_dir}sra/ERR171441_1.fasta"
 }

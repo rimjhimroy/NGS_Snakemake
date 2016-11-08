@@ -54,6 +54,5 @@ include: ruleDir + "/fastqProcessors/Sra.rules"
 rule all:
     input:
         # CONFIG['base']['bashrc'],                       # Needs to be separate defined always !
-        CONFIG["executables"]["reas"] + 'reas_all.pl',
-        CONFIG["base"]["reads"]
+        "consensus.fa"
 

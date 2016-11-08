@@ -21,7 +21,7 @@ __email__ = "jan.vanhaarst@wur.nl"
 # Download and install samtools
 rule reas_installation:
     output: CONFIG["executables"]["reas"] + 'reas_all.pl'
-    params : dir = strip_path_level(CONFIG['executables']['reas'],1)
+    params : dir = strip_path_level(CONFIG['executables']['reas'],2)
     threads : 12
     shell:
         "TEMPDIR=`mktemp -d`;"
@@ -34,12 +34,16 @@ rule reas_installation:
         "make install && "
         "mv -v ../bin {params.dir} &&"
         "touch {output} && "
+        "cd - && "
+        "cd dust && "
+        "make && make install && "
         "cd / && rm -rf $TEMPDIR;"
 
 rule reas:
     input:
         reads = CONFIG["reads"],
-        REAS = rules.reas_installation.output
+        REAS = rules.reas_installation.output,
+        PATH = strip_path_level(CONFIG['executables']['reas'],1)
     output: "consensus.fa"
     message: """Run ReAS on unpaired data"""
     threads: 8
@@ -54,6 +58,7 @@ rule reas:
             conda create --use-index-cache --yes --name reas muscle blast;
         fi
         source activate reas
-        {input.REAS} -pa {threads} -read {input.reads} -output {output}
+        export PATH=$PATH:{input.PATH}
+        {input.REAS} {params.options} -pa {threads} -read {input.reads} -output {output}
         source deactivate;
         """
