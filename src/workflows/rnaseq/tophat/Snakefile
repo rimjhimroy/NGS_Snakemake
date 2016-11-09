@@ -113,6 +113,7 @@ include: ruleDir + "/rnaseq/Tophat.rules"
 include: ruleDir + "/rnaseq/Stringtie.rules"
 include: ruleDir + "/rnaseq/Cufflinks.rules"
 include: ruleDir + "/rnaseq/Samtools.rules"
+include: ruleDir + "/rnaseq/CummeRbund.rules"
 include: ruleDir + "/fastqProcessors/FastQC.rules"
 include: ruleDir + "/fastqProcessors/readfq.rules"
 
@@ -133,4 +134,5 @@ rule all:
                 name=NAMES,
                 sample=SAMPLES),
         "MERGED/merged.gtf",
-        "DIFF/gene_exp.diff"
+        "DIFF/gene_exp.diff",
+        "DIFF/MDSplot_with_replicates.png"
