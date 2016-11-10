@@ -1,0 +1,57 @@
+{
+	"base":
+	{
+		"seq_file": "/tmp/test.fa",
+		"format": "fasta",
+		"output": "{working_dir}transposome_output",
+		"cpus":"8",
+
+		"bashrc": "{base_dir}{executables}bashrc",
+		"download_dir":"{download_dir}",
+		"rmlib": "{base_dir}{executables}repeatmasker/Libraries/RepeatMasker.lib",
+		"run_log": "{working_dir}transposome_run.txt",
+		"cluster_log":"{working_dir}transposome_cluster.txt",
+
+		"perl_brew" : "{home_dir}perl5/perlbrew/",
+		"perl_install": "{home_dir}perl5/perlbrew/perls/perl-5.18.0/",
+		"perl_version": "5.18.0",
+		"perl_cpanm_options" : "--force --notest ",
+		"perl_brew_options" : "-j 6 --notest --noman --thread --force ",
+		"perl_libs":
+		[
+		],
+		"genome":"do not use (is for repeatmasker)",
+		"cl_options":"do not use (is for repeatmasker)"
+	},
+		"executables":
+	{
+		"transposome": "{base_dir}{executables}transposome",
+		"perl" : "{home_dir}perl5/perlbrew/perls/perl-5.18.0/bin/perl",
+		"cpanm" : "{home_dir}perl5/perlbrew/bin/cpanm",
+		"rmblast": "{base_dir}{executables}rmblast/bin/rmblastn",
+		"makeblastdb": "{base_dir}{executables}blast_plus/bin/makeblastdb",
+		"blastn": "{base_dir}{executables}blast_plus/bin/blastn",
+		"blastp": "{base_dir}{executables}blast_plus/bin/blastp",
+		"blastx": "{base_dir}{executables}blast_plus/bin/blastx",
+		"tblastx": "{base_dir}{executables}blast_plus/bin/tblastx",
+		"RepeatMasker": "{base_dir}{executables}repeatmasker/RepeatMasker",
+		"repeatscout": "{base_dir}{executables}repeatscout/",
+		"repeatmodeler": "{base_dir}{executables}repeatmodeler/",
+		"trf": "{base_dir}{executables}trf/trf",
+		"recon" : "{base_dir}{executables}recon/bin"
+	},
+
+	"executable_sources":
+	{
+		"wget_options": " -c --proxy=off ",
+		"perl_URL": "http://downloads.activestate.com/ActivePerl/releases/5.18.4.1803/ActivePerl-5.18.4.1803-x86_64-linux-glibc-2.5-298573.tar.gz",
+		"trf_URL": "http://tandem.bu.edu/trf/downloads/trf407b.linux64",
+		"blast+_URL": "ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/2.2.29/ncbi-blast-2.2.29+-x64-linux.tar.gz",
+		"rmblast_URL": "ftp://ftp.ncbi.nlm.nih.gov/blast/executables/rmblast/2.2.28/ncbi-rmblastn-2.2.28-x64-linux.tar.gz ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/2.2.28/ncbi-blast-2.2.28+-x64-linux.tar.gz",
+		"repeatmasker_URL": "http://www.repeatmasker.org/RepeatMasker-open-4-0-5.tar.gz",
+ 		"recon_URL": "http://www.repeatmasker.org/RECON-1.08.tar.gz",
+		"repeatscout_URL": "http://bix.ucsd.edu/repeatscout/RepeatScout-1.0.5.tar.gz",
+		"repeatmodeler_URL": "http://www.repeatmasker.org/RepeatModeler-open-1-0-8.tar.gz"
+	}
+	
+}

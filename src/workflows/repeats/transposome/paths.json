@@ -1,0 +1,7 @@
+{
+	"base_dir": "/tmp/",
+	"working_dir": "/tmp/repeats/",
+	"executables": "bin/repeats/",
+	"home_dir":"/home/vlpb/",
+	"download_dir":"/tmp/"
+}

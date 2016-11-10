@@ -16,7 +16,8 @@ rule bashrc:
     priority: 5000
     shell :
         "mkdir -p {params.dir} && "
-        "touch {output}"
+        "echo '#!/bin/bash' > {output} && "
+        "echo 'set +u' >> {output}"
         
 # Download and install TRF
 rule trf_installation:
