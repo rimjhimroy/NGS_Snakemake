@@ -9,8 +9,8 @@
 		"bashrc": "{base_dir}{executables}bashrc",
 		"download_dir":"{download_dir}",
 		"rmlib": "{base_dir}{executables}repeatmasker/Libraries/RepeatMasker.lib",
-		"run_log": "{working_dir}transposome_run.txt",
-		"cluster_log":"{working_dir}transposome_cluster.txt",
+		"run_log": "transposome_run.txt",
+		"cluster_log":"transposome_cluster.txt",
 
 		"perl_brew" : "{home_dir}perl5/perlbrew/",
 		"perl_install": "{home_dir}perl5/perlbrew/perls/perl-5.18.0/",
