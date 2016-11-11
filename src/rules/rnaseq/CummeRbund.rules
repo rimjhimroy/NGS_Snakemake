@@ -1,0 +1,26 @@
+"""
+@version: 0.1
+
+Analyse cufdiff output with cummeRbund
+
+Required programs:
+* cummeRbund (conda bioconductor-cummerbund)
+
+"""
+
+import os, subprocess
+import configparser
+
+__author__ = "Jan van Haarst"
+__email__ = "jan.vanhaarst@wur.nl"
+
+rule cummerbund:
+    input: rules.cufdiff.output        
+    output: "DIFF/MDSplot_with_replicates.png"
+    message: """Run cummeRbund"""
+    params: script = ruleDir + "/rnaseq/cummerbund.R" 
+    shell:
+        """
+        cd DIFF
+        Rscript {params.script}
+        """

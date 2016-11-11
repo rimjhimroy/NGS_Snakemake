@@ -48,23 +48,42 @@ import os
 def createSymlinks(CONFIG):
     for sample in CONFIG["samples"]:
         for lib in CONFIG["samples"][sample]:
-           for readset in CONFIG["samples"][sample][lib]["readsets"]:
-                for path in CONFIG["samples"][sample][lib]["readsets"][readset]:
-                    splitpath=path.split("/")
-                    dir="./reads/" + sample + "/" + lib + "/" + readset
-                    try:
-                        os.stat(dir)
-                    except:
-                        print("Creating " + dir, file=sys.stderr)
-                        os.makedirs(dir)
-                    newpath=dir + "/" + splitpath[-1]
-                    oldpath=path
-                    try:
-                        os.stat(newpath)
-                        print(newpath,"already exists, skipping", file=sys.stderr)
-                    except:
-                        print(oldpath," -> ",newpath)
-                        os.symlink(oldpath, newpath)
+            if "readset" in CONFIG["samples"][sample][lib]:
+                for readset in CONFIG["samples"][sample][lib]["readsets"]:
+                    for path in CONFIG["samples"][sample][lib]["readsets"][readset]:
+                        splitpath=path.split("/")
+                        dir="./reads/" + sample + "/" + lib + "/" + readset
+                        try:
+                            os.stat(dir)
+                        except:
+                            print("Creating " + dir, file=sys.stderr)
+                            os.makedirs(dir)
+                        newpath=dir + "/" + splitpath[-1]
+                        oldpath=path
+                        try:
+                            os.stat(newpath)
+                            print(newpath,"already exists, skipping", file=sys.stderr)
+                        except:
+                            print(oldpath," -> ",newpath)
+                            os.symlink(oldpath, newpath)
+            if "replicates" in CONFIG["samples"][sample][lib]:
+                for readset in CONFIG["samples"][sample][lib]["replicates"]:
+                    for path in CONFIG["samples"][sample][lib]["replicates"][readset]:
+                        splitpath=path.split("/")
+                        dir="./reads/" + sample + "/" + lib + "/" + readset
+                        try:
+                            os.stat(dir)
+                        except:
+                            print("Creating " + dir, file=sys.stderr)
+                            os.makedirs(dir)
+                        newpath=dir + "/" + splitpath[-1]
+                        oldpath=path
+                        try:
+                            os.stat(newpath)
+                            print(newpath,"already exists, skipping", file=sys.stderr)
+                        except:
+                            print(oldpath," -> ",newpath)
+                            os.symlink(oldpath, newpath)
 
 if __name__ == "__main__":
     with open(sys.argv[1]) as f:

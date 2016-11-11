@@ -1,0 +1,138 @@
+"""
+Run the maker annotation pipeline
+"""
+
+import json, os, inspect
+import configparser
+import io
+
+__author__ = "Jan van Haarst"
+__email__ = "jan.vanhaarst@wur.nl"
+
+# Get lib configuration
+# Set PYTHONPATH before running Snakemake :
+# export PYTHONPATH=$PYTHONPATH:/home/haars001/scratch/projects/VLPB/
+
+from SnakeMakeVlpb import VLPB_LIB_PATH
+from SnakeMakeVlpb.src.utils import CreateSymlinkReads
+from SnakeMakeVlpb.src.utils.StripPathLevel import strip_path_level
+
+ruleDir = VLPB_LIB_PATH + "rules/"
+
+workdir: os.getcwd()
+"""
+Recursive function to do a string format on each of the string values in the config.
+    Full replace on a JSON does not work: it uses '{}' for formatting, which results
+    in errors.
+"""
+def replace_paths_in_json(conf, paths):
+    for item in conf:
+        if isinstance(conf[item], str): #is it a string value?
+            conf[item] = conf[item].format(**paths) #use json to replace values
+        elif isinstance(conf[item], dict): # is this a json object (dict) ?
+            replace_paths_in_json(conf[item], paths) # parse object
+
+# Get the config file:
+with open("config.json") as conf:
+    with open("paths.json") as paths:
+        PATHS = json.load(paths)
+        CONFIG = json.load(conf)
+        replace_paths_in_json(CONFIG, PATHS)
+
+# Create symlinks to the readfiles in structured folders, original location of data in JSON
+CreateSymlinkReads.createSymlinks(CONFIG)
+
+# Get info from symlinked files
+SAMPLES,LIBRARIES,REPLICATES,NAMES,=glob_wildcards("reads/{sample}/{library}/{replicate}/{name}.fastq.gz")
+
+# Create input for cuffdiff
+import itertools
+def unique_everseen(iterable, key=None):
+    "List unique elements, preserving order. Remember all elements ever seen."
+    # unique_everseen('AAAABBBCCDAABBB') --> A B C D
+    # unique_everseen('ABBCcAD', str.lower) --> A B C D
+    seen = set()
+    seen_add = seen.add
+    if key is None:
+        for element in filterfalse(seen.__contains__, iterable):
+            seen_add(element)
+            yield element
+    else:
+        for element in iterable:
+            k = key(element)
+            if k not in seen:
+                seen_add(k)
+                yield element
+
+BAMS = (expand("TOPHAT/{sample}/{library}/{replicate}/{name}/accepted_hits.sorted.rmdup.bam",
+                zip,
+                library=LIBRARIES,
+                replicate=REPLICATES,
+                name=NAMES,
+                sample=SAMPLES))
+
+LABELS = list(unique_everseen(expand("{sample}_{library}",
+                zip,
+                library=LIBRARIES,
+                replicate=REPLICATES,
+                name=NAMES,
+                sample=SAMPLES)))
+
+SAMPLE_LIBRARY=expand("{sample}_{library}",
+                zip,
+                library=LIBRARIES,
+                replicate=REPLICATES,
+                name=NAMES,
+                sample=SAMPLES)
+
+label_dict=dict()
+BAMFILES=list()
+for label in LABELS:
+    # fill dict with info on where the different labels are in the list
+    size=0
+    label_dict[label]=dict()
+    for index, item in enumerate(SAMPLE_LIBRARY ):
+        if label == item:
+            #print(index,item)
+            label_dict[label]['end']=index
+            size = size + 1
+            label_dict[label]['size']=size
+    # Now create list of files per label
+    label_dict[label]['BAMS']=list()
+    for x in itertools.islice(BAMS, label_dict[label]['end']-label_dict[label]['size']+1,label_dict[label]['end']+1):
+        label_dict[label]['BAMS'].append(x)
+    label_dict[label]['BAMS'].sort()
+    BAMFILES.append(','.join(label_dict[label]['BAMS']))
+
+BAMS=" ".join(BAMFILES)
+LABELS=",".join(LABELS)
+
+# Include necessary rules
+include: ruleDir + "/mappers/Bowtie.rules"
+include: ruleDir + "/rnaseq/Tophat.rules"
+include: ruleDir + "/rnaseq/Stringtie.rules"
+include: ruleDir + "/rnaseq/Cufflinks.rules"
+include: ruleDir + "/rnaseq/Samtools.rules"
+include: ruleDir + "/rnaseq/CummeRbund.rules"
+include: ruleDir + "/fastqProcessors/FastQC.rules"
+include: ruleDir + "/fastqProcessors/readfq.rules"
+
+rule all:
+    input:
+        CONFIG['base']['bashrc'], # Needs to be always separately defined !
+        expand("FASTQC/{sample}/{library}/{replicate}/{name}_fastqc.zip",
+                zip,
+                library=LIBRARIES,
+                replicate=REPLICATES,
+                name=NAMES,
+                sample=SAMPLES),
+        "READFQ/counts",
+        expand("TOPHAT/{sample}/{library}/{replicate}/{name}/accepted_hits.sorted.rmdup.bam",
+                zip,
+                library=LIBRARIES,
+                replicate=REPLICATES,
+                name=NAMES,
+                sample=SAMPLES),
+        "MERGED/merged.gtf",
+        "DIFF/gene_exp.diff",
+        "DIFF/MDSplot_with_replicates.png"

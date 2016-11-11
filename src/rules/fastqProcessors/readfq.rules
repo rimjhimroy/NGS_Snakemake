@@ -1,0 +1,45 @@
+"""
+@version: 0.1
+
+Create histogram of a FASTQ file
+
+Required programs:
+* bbmap
+
+"""
+
+__author__ = "Jan van Haarst"
+__email__ = "jan.vanhaarst@wur.nl"
+
+# Download and install bfc
+rule readfq_installation:
+    output: CONFIG["executables"]["kseq_count_q30"]
+    params : dir = strip_path_level(CONFIG["executables"]["kseq_count_q30"],1)
+    threads : 999
+    shell:
+        #"set -o xtrace;"
+        #"set -o verbose;"
+        "TEMPDIR=`mktemp -d`;"
+        "cd $TEMPDIR;"
+        "git clone " + CONFIG['executable_sources']['readfq_URL'] + " && "
+        "cd readfq && "
+        "make -j {threads} && "
+        "mkdir -p {params.dir} && "
+        "mv kseq_count_q30 {output} && "
+        "touch {output} && "
+        "cd / && rm -rf $TEMPDIR;"
+
+
+rule readfq_quality:
+    message: """Create quality report of FASTQ file with readfq"""
+    input:
+        READFQ = rules.readfq_installation.output,
+        reads = "reads/{genome}/{sample}/{replicate}/{name}.fastq.gz"
+    output: temp("READFQ/{genome}/{sample}/{replicate}/{name}.counts")
+    shell: "{input.READFQ} < {input.reads} > {output}"
+
+rule readfq_combine:
+    message: """Create combined quality report of FASTQ file with readfq"""
+    input: expand("READFQ/{sample}/{library}/{replicate}/{name}.counts",zip,sample=SAMPLES,library=LIBRARIES,replicate=REPLICATES,name=NAMES)
+    output: "READFQ/counts"
+    shell: 'for name in {input} ; do echo -e -n "$name\t" | sed \'s/.*\///\' | sed \'s/.counts//\'|cat - "$name" >> {output} ; done;sort --version-sort --output={output} {output}'
