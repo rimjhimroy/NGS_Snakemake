@@ -31,11 +31,11 @@ rule readfq_installation:
 
 
 rule readfq_quality:
-    message: """Create quality report of FASTQ file with readfq"""
+    message: """Count FASTQ file with readfq"""
     input:
         READFQ = rules.readfq_installation.output,
-        reads = "reads/{genome}/{sample}/{replicate}/{name}.fastq.gz"
-    output: temp("READFQ/{genome}/{sample}/{replicate}/{name}.counts")
+        reads = "{name}.fastq.gz"
+    output: "{name}.counts"
     shell: "{input.READFQ} < {input.reads} > {output}"
 
 rule readfq_combine:
@@ -43,3 +43,4 @@ rule readfq_combine:
     input: expand("READFQ/{sample}/{library}/{replicate}/{name}.counts",zip,sample=SAMPLES,library=LIBRARIES,replicate=REPLICATES,name=NAMES)
     output: "READFQ/counts"
     shell: 'for name in {input} ; do echo -e -n "$name\t" | sed \'s/.*\///\' | sed \'s/.counts//\'|cat - "$name" >> {output} ; done;sort --version-sort --output={output} {output}'
+
