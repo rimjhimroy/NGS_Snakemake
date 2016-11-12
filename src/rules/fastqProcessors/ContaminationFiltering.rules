@@ -1,83 +1,42 @@
 """
-@author: Jetse
 @version: 0.1
-@attention: TODO: Remove all # from the FileControl methods to include the control (biopython is needed for testing)
-@attention: Not tested yet, bowtie2 needs 64 bit machine, virtual machine is 32 bit...
 
-This module can be executed for any organism with a known reference genome.
-The {organism} is used as a wildcard, and has to be present as a key in the JSON file below the
-"contaminationRefGenomes". A small example is shown below:
-
-    "contaminationRefGenomes" : {
-        "PhiX" : "/home/jaco001/programmingProjects/assembly/src/preprocessing/phixDb/PhiX.fasta"
-        "eColi" : "/home/jaco001/programmingProjects/assembly/src/preprocessing/eColiDb/eColi.fasta"
-    },
-
-In this JSON there are two reference genomes. When the fastq reads which map on the PhiX reference genome have to be
-filtered, the prefix PhiXFiltered has to be used. The command eColiFiltered will filter all reads out that map on the
-eColi reference genome.
+Filter reads with Bowtie2 against a contamination genome
 
 Required programs:
 * bowtie2
 
-Expects a global variable CONFIG (e.g. parsed from json) of at least the following structure for paired end data:
-{
-    "libraries":{
-        "testLibrary":{
-            "insertSize":500
-        }
-    }
-    "contaminationRefGenomes" : {
-        "PhiX" : "/home/jaco001/programmingProjects/assembly/src/preprocessing/phixDb/PhiX.fasta"
-    }
-}
-For unpaired data, the libraries section is not needed in this module.
 
 """
-###############
-##  Imports  ##
-###############
-import subprocess
+import os, subprocess
+import configparser
 
-###############################
-##  Contamination filtering  ##
-###############################
+__author__ = "Jan van Haarst"
+__email__ = "jan.vanhaarst@wur.nl"
 
 rule filterPaired:
     input:
-        forward = "preprocessing/{sample}_1.fastq",
-        reversed = "preprocessing/{sample}_2.fastq",
-        reference = lambda wildcards: CONFIG["contaminationRefGenomes"][wildcards.org],
-        index = lambda wildcards: CONFIG["contaminationRefGenomes"][wildcards.org] + ".1.bt2",
+        forward = "{sample}.fastq.gz",
+        reference = CONFIG['contaminationGenome'],
+        index = CONFIG['contaminationGenome']+".1.bt2",
         BOWTIE2=rules.bowtie_installation.output
     output:
-        forward = "preprocessing/{org}Filtered.{sample}_1.fastq",
-        reversed = "preprocessing/{org}Filtered.{sample}_2.fastq"
-    threads: 999
-    run:
-        insertSize = int(CONFIG["libraries"][wildcards.sample]["insertSize"])
-        print("{input.BOWTIE2} -p {threads} -x {input.reference} "
-              "--un-conc {output.forward}_tmp_unmapppedPhix.fastq "
-              "-I {minInsert} -X {maxInsert} "
-              "-1 {input.forward} -2 {input.reversed} -S /dev/null".format(threads=threads,
-                                                                           input=input,
-                                                                           output=output,
-                                                                           minInsert=insertSize*0.5,
-                                                                           maxInsert=insertSize*2))
-        os.rename(output.forward + "_tmp_unmapppedPhix.1.fastq", output.forward)
-        os.rename(output.forward + "_tmp_unmapppedPhix.2.fastq", output.reversed)
-
-rule filterSingle:
-    input:
-        fastq = "preprocessing/{sample}.fastq",
-        reference = lambda wildcards: CONFIG["contaminationRefGenomes"][wildcards.org],
-        index = lambda wildcards: CONFIG["contaminationRefGenomes"][wildcards.org] + ".1.bt2",
-        BOWTIE2=rules.bowtie_installation.output
-    output: "preprocessing/{org}_filtered.{sample}.fastq"
-    run:
-        print("{input.BOWTIE2} -p {threads} -x {input.reference} "
-              "--un {output[0]} "
-              "-I {minInsert} -X {maxInsert} "
-              "-U {input.fastq} -S /dev/null".format(threads=threads,
-                                                   input=input,
-                                                   output=output))
+        forward = "{sample}.filtered.fastq.gz"
+    message: """Filter paired data"""
+    threads: 12
+    params:
+        options = "--time"
+    shell:
+        """
+        reverse=$(echo {input.forward} | sed 's/_R1_/_R2_/')
+        reverse_filtered=$(echo {output.forward} | sed 's/_R1_/_R2_/')
+        {input.BOWTIE2} \
+        --threads {threads} \
+        -x {input.reference} \
+        --un-conc-gz {output.forward}_tmp_unmappped.fastq.gz \
+        -1 {input.forward} -2 ${{reverse}} \
+        -S /dev/null \
+        {params.options}
+        mv {output.forward}_tmp_unmappped.fastq.1.gz {output.forward}
+        mv {output.forward}_tmp_unmappped.fastq.2.gz ${{reverse_filtered}}
+        """
