@@ -11,14 +11,12 @@ Required programs:
 __author__ = "Jan van Haarst"
 __email__ = "jan.vanhaarst@wur.nl"
 
-
-
 TRINITY_VERSION = subprocess.check_output("Trinity --version | grep version", shell=True)
 
 rule trinity_input_list:
     message: """Create combined list of RNA files"""
     input: expand("filtered/{sample}/{library}/{replicate}/{name}.fastq.gz",zip,sample=SAMPLES,library=LIBRARIES,replicate=REPLICATES,name=NAMES)
-    output: "TRINITY/input_list.txt"
+    output: temp("TRINITY/input_list.txt")
     shell: 'for name in {input} ; do echo $name;done | sort -V  > {output}; sort --version-sort --output={output} {output}'
 
 rule trinity:
