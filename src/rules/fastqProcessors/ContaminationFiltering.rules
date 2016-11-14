@@ -16,13 +16,14 @@ __email__ = "jan.vanhaarst@wur.nl"
 
 rule filterPaired:
     input:
-        forward = "{sample}.fastq.gz",
+        forward = "reads/{sample}/{library}/{replicate}/{name}.fastq.gz",
         reference = CONFIG['contaminationGenome'],
         index = CONFIG['contaminationGenome']+".1.bt2",
         BOWTIE2=rules.bowtie_installation.output
     output:
-        forward = "{sample}.filtered.fastq.gz"
+        forward = "filtered/{sample}/{library}/{replicate}/{name}.fastq.gz"
     message: """Filter paired data"""
+    log: "{sample}.filter.log"
     threads: 12
     params:
         options = "--time"
