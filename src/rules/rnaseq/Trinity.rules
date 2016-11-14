@@ -1,0 +1,38 @@
+"""
+@version: 0.1
+
+Create de novo assembly from RNA-seq data
+
+Required programs:
+* Trinity
+
+"""
+
+__author__ = "Jan van Haarst"
+__email__ = "jan.vanhaarst@wur.nl"
+
+
+
+TRINITY_VERSION = subprocess.check_output("Trinity --version | grep version", shell=True)
+
+rule trinity_input_list:
+    message: """Create combined list of RNA files"""
+    input: expand("filtered/{sample}/{library}/{replicate}/{name}.fastq.gz",zip,sample=SAMPLES,library=LIBRARIES,replicate=REPLICATES,name=NAMES)
+    output: "TRINITY/input_list.txt"
+    shell: 'for name in {input} ; do echo $name;done | sort -V  > {output}; sort --version-sort --output={output} {output}'
+
+rule trinity:
+    input: rules.trinity_input_list.output
+    output: "TRINITY/trinity_output/Trinity.fasta"
+    message: """Run Trinity on filtered data"""
+    threads: 16
+    version: TRINITY_VERSION
+    params:
+        options = CONFIG["trinity"]["options"]
+    shell:
+        """
+        R1=$(grep _R1_ {input} | tr '\n' ',' | sed 's/,$//')
+        R2=$(grep _R2_ {input} | tr '\n' ',' | sed 's/,$//')
+        trinity_output=$(dirname {output})
+        Trinity {params.options} --CPU {threads} --left $R1 --right $R2 --output $trinity_output
+        """
