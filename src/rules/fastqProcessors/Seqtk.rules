@@ -1,0 +1,27 @@
+"""
+@version: 0.1
+
+Use seqtk toolkit
+
+Required programs:
+* seqtk (bioconda)
+
+"""
+
+import os, subprocess
+import configparser
+
+__author__ = "Jan van Haarst"
+__email__ = "jan.vanhaarst@wur.nl"
+
+
+rule seqtk_sample:
+    input: "{name}.fasta"
+    params:        
+        number = CONFIG["seqtk"]["options"]["number"],
+        seed = CONFIG["seqtk"]["options"]["seed"]
+    output: "{name}.sampled.fasta"
+    shell:
+        """
+        seqtk sample -s{params.seed} {input} {params.number} > {output}
+        """     

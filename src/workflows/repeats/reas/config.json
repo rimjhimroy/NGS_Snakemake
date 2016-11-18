@@ -48,6 +48,12 @@
             "seg_file" : "seg.fa"
             }
 	},
+	"seqtk":{
+		"options":{
+			"number" : "1000000",
+			"seed"	 : "314159"
+		}
+	},
 	"sra": 
 	{
 		"sra_download" :{
@@ -57,5 +63,5 @@
 			"options" : "--split-files --fasta"
 		}
 	},
-	"reads" : "{download_dir}sra/ERR171441_1.fasta"
+	"reads" : "{download_dir}sra/ERR171441_1.sampled.fasta"
 }

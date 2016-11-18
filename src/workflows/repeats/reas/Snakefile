@@ -50,6 +50,9 @@ workdir:  CONFIG["base"]["working_dir"]
 # Include necessary rules
 include: ruleDir + "/repeats/reas.rules"
 include: ruleDir + "/fastqProcessors/Sra.rules"
+include: ruleDir + "/fastqProcessors/Seqtk.rules"
+
+os.mkdir(strip_path_level(CONFIG['executables']['reas'],1))
 
 rule all:
     input:
