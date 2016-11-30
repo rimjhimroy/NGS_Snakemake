@@ -1,0 +1,53 @@
+"""
+@version: 0.1
+
+Map reads with Tophat (needs Bowtie in place for creation of index)
+
+Required programs:
+* Tophat
+
+"""
+
+import os, subprocess
+import configparser
+
+__author__ = "Jan van Haarst"
+__email__ = "jan.vanhaarst@wur.nl"
+
+#ruleorder: TophatPaired > TophatSingle
+
+#rule TophatPaired:
+#    input:
+#        forward = lambda wildcards: CONFIG["mapping"]["reads"][wildcards.sample][0],
+#        reversed = lambda wildcards: CONFIG["mapping"]["reads"][wildcards.sample][1],
+#        reference = CONFIG["refGenome"],
+#        index = CONFIG["refGenome"] + ".1.bt2"
+#    output: "TOPHAT/{genome}/{sample}/{replicate}/{name}/accepted_hits.bam"
+#    shell: "{input.READFQ} < {input.reads} > {output}"
+
+rule TophatSingle:
+    input:
+        reads = "reads/{sample}/{library}/{replicate}/{name}.fastq.gz",
+        reference = CONFIG["refGenome"],
+        index = CONFIG["refGenome"] + ".1.bt2"
+    output: "TOPHAT/{sample}/{library}/{replicate}/{name}/accepted_hits.bam"
+    message: """Run Tophat on unpaired data"""
+    threads: 8
+    params:
+        options = CONFIG["tophat2"]["options"]
+    shell:
+        """
+        TEMPDIR=$(mktemp -d);
+        UUID=$(uuidgen);
+        if conda info --envs | grep '^tophat2'
+        then
+            echo "Conda environment exists"
+        else
+            conda create --use-index-cache --yes --name tophat2 python=2 tophat;
+        fi
+        source activate tophat2
+        tophat2 --num-threads {threads} {params.options} --tmp-dir $TEMPDIR --output-dir TOPHAT/{wildcards.sample}/{wildcards.library}/{wildcards.replicate}/{wildcards.name} {input.reference} {input.reads} &&
+        rm -rf $TEMPDIR;
+        source deactivate;
+        """
+

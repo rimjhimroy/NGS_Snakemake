@@ -1,0 +1,38 @@
+"""
+@version:0.1
+@author: Jetse
+
+The Samtools module contains all rules for manipulating bam files with samtools.
+
+
+"""
+
+__author__ = "Jan van Haarst"
+__email__ = "jan.vanhaarst@wur.nl"
+
+rule samToBam:
+    input: "{name}.sam"
+    output: "{name}.bam"
+    shell: "samtools view -bS {input} > {output}"
+
+rule indexBam:
+    input:  "{prefix}.bam"
+    output: "{prefix}.bam.bai"
+    shell: "samtools index {input}"
+
+rule sortBam:
+    input: "{name}.bam"
+    output: temp("{name}.sorted.bam")
+    threads : 8
+    shell: "samtools sort --threads {threads} -o {output} {input}"
+
+rule faidX:
+    input: "{name}.fasta"
+    output: "{name}.fasta.fai"
+    shell: "samtools faidx {input}"
+
+rule rmdup:
+    input:  "{name}.bam"
+    output: temp("{name}.rmdup.bam")
+    shell:  "samtools rmdup -S {input} {output}"
+

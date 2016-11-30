@@ -46,8 +46,9 @@ rule bowtieIndex:
     input:
         inFile = "{ref}.fasta",
         BOWTIE2=rules.bowtie_installation.output
+    threads : 999
     output: "{ref}.fasta.1.bt2"
-    shell: "{input.BOWTIE2}-build {input.inFile} {input.inFile}"
+    shell: "{input.BOWTIE2}-build --threads {threads} {input.inFile} {input.inFile}"
 
 rule bowtiePaired:
     input:

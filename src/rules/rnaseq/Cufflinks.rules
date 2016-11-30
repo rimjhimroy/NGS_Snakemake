@@ -1,0 +1,52 @@
+"""
+@version: 0.1
+
+Analyse files with cufflinks
+
+Required programs:
+* cufflinks
+
+"""
+
+import os, subprocess
+import configparser
+
+__author__ = "Jan van Haarst"
+__email__ = "jan.vanhaarst@wur.nl"
+
+rule cuffmerge:
+    input:
+        gtf = CONFIG["refGTF"],
+        reference = CONFIG["refGenome"],
+        gtf_list = rules.stringtie_gtf_list.output
+    output: "MERGED/merged.gtf"
+    message: """Run cuffmerge"""
+    threads: 8
+    params:
+        options = CONFIG["cuffmerge"]["options"]
+    shell:
+        """
+        cuffmerge -o MERGED --ref-gtf {input.gtf} --ref-sequence {input.reference}  --num-threads {threads} {input.gtf_list}
+        """
+
+rule cufdiff:
+    input:
+        merged_gtf = rules.cuffmerge.output,
+        files = expand("TOPHAT/{sample}/{library}/{replicate}/{name}/accepted_hits.sorted.rmdup.bam",
+                zip,
+                library=LIBRARIES,
+                replicate=REPLICATES,
+                name=NAMES,
+                sample=SAMPLES)
+    output: "DIFF/gene_exp.diff"
+    message: """Run cuffdiff"""
+    threads: 8
+    params:
+        options = CONFIG["cuffmerge"]["options"]
+    shell:
+        """
+        cuffdiff -p {threads} -o DIFF \
+        -L {LABELS} \
+        {input.merged_gtf} \
+        {BAMS}
+        """

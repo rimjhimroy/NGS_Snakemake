@@ -1,0 +1,38 @@
+"""
+@version: 0.1
+
+Map reads with Tophat (needs Bowtie in place for creation of index)
+
+Required programs:
+* Stringtie
+
+"""
+
+__author__ = "Jan van Haarst"
+__email__ = "jan.vanhaarst@wur.nl"
+
+
+
+STRINGTIE_VERSION = subprocess.check_output("stringtie --version", shell=True)
+
+rule stringtie:
+    # https://ccb.jhu.edu/software/stringtie/index.shtml
+    input:
+        BAM = "TOPHAT/{sample}/{library}/{replicate}/{name}/accepted_hits.sorted.rmdup.bam",
+        GTF = CONFIG["refGTF"]
+    output: "STRINGTIE/{sample}/{library}/{replicate}/{name}/transcripts.gtf"
+    message: """Run Stringtie on mapped data"""
+    threads: 8
+    version: STRINGTIE_VERSION
+    params:
+        options = CONFIG["stringtie"]["options"]
+    shell:
+        """
+        stringtie {params.options} -p {threads} -G {input.GTF} -o {output} {input.BAM}
+        """
+
+rule stringtie_gtf_list:
+    message: """Create combined list of gtf files"""
+    input: expand("STRINGTIE/{sample}/{library}/{replicate}/{name}/transcripts.gtf",zip,sample=SAMPLES,library=LIBRARIES,replicate=REPLICATES,name=NAMES)
+    output: "STRINGTIE/cuffmerge_gtf_list.txt"
+    shell: 'for name in {input} ; do echo $name;done | sort -V  > {output}; sort --version-sort --output={output} {output}'

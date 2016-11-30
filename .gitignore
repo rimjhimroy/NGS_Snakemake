@@ -1,3 +1,6 @@
+# Snakemake run files
+.snakemake
+
 # Annotation stuff :
 data
 TEMP_MAKER
