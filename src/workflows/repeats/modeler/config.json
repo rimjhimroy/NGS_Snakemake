@@ -5,7 +5,9 @@
 		"download_dir":"{download_dir}",
 		"genome": "{base_dir}e.coli.fna",
 		"rmlib" : "{base_dir}{databases}repeat_db.fasta",
-		"cpus": "8"
+		"cpus": "8",
+		"output":"do not use (is for repeatmasker)",
+		"cl_options":"do not use (is for repeatmasker)"
 	},
 	"executables":
 	{
