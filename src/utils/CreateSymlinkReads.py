@@ -48,8 +48,10 @@ import os
 def createSymlinks(CONFIG):
     for sample in CONFIG["samples"]:
         for lib in CONFIG["samples"][sample]:
-            if "readset" in CONFIG["samples"][sample][lib]:
+            print(CONFIG["samples"][sample][lib])
+            if "readsets" in CONFIG["samples"][sample][lib]:
                 for readset in CONFIG["samples"][sample][lib]["readsets"]:
+                    print(readset)
                     for path in CONFIG["samples"][sample][lib]["readsets"][readset]:
                         splitpath=path.split("/")
                         dir="./reads/" + sample + "/" + lib + "/" + readset

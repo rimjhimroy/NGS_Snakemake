@@ -43,18 +43,17 @@ CreateSymlinkReads.createSymlinks(CONFIG)
 
 # Get info from symlinked files
 SAMPLES, LIBRARIES, READSETS, NAMES, FORWARD_REVERSE, = glob_wildcards("reads/{sample}/{library}/{readset}/{name}_{forward_reverse}.fastq")
-print(SAMPLES), print(LIBRARIES), print(READSETS), print(NAMES), print(FORWARD_REVERSE)
+#print(SAMPLES), print(LIBRARIES), print(READSETS), print(NAMES), print(FORWARD_REVERSE)
 
 # Include necessary rules
 include: ruleDir + "/repeats/Tedna.rules"
 
 rule all:
     input:
-        # CONFIG['base']['bashrc'],                       # Needs to be separate defined always !
         expand("tedna_repeats/{sample}/{library}/{readset}/{name}.fasta",
             zip,
             sample=SAMPLES,
             library=LIBRARIES,
             readset=READSETS,
-            name=NAMES),
-        rules.tedna.output
+            name=NAMES)
+
