@@ -18,7 +18,7 @@
 		"perl_cpanm_options" : "--force --notest ",
 		"perl_brew_options" : "-j 6 --notest --noman --thread --force ",
 		"perl_libs":
-		[
+		["Moose"
 		],
 		"genome":"do not use (is for repeatmasker)",
 		"cl_options":"do not use (is for repeatmasker)"
