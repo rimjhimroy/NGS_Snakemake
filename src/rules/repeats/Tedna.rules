@@ -4,15 +4,35 @@
 
 import os, subprocess
 import configparser
+from SnakeMakeVlpb.src.utils.StripPathLevel import strip_path_level
+
+# Download and install Sparsehash
+rule sparsehash_installation:
+	output: CONFIG["executables"]["sparsehash"]
+	shell:
+		"mkdir -p " + CONFIG["base"]["executables"] + " && "
+		"cd " + CONFIG["base"]["executables"] + " && "
+		"git clone " + CONFIG["executable_sources"]["sparsehash_URL"] + " && "
+		"cd " + CONFIG["executables"]["sparsehash"] + " && "
+		"./configure --prefix=" + CONFIG["executables"]["sparsehash"] + " && "
+		"make && "
+		"make install && "
+		"touch {output}"
 
 # Download and install Tedna
 rule tedna_installation:
+	input:
+		rules.sparsehash_installation.output
 	output: CONFIG["executables"]["tedna"]
 	shell:
 		"mkdir -p " + CONFIG["base"]["executables"] + " && "
 		"cd " + CONFIG["base"]["executables"] + " && "
 		"wget" + CONFIG["executable_sources"]["wget_options"] + CONFIG["executable_sources"]["Tedna_URL"] + " && "
-		"chmod +x " + CONFIG["executables"]["tedna"] + " && "
+		"tar -zxvf " + CONFIG["executable_sources"]["Tedna_file"] + " && "
+		"cd tedna_1.2.2/ && "
+		"sed -i 's;CFLAGS = -Wall -pedantic -std=c++11 -pthread;CFLAGS = -Wall -pedantic -std=c++11 -pthread -I/tmp/bin/repeats/sparsehash/include;g' makefile && "
+		"make && "
+		"rm " + CONFIG["executable_sources"]["Tedna_file"] + " && "
 		"touch {output}"
 
 # Run Tedna

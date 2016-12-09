@@ -8,25 +8,27 @@
 
 	"executables":
 	{
-		"tedna": "{base_dir}{executables}tedna"
+		"tedna": "{base_dir}{executables}tedna_1.2.2/tedna",
+        "sparsehash": "{base_dir}{executables}sparsehash"
 	},
 
 	"executable_sources":
 	{
-		"Tedna_URL": "https://urgi.versailles.inra.fr/content/download/3482/29406/file/tedna",
-		"version": "1.2.2",
-		"wget_options": " -c --proxy=off "
+		"Tedna_URL": "https://urgi.versailles.inra.fr/content/download/3481/29402/file/tedna_1.2.2.tar.gz",
+		"Tedna_file": "{base_dir}{executables}tedna_1.2.2.tar.gz",
+		"wget_options": " -c --proxy=off ",
+        "sparsehash_URL": "https://github.com/sparsehash/sparsehash.git"
 	},
 
 	"samples": {
         "Pleurotus_ostreatus": {
             "EP57": {
                 "readsets": {
-                        "1": [
-                                "/media/sven/extData/sven/VLPB/raw_reads/ST_sample001_1.fastq", 
-                                "/media/sven/extData/sven/VLPB/raw_reads/ST_sample001_2.fastq"
-                                ]	
-                        },
+                    "1": [
+                        "/media/sven/extData/sven/VLPB/raw_reads/ST_sample001_1.fastq", 
+                        "/media/sven/extData/sven/VLPB/raw_reads/ST_sample001_2.fastq"
+                        ]	
+                    },
                 "type": "pe",
                 "insertSize": "300",
                 "insertSizeStDev": "",
