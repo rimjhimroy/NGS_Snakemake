@@ -1,0 +1,24 @@
+{
+	"base":
+	{
+		"fasta": "/tmp/fasta.fa",
+		"output": "/tmp/consensus.fa",
+		"working_dir": "{base_dir}temp_repeats",
+		"download_dir": "{download_dir}",
+        "executables": "{base_dir}{executables}"
+	},
+
+	"executables":
+	{
+		"usearch": "{base_dir}{executables}/usearch"
+	},
+
+	"executable_sources":
+	{
+		"usearch_URL": "http://drive5.com/cgi-bin/upload3.py?license=2017012008363614880",
+		"wget_options": " -c --proxy=off "
+	},
+    "usearch_opts": {
+    	"cl_options": "  -id 0.8 -threads 20 "
+    }
+}

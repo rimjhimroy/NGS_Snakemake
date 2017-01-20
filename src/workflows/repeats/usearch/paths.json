@@ -1,7 +1,5 @@
 {
 	"base_dir": "/tmp/",
 	"executables": "bin/repeats/",
-	"databases":"databases/",
-	"home_dir":"/home/vlpb/",
 	"download_dir":"/tmp/"
 }

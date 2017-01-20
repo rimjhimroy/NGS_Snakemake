@@ -1,0 +1,27 @@
+#############
+##  usearch  ##
+#############
+
+import os, subprocess
+import configparser
+from SnakeMakeVlpb.src.utils.StripPathLevel import strip_path_level
+
+
+# Download and install
+rule usearch_installation:
+	output: CONFIG["executables"]["usearch"]
+	shell:
+		"mkdir -p " + CONFIG["base"]["executables"] + " && "
+		"cd " + CONFIG["base"]["executables"] + " && "
+		"wget" + CONFIG["executable_sources"]["wget_options"] + CONFIG["executable_sources"]["usearch_URL"] + " && "
+		"mv upload* usearch && "
+		"chmod a+rx usearch && "
+		"touch {output}"
+
+rule usearch:
+	input:
+		rules.usearch_installation.output,
+		fasta = CONFIG["base"]["fasta"]
+	output: "" + CONFIG["base"]["output"] 
+	shell:
+		"" + CONFIG["base"]["executables"] + "/usearch -cluster_fast {input.fasta} -consout " + CONFIG["base"]["output"] + " " + CONFIG["usearch_opts"]["cl_options"] 
