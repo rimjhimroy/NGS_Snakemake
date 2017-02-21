@@ -16,24 +16,19 @@ To run with docker:
 
 - create a data folder and a data/tmp folder.
 
-- In this repository, copy the config files from one of our workflows 
-  (https://git.wageningenur.nl/warri004/SnakemakeVLPB/tree/master/src/workflows)
-  and add it to the data folder, modifying them accordingly. The paths.json should work without
-  change.
+- In this repository, copy the config files from one of our workflows and add it to the 
+  data folder, modifying them accordingly.
 
-- Find the correct snakemake image to run. <PATHWAY NAME> is the name of the pathway choosen in 
-  the previous step and the exact name of the docker image can be found by seaching:
+  You can find the available workflows in:
 
-  ```docker search sauloal/snakemake```
+  ```src/workflows```
 
-  e.g.: for the workflow ```annotation/braker/``` (found in src/workflows/annotation/braker/)
-        the correct image would be ```sauloal/snakemake_annotation_braker```
+  The ```paths.json``` should work without change while the other config files might need
+  adaptation.
 
-- inside the data folder, run docker with:
+- inside the data folder, run docker with the name of the workflow choose. e.g.: for annotation/braker
 
-  ```docker run -it --rm -v $PWD:/home/snakemake/data/ sauloal/snakemake_<PATHWAY NAME>```
-
-
+  ```docker run -it --rm -v $PWD:/home/snakemake/data/ sauloal/snakemake annotation/braker```
 
 
 

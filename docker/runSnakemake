@@ -1,0 +1,12 @@
+#!/bin/bash
+
+WORKFLOW_PATH=$1
+shift
+REST=$@
+
+echo "WORKFLOW PATH       : ${WORKFLOW_PATH}"
+echo "REMAINING PARAMETERS: ${REST}"
+echo
+
+#source activate snakemake && snakemake --directory /home/snakemake/data --snakefile /home/snakemake/SnakemakeVLPB/src/workflows/variantCalling/freebayes/Snakefile
+source activate snakemake && snakemake --directory /home/snakemake/data --snakefile /home/snakemake/SnakemakeVLPB/src/workflows/${WORKFLOW_PATH}/Snakefile ${REST}

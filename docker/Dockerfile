@@ -80,10 +80,14 @@ RUN mkdir -p  /home/snakemake/.ssh                     && \
 RUN echo -e "Host git.wur.nl\n\tStrictHostKeyChecking no\n" >> /home/snakemake/.ssh/config && \
     ssh-keyscan -t rsa -H github.com >> /home/snakemake/.ssh/known_hosts && \
     ssh-keyscan -t rsa -H git.wur.nl >> /home/snakemake/.ssh/known_hosts && \
-    git clone git@git.wur.nl:warri004/SnakemakeVLPB.git && \
-    mkdir /home/snakemake/data
+    git clone git@git.wur.nl:warri004/SnakemakeVLPB.git
+    
+RUN mkdir /home/snakemake/data && \
+    mkdir /home/snakemake/bin
 
 ENV PYTHONPATH=$PYTHONPATH:/home/snakemake/SnakemakeVLPB
+
+ADD runSnakemake /home/snakemake/bin/
 
 
 
@@ -94,3 +98,5 @@ ENV PYTHONPATH=$PYTHONPATH:/home/snakemake/SnakemakeVLPB
 WORKDIR /home/snakemake/data
 
 #CMD source activate snakemake && snakemake --directory /home/snakemake/data --snakefile /home/snakemake/SnakemakeVLPB/src/workflows/variantCalling/freebayes/Snakefile
+
+ENTRYPOINT ["/home/snakemake/bin/runSnakemake"]
