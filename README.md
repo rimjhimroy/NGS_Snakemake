@@ -19,16 +19,13 @@ To run with docker:
 - In this repository, copy the config files from one of our workflows and add it to the 
   data folder, modifying them accordingly.
 
-  You can find the available workflows in:
+    You can find the available workflows in: ```src/workflows```
 
-  ```src/workflows```
-
-  The ```paths.json``` should work without change while the other config files might need
-  adaptation.
+    The ```paths.json``` should work without change while the other config files might need adaptation.
 
 - inside the data folder, run docker with the name of the workflow choose. e.g.: for annotation/braker
 
-  ```docker run -it --rm -v $PWD:/home/snakemake/data/ sauloal/snakemake annotation/braker```
+     ```docker run -it --rm -v $PWD:/home/snakemake/data/ sauloal/snakemake annotation/braker```
 
 
 
