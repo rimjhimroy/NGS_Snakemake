@@ -1,8 +1,8 @@
 {
-	"base_dir": "/tmp/",
+	"base_dir": "/home/snakemake/data/",
 	"executables": "bin/maker_helpers/",
 	"databases":"databases/",
-	"web_host":"http://assembly.ab.wurnet.nl/~jvh/",
-	"home_dir":"/home/sven/",
-	"download_dir":"/tmp/"
+	"web_host":"<PLEASE SET UP>",
+	"home_dir":"/home/snakemake/",
+	"download_dir":"/home/snakemake/data/tmp/"
 }

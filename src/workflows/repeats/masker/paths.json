@@ -1,6 +1,6 @@
 {
-	"base_dir": "/tmp/",
+	"base_dir": "/home/snakemake/data/",
 	"executables": "bin/repeats/",
 	"databases":"databases/",
-	"download_dir":"/tmp/"
+	"download_dir":"/home/snakemake/data/tmp/"
 }

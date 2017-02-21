@@ -1,6 +1,6 @@
 {
-	"base_dir": "/tmp/snakemake_assembly/",
+	"base_dir": "/home/snakemake/data/",
 	"executables": "bin/",
-	"web_host":"http://assembly.ab.wurnet.nl/~jvh/",
-	"home_dir":"/home/haars001/"
+	"web_host":"<PLEASE SET UP>",
+	"home_dir":"/home/snakemake/"
 }
