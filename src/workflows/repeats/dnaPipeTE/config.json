@@ -19,8 +19,8 @@
 		"dnaPipeTE_URL": "https://github.com/clemgoub/dnaPipeTE/archive/master.zip",
 		"wget_options": " -c --proxy=off ",
         "trf_URL": "http://tandem.bu.edu/trf/Downloads/trf409.linux64",
-        "java_URL": "http://download.oracle.com/otn-pub/java/jdk/7u80-b15/jre-7u80-linux-x64.tar.gz",
-        "java_file": "jre-7u80-linux-x64.tar.gz"
+        "java_URL": "http://download.oracle.com/otn-pub/java/jdk/8u151-b12/e758a0de34e24606bca991d704f6dcbf/server-jre-8u151-linux-x64.tar.gz",
+        "java_file": "server-jre-8u151-linux-x64.tar.gz"
 	},
 
 	"samples": {
