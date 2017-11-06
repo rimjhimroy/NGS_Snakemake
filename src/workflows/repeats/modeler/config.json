@@ -10,7 +10,7 @@
 		"cl_options":"do not use (is for repeatmasker)",
 		
 		"perl_brew" : "{home_dir}perl5/perlbrew/",
-		"perl_install": "{home_dir}perl5/perlbrew/perls/perl-5.18.0/",
+		"perl_install": "{home_dir}perl5/perlbrew/perls/perl-5.26.0/",
 		"perl_version": "5.18.0",
 		"perl_cpanm_options" : "--force --notest ",
 		"perl_brew_options" : "-j 6 --notest --noman --thread --force ",
@@ -37,7 +37,7 @@
 	},
 	"executables":
 	{
-		"perl" : "{home_dir}perl5/perlbrew/perls/perl-5.18.0/bin/perl",
+		"perl" : "{home_dir}perl5/perlbrew/perls/perl-5.26.0/bin/perl",
 		"cpanm" : "{home_dir}perl5/perlbrew/bin/cpanm",
 	
 		"rmblast": "{base_dir}{executables}rmblast/bin/rmblastn",
@@ -56,14 +56,14 @@
 	"executable_sources":
 	{
 		"wget_options": " -c --proxy=off ",
-		"perl_URL": "http://downloads.activestate.com/ActivePerl/releases/5.18.4.1803/ActivePerl-5.18.4.1803-x86_64-linux-glibc-2.5-298573.tar.gz",
+		"perl_URL": "http://downloads.activestate.com/ActivePerl/releases/5.26.0.2600/ActivePerl-5.26.0.2600-x86_64-linux-glibc-2.15-403863.tar.gz",
 		"trf_URL": "http://tandem.bu.edu/trf/downloads/trf407b.linux64",
-		"blast+_URL": "ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/2.2.29/ncbi-blast-2.2.29+-x64-linux.tar.gz",
+		"blast+_URL": "ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/2.7.1/ncbi-blast-2.7.1+-x64-linux.tar.gz",
 		"rmblast_URL": "ftp://ftp.ncbi.nlm.nih.gov/blast/executables/rmblast/2.2.28/ncbi-rmblastn-2.2.28-x64-linux.tar.gz ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/2.2.28/ncbi-blast-2.2.28+-x64-linux.tar.gz",
-		"repeatmasker_URL": "http://www.repeatmasker.org/RepeatMasker-open-4-0-5.tar.gz",
+		"repeatmasker_URL": "http://www.repeatmasker.org/RepeatMasker-open-4-0-7.tar.gz",
  		"recon_URL": "http://www.repeatmasker.org/RECON-1.08.tar.gz",
 		"repeatscout_URL": "http://bix.ucsd.edu/repeatscout/RepeatScout-1.0.5.tar.gz",
-		"repeatmodeler_URL": "http://www.repeatmasker.org/RepeatModeler-open-1-0-8.tar.gz"
+		"repeatmodeler_URL": "http://www.repeatmasker.org/RepeatModeler-open-1-0-10.tar.gz"
 	}
 
 }
