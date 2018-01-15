@@ -1,0 +1,86 @@
+"""
+@version: 0.1
+
+Run ReAS repeat discovery tool
+
+Required programs:
+* ReAS
+* MUSCLE
+* BLASTN (from BLAST-suite)
+* dustmasker (from BLAST-suite)
+
+"""
+
+import os, subprocess
+import configparser
+from snakemake.remote.FTP import RemoteProvider as FTPRemoteProvider
+
+__author__ = "Jan van Haarst"
+__email__ = "jan.vanhaarst@wur.nl"
+
+
+# Download and install samtools
+rule reas_installation:
+    output: CONFIG["executables"]["reas"] + 'reas_all.pl'
+    params : dir = strip_path_level(CONFIG['executables']['reas'],1)
+    threads : 12
+    shell:
+        "TEMPDIR=`mktemp -d`;"
+        "cd $TEMPDIR;"
+        "git clone " +CONFIG["executable_sources"]['reas_URL'] + " && "
+        "cd reas && "
+        "mkdir bin && "
+        "cd code && "
+        "make -j {threads} && "
+        "make install && "
+        "mv -v ../bin {params.dir} &&"
+        "touch {output} && "
+        "cd / && rm -rf $TEMPDIR;"
+
+
+FTP = FTPRemoteProvider()
+READS=os.path.basename(CONFIG["reads_URL"])
+FORWARD_READS=os.path.basename(CONFIG["reads_pe_URLS"]["1"])
+REVERSE_READS=os.path.basename(CONFIG["reads_pe_URLS"]["2"])
+
+ruleorder: download_pe_data > download_data
+
+rule download_data:
+    input: FTP.remote(CONFIG["reads_URL"], keep_local=True)
+    output : READS
+    shell : "mv {input} {output}"
+
+rule download_pe_data:
+    input: 
+        forward = FTP.remote(CONFIG["reads_pe_URLS"]["1"], keep_local=True),
+        reverse = FTP.remote(CONFIG["reads_pe_URLS"]["2"], keep_local=True)
+    output : 
+        FORWARD_READS=FORWARD_READS,
+        REVERSE_READS=REVERSE_READS
+    shell : 
+        "mv {input.forward} {output.FORWARD_READS};"
+        "mv {input.reverse} {output.REVERSE_READS};"
+
+rule reas:
+    input:
+        reads = "reads/{sample}/{library}/{replicate}/{name}.fastq.gz",
+    output: "TOPHAT/{sample}/{library}/{replicate}/{name}/accepted_hits.bam"
+    message: """Run Tophat on unpaired data"""
+    threads: 8
+    params:
+        options = CONFIG["reas"]["options"]
+    shell:
+        """
+        TEMPDIR=$(mktemp -d);
+        UUID=$(uuidgen);
+        if conda info --envs | grep '^reas'
+        then
+            echo "Conda environment exists"
+        else
+            conda create --use-index-cache --yes --name reas muscle blast;
+        fi
+        source activate reas
+        tophat2 --num-threads {threads} {params.options} --tmp-dir $TEMPDIR --output-dir TOPHAT/{wildcards.sample}/{wildcards.library}/{wildcards.replicate}/{wildcards.name} {input.reference} {input.reads} &&
+        rm -rf $TEMPDIR;
+        source deactivate;
+        """

@@ -1,0 +1,29 @@
+{
+	"base":
+	{
+		"working_dir": "{base_dir}temp_reas",
+		"download_dir": "{download_dir}",
+        	"executables": "{base_dir}{executables}"
+	},
+
+	"executables":
+	{
+		"reas": "{base_dir}{executables}reas/bin/"
+	},
+
+	"executable_sources":
+	{
+		"reas_URL": "https://git.wur.nl/haars001/reas.git",
+		"wget_options": " -c --proxy=off "
+	},
+	"reads_info" : "http://www.ebi.ac.uk/ena/data/view/ERX147330",
+	"reads_URL" : "ftp.sra.ebi.ac.uk/vol1/fastq/DRR001/DRR001191/DRR001191_1.fastq.gz",
+	"reads_pe_URLS" : {
+		"1": "ftp.sra.ebi.ac.uk/vol1/fastq/ERR171/ERR171441/ERR171441_1.fastq.gz",
+		"2": "ftp.sra.ebi.ac.uk/vol1/fastq/ERR171/ERR171441/ERR171441_2.fastq.gz"
+	},
+	"reas": 
+	{
+		"options": ""
+	}
+}
