@@ -3,7 +3,7 @@
 	{
 		"working_dir": "{base_dir}temp_reas",
 		"download_dir": "{download_dir}",
-        	"executables": "{base_dir}{executables}"
+        "executables": "{base_dir}{executables}"
 	},
 
 	"executables":
@@ -16,14 +16,52 @@
 		"reas_URL": "https://git.wur.nl/haars001/reas.git",
 		"wget_options": " -c --proxy=off "
 	},
-	"reads_info" : "http://www.ebi.ac.uk/ena/data/view/ERX147330",
-	"reads_URL" : "ftp.sra.ebi.ac.uk/vol1/fastq/DRR001/DRR001191/DRR001191_1.fastq.gz",
-	"reads_pe_URLS" : {
-		"1": "ftp.sra.ebi.ac.uk/vol1/fastq/ERR171/ERR171441/ERR171441_1.fastq.gz",
-		"2": "ftp.sra.ebi.ac.uk/vol1/fastq/ERR171/ERR171441/ERR171441_2.fastq.gz"
-	},
+	"sra_id" : "ERR171441",
 	"reas": 
 	{
-		"options": ""
-	}
+		"options": {
+            "k": "17",
+            "d": "6",
+            "m": "1",
+            "fraction": "1",
+            "n": "1",
+            "t": "0",
+            "pa": "1",
+            "bound_file": "seg.bk",
+            "link_file": "seg.link",
+            "sub_multi": "-t -1",
+            "output": "consensus.fa",
+            "prefix": "-p ''",
+            "log": "",
+            "size": "100",
+            "seqsize": "80",
+            "ident": "0.6",
+            "nonlcs": "50",
+            "end": "50",
+            "min_depth": "-j 2",
+            "min_extend": "-u 50",
+            "max_extend": "-v 200",
+            "clean_read_file" : "reads.clean.fa",
+            "nmers_file" : "read.N_mers",
+            "hd_read_id_file" : "HD_reads.id",
+            "hd_read_file" : "HD_reads.fa",
+            "seg_file" : "seg.fa"
+            }
+	},
+	"seqtk":{
+		"options":{
+			"number" : "1000000",
+			"seed"	 : "314159"
+		}
+	},
+	"sra": 
+	{
+		"sra_download" :{
+			"options": "--max-size 20G"
+		},
+		"fastq-dump" : {
+			"options" : "--split-files --fasta"
+		}
+	},
+	"reads" : "{download_dir}sra/ERR171441_1.sampled.fasta"
 }

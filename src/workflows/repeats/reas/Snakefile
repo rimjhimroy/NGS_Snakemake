@@ -10,9 +10,9 @@ import io
 # Set PYTHONPATH before running Snakemake :
 # export PYTHONPATH=$PYTHONPATH:/home/lavri002/scratch/
 
-from SnakeMakeVlpb import VLPB_LIB_PATH
-from SnakeMakeVlpb.src.utils import CreateSymlinkReads
-from SnakeMakeVlpb.src.utils.StripPathLevel import strip_path_level
+from SnakeMakeVlpb_reas import VLPB_LIB_PATH
+from SnakeMakeVlpb_reas.src.utils import CreateSymlinkReads
+from SnakeMakeVlpb_reas.src.utils.StripPathLevel import strip_path_level
 
 
 ruleDir = VLPB_LIB_PATH + "rules/"
@@ -49,12 +49,13 @@ workdir:  CONFIG["base"]["working_dir"]
 
 # Include necessary rules
 include: ruleDir + "/repeats/reas.rules"
+include: ruleDir + "/fastqProcessors/Sra.rules"
+include: ruleDir + "/fastqProcessors/Seqtk.rules"
+
+os.mkdir(strip_path_level(CONFIG['executables']['reas'],1))
 
 rule all:
     input:
         # CONFIG['base']['bashrc'],                       # Needs to be separate defined always !
-        CONFIG["executables"]["reas"] + 'reas_all.pl',
-        os.path.basename(CONFIG["reads_URL"]),
-        os.path.basename(CONFIG["reads_pe_URLS"]["1"]),
-        os.path.basename(CONFIG["reads_pe_URLS"]["2"])
+        "consensus.fa"
 

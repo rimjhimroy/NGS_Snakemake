@@ -13,18 +13,21 @@ Required programs:
 
 import os, subprocess
 import configparser
-from snakemake.remote.FTP import RemoteProvider as FTPRemoteProvider
 
 __author__ = "Jan van Haarst"
 __email__ = "jan.vanhaarst@wur.nl"
 
 
-# Download and install samtools
+# Download and install reas
 rule reas_installation:
-    output: CONFIG["executables"]["reas"] + 'reas_all.pl'
+    output: 
+        reas = CONFIG["executables"]["reas"] + 'reas_all.pl',
+        dust = CONFIG["executables"]["reas"] + 'dust',
+        cross_match = CONFIG["executables"]["reas"] + 'cross_match'
     params : dir = strip_path_level(CONFIG['executables']['reas'],1)
     threads : 12
     shell:
+        "mkdir -p {params.dir};"
         "TEMPDIR=`mktemp -d`;"
         "cd $TEMPDIR;"
         "git clone " +CONFIG["executable_sources"]['reas_URL'] + " && "
@@ -33,54 +36,194 @@ rule reas_installation:
         "cd code && "
         "make -j {threads} && "
         "make install && "
-        "mv -v ../bin {params.dir} &&"
-        "touch {output} && "
+        "touch {output.reas} && "
+        "cd - && "
+        "cd dust && "
+        "make && make install && "
+        "touch {output.dust} && "
+        "cd - && "
+        "cd cross_match && "
+        "make manyreads && "
+        "mv -v cross_match{{,.manyreads}} ../bin && "
+        "touch {output.cross_match} && "
+        "mv -v ../bin/* {params.dir} &&"
         "cd / && rm -rf $TEMPDIR;"
 
+#rule reas:
+#    input:
+#        reads = CONFIG["reads"],
+#        REAS = rules.reas_installation.output,
+#        PATH = strip_path_level(CONFIG['executables']['reas'],1)
+#    output: "consensus.fa"
+#    message: """Run ReAS on unpaired data"""
+#    threads: 8
+#    params:
+#        options = CONFIG["reas"]["options"]
+#    shell:
+#        """
+#        if conda info --envs | grep '^reas'
+#        then
+#            echo "Conda environment exists"
+#        else
+#            conda create --use-index-cache --yes --name reas muscle blast;
+#        fi
+#        source activate reas
+#        export PATH=$PATH:{input.PATH}
+#        {input.REAS} {params.options} -pa {threads} -read {input.reads} -output {output}
+#        source deactivate;
+#        """
 
-FTP = FTPRemoteProvider()
-READS=os.path.basename(CONFIG["reads_URL"])
-FORWARD_READS=os.path.basename(CONFIG["reads_pe_URLS"]["1"])
-REVERSE_READS=os.path.basename(CONFIG["reads_pe_URLS"]["2"])
-
-ruleorder: download_pe_data > download_data
-
-rule download_data:
-    input: FTP.remote(CONFIG["reads_URL"], keep_local=True)
-    output : READS
-    shell : "mv {input} {output}"
-
-rule download_pe_data:
-    input: 
-        forward = FTP.remote(CONFIG["reads_pe_URLS"]["1"], keep_local=True),
-        reverse = FTP.remote(CONFIG["reads_pe_URLS"]["2"], keep_local=True)
-    output : 
-        FORWARD_READS=FORWARD_READS,
-        REVERSE_READS=REVERSE_READS
-    shell : 
-        "mv {input.forward} {output.FORWARD_READS};"
-        "mv {input.reverse} {output.REVERSE_READS};"
-
-rule reas:
+rule reas_clean_reads:
     input:
-        reads = "reads/{sample}/{library}/{replicate}/{name}.fastq.gz",
-    output: "TOPHAT/{sample}/{library}/{replicate}/{name}/accepted_hits.bam"
-    message: """Run Tophat on unpaired data"""
-    threads: 8
+        rules.reas_installation.output,
+        reads = CONFIG["reads"],
+        PATH = strip_path_level(CONFIG['executables']['reas'],1)
+    output: CONFIG["reas"]["options"]["clean_read_file"]
     params:
-        options = CONFIG["reas"]["options"]
+        seqsize = CONFIG["reas"]["options"]["seqsize"]
     shell:
         """
-        TEMPDIR=$(mktemp -d);
-        UUID=$(uuidgen);
-        if conda info --envs | grep '^reas'
-        then
-            echo "Conda environment exists"
-        else
-            conda create --use-index-cache --yes --name reas muscle blast;
-        fi
-        source activate reas
-        tophat2 --num-threads {threads} {params.options} --tmp-dir $TEMPDIR --output-dir TOPHAT/{wildcards.sample}/{wildcards.library}/{wildcards.replicate}/{wildcards.name} {input.reference} {input.reads} &&
-        rm -rf $TEMPDIR;
-        source deactivate;
+        export PATH=$PATH:{input.PATH}
+        cat {input.reads} | CleanData.pl -size={params.seqsize} | rename.pl > {output}
+        # remove output if empty, or touch if not
+        [ -s {output} ] && touch {output} || rm -f {output}
+        """
+
+rule reas_kmers:
+    input:
+        rules.reas_installation.output,
+        clean_read_file = rules.reas_clean_reads.output,
+        PATH = strip_path_level(CONFIG['executables']['reas'],1)
+    output: CONFIG["reas"]["options"]["nmers_file"]
+    params:
+        k = CONFIG["reas"]["options"]["k"],
+        d = CONFIG["reas"]["options"]["d"],
+        m = CONFIG["reas"]["options"]["m"]
+    shell:
+        """
+        export PATH=$PATH:{input.PATH}
+        kmer_num -k {params.k} {input.clean_read_file} | kmer2reads -d {params.d} {input.clean_read_file} | N_mers -m {params.m} > {output}
+        # remove output if empty, or touch if not
+        [ -s {output} ] && touch {output} || rm -f {output}
+        """
+
+rule reas_subsample:
+    input:
+        rules.reas_installation.output,
+        nmers_file = rules.reas_kmers.output,
+        PATH = strip_path_level(CONFIG['executables']['reas'],1)
+    output: CONFIG["reas"]["options"]["hd_read_id_file"]
+    params:
+        fraction = CONFIG["reas"]["options"]["fraction"]
+    shell:
+        """
+        export PATH=$PATH:{input.PATH}
+        cat {input.nmers_file} | cut -f1 | RandomList.pl {params.fraction} > {output}
+        # remove output if empty, or touch if not
+        [ -s {output} ] && touch {output} || rm -f {output}
+        """
+
+rule reas_picklist:
+    input:
+        rules.reas_installation.output,
+        clean_read_file = rules.reas_clean_reads.output,
+        hd_read_id_file = rules.reas_subsample.output,
+        PATH = strip_path_level(CONFIG['executables']['reas'],1)
+    output: CONFIG["reas"]["options"]["hd_read_file"]
+    shell:
+        """
+        export PATH=$PATH:{input.PATH}
+        cat {input.clean_read_file} | pickListSeq.pl {input.hd_read_id_file} > {output}
+        # remove output if empty, or touch if not
+        [ -s {output} ] && touch {output} || rm -f {output}
+        """
+
+rule reas_pairwise_alignment:
+    input:
+        rules.reas_installation.output,
+        hd_read_file = rules.reas_picklist.output,
+        PATH = strip_path_level(CONFIG['executables']['reas'],1)
+    output: CONFIG["reas"]["options"]["bound_file"]
+    params:
+        n = CONFIG["reas"]["options"]["n"],
+        pa = CONFIG["reas"]["options"]["pa"],
+        bound_file = CONFIG["reas"]["options"]["bound_file"],
+        size = CONFIG["reas"]["options"]["size"],
+        ident = CONFIG["reas"]["options"]["ident"],
+        d = CONFIG["reas"]["options"]["d"],
+        t = CONFIG["reas"]["options"]["t"]
+    threads: 8
+    shell:
+        """
+        export PATH=$PATH:{input.PATH}
+        run_HighDseg.pl -r {input.hd_read_file} -n {params.n} -a {threads} -b {output} -s {params.size} -i {params.ident} -d {params.d} -t {params.t}
+        # remove output if empty, or touch if not
+        [ -s {output} ] && touch {output} || rm -f {output}
+        """
+
+rule reas_cut_segments:
+    input:
+        rules.reas_installation.output,
+        hd_read_file = rules.reas_subsample.output,
+        bound_file = rules.reas_pairwise_alignment.output,
+        PATH = strip_path_level(CONFIG['executables']['reas'],1)
+    output: CONFIG["reas"]["options"]["seg_file"]
+    params:
+        n = CONFIG["reas"]["options"]["n"],
+        pa = CONFIG["reas"]["options"]["pa"],
+        bound_file = CONFIG["reas"]["options"]["bound_file"],
+        size = CONFIG["reas"]["options"]["size"],
+        ident = CONFIG["reas"]["options"]["ident"],
+        d = CONFIG["reas"]["options"]["d"]
+    shell:
+        """
+        export PATH=$PATH:{input.PATH}
+        cat {input.bound_file} | cutSeg.pl {input.hd_read_file} > {output}
+        # remove output if empty, or touch if not
+        [ -s {output} ] && touch {output} || rm -f {output}
+        """
+
+rule reas_segment_linkage:
+    input:
+        rules.reas_installation.output,
+        hd_read_file = rules.reas_subsample.output,
+        PATH = strip_path_level(CONFIG['executables']['reas'],1)
+    output: CONFIG["reas"]["options"]["link_file"]
+    params:
+        n = CONFIG["reas"]["options"]["n"],
+        pa = CONFIG["reas"]["options"]["pa"],
+        size = CONFIG["reas"]["options"]["size"],
+        ident = CONFIG["reas"]["options"]["ident"],
+        nonlcs = CONFIG["reas"]["options"]["nonlcs"]
+    shell:
+        """
+        export PATH=$PATH:{input.PATH}
+        run_SegLink.pl -r {input.hd_read_file} -n {params.n} -a {params.pa} {params.size} {params.ident} {params.nonlcs} -o {output}
+        # remove output if empty, or touch if not
+        [ -s {output} ] && touch {output} || rm -f {output}
+        """
+
+rule reas_repeat_assembly:
+    input:
+        rules.reas_installation.output,
+        seg_file = rules.reas_cut_segments.output,
+        link_file = rules.reas_segment_linkage.output,
+        bound_file = rules.reas_pairwise_alignment.output,
+        PATH = strip_path_level(CONFIG['executables']['reas'],1)
+    output: CONFIG["reas"]["options"]["output"]
+    params:
+        sub_multi = CONFIG["reas"]["options"]["sub_multi"],
+        d = CONFIG["reas"]["options"]["d"],
+        prefix = CONFIG["reas"]["options"]["prefix"],
+        log = CONFIG["reas"]["options"]["log"],
+        end = CONFIG["reas"]["options"]["end"],
+        min_depth = CONFIG["reas"]["options"]["min_depth"],
+        min_extend = CONFIG["reas"]["options"]["min_extend"],
+        max_extend = CONFIG["reas"]["options"]["max_extend"]
+    shell:
+        """
+        export PATH=$PATH:{input.PATH}
+        DoAssembly -r {input.seg_file} -l {input.link_file} {params.sub_multi} -b {input.bound_file} -d {params.d} -o {output} {params.prefix} {params.log} -e {params.end} {params.min_depth} {params.min_extend} {params.max_extend}
+        # remove output if empty, or touch if not
+        [ -s {output} ] && touch {output} || rm -f {output}
         """
