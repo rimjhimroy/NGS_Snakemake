@@ -40,6 +40,7 @@ To run a workflow, you will need:
 ### Example ###
 
 The repository was extracted in `/tmp/SnakeMakeVlpb` , with ```git clone https://git.wur.nl/warri004/SnakemakeVLPB.git /tmp/SnakeMakeVlpb```.
+Please note the capitol "M" in the target directory.
 
 To let Snakemake find our code, we need to add that directory to the `PYTHONPATH`:
 
