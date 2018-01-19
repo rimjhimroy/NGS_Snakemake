@@ -10,9 +10,9 @@ import io
 # Set PYTHONPATH before running Snakemake :
 # export PYTHONPATH=$PYTHONPATH:/home/lavri002/scratch/
 
-from SnakeMakeVlpb_reas import VLPB_LIB_PATH
-from SnakeMakeVlpb_reas.src.utils import CreateSymlinkReads
-from SnakeMakeVlpb_reas.src.utils.StripPathLevel import strip_path_level
+from SnakeMakeVlpb import VLPB_LIB_PATH
+from SnakeMakeVlpb.src.utils import CreateSymlinkReads
+from SnakeMakeVlpb.src.utils.StripPathLevel import strip_path_level
 
 
 ruleDir = VLPB_LIB_PATH + "rules/"
@@ -52,7 +52,7 @@ include: ruleDir + "/repeats/reas.rules"
 include: ruleDir + "/fastqProcessors/Sra.rules"
 include: ruleDir + "/fastqProcessors/Seqtk.rules"
 
-os.mkdir(strip_path_level(CONFIG['executables']['reas'],1))
+os.makedirs(strip_path_level(CONFIG['executables']['reas'],1), exist_ok=True)
 
 rule all:
     input:
