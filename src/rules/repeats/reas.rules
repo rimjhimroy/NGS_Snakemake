@@ -80,9 +80,12 @@ rule reas_clean_reads:
         PATH = strip_path_level(CONFIG['executables']['reas'],1)
     output: CONFIG["reas"]["options"]["clean_read_file"]
     params:
-        seqsize = CONFIG["reas"]["options"]["seqsize"]
+        seqsize = CONFIG["reas"]["options"]["seqsize"],
+        working_dir = CONFIG['base']['working_dir']
     shell:
         """
+        mkdir -p {params.working_dir}
+        cd {params.working_dir}
         export PATH=$PATH:{input.PATH}
         cat {input.reads} | CleanData.pl -size={params.seqsize} | rename.pl > {output}
         # remove output if empty, or touch if not
@@ -98,9 +101,12 @@ rule reas_kmers:
     params:
         k = CONFIG["reas"]["options"]["k"],
         d = CONFIG["reas"]["options"]["d"],
-        m = CONFIG["reas"]["options"]["m"]
+        m = CONFIG["reas"]["options"]["m"],
+        working_dir = CONFIG['base']['working_dir']
     shell:
         """
+        mkdir -p {params.working_dir}
+        cd {params.working_dir}
         export PATH=$PATH:{input.PATH}
         kmer_num -k {params.k} {input.clean_read_file} | kmer2reads -d {params.d} {input.clean_read_file} | N_mers -m {params.m} > {output}
         # remove output if empty, or touch if not
@@ -114,9 +120,12 @@ rule reas_subsample:
         PATH = strip_path_level(CONFIG['executables']['reas'],1)
     output: CONFIG["reas"]["options"]["hd_read_id_file"]
     params:
-        fraction = CONFIG["reas"]["options"]["fraction"]
+        fraction = CONFIG["reas"]["options"]["fraction"],
+        working_dir = CONFIG['base']['working_dir']
     shell:
         """
+        mkdir -p {params.working_dir}
+        cd {params.working_dir}
         export PATH=$PATH:{input.PATH}
         cat {input.nmers_file} | cut -f1 | RandomList.pl {params.fraction} > {output}
         # remove output if empty, or touch if not
@@ -130,8 +139,12 @@ rule reas_picklist:
         hd_read_id_file = rules.reas_subsample.output,
         PATH = strip_path_level(CONFIG['executables']['reas'],1)
     output: CONFIG["reas"]["options"]["hd_read_file"]
+    params:
+        working_dir = CONFIG['base']['working_dir']
     shell:
         """
+        mkdir -p {params.working_dir}
+        cd {params.working_dir}
         export PATH=$PATH:{input.PATH}
         cat {input.clean_read_file} | pickListSeq.pl {input.hd_read_id_file} > {output}
         # remove output if empty, or touch if not
@@ -151,10 +164,13 @@ rule reas_pairwise_alignment:
         size = CONFIG["reas"]["options"]["size"],
         ident = CONFIG["reas"]["options"]["ident"],
         d = CONFIG["reas"]["options"]["d"],
-        t = CONFIG["reas"]["options"]["t"]
+        t = CONFIG["reas"]["options"]["t"],
+        working_dir = CONFIG['base']['working_dir']
     threads: 8
     shell:
         """
+        mkdir -p {params.working_dir}
+        cd {params.working_dir}
         export PATH=$PATH:{input.PATH}
         run_HighDseg.pl -r {input.hd_read_file} -n {params.n} -a {threads} -b {output} -s {params.size} -i {params.ident} -d {params.d} -t {params.t}
         # remove output if empty, or touch if not
@@ -174,9 +190,12 @@ rule reas_cut_segments:
         bound_file = CONFIG["reas"]["options"]["bound_file"],
         size = CONFIG["reas"]["options"]["size"],
         ident = CONFIG["reas"]["options"]["ident"],
-        d = CONFIG["reas"]["options"]["d"]
+        d = CONFIG["reas"]["options"]["d"],
+        working_dir = CONFIG['base']['working_dir']
     shell:
         """
+        mkdir -p {params.working_dir}
+        cd {params.working_dir}
         export PATH=$PATH:{input.PATH}
         cat {input.bound_file} | cutSeg.pl {input.hd_read_file} > {output}
         # remove output if empty, or touch if not
@@ -194,9 +213,12 @@ rule reas_segment_linkage:
         pa = CONFIG["reas"]["options"]["pa"],
         size = CONFIG["reas"]["options"]["size"],
         ident = CONFIG["reas"]["options"]["ident"],
-        nonlcs = CONFIG["reas"]["options"]["nonlcs"]
+        nonlcs = CONFIG["reas"]["options"]["nonlcs"],
+        working_dir = CONFIG['base']['working_dir']
     shell:
         """
+        mkdir -p {params.working_dir}
+        cd {params.working_dir}
         export PATH=$PATH:{input.PATH}
         run_SegLink.pl -r {input.hd_read_file} -n {params.n} -a {params.pa} {params.size} {params.ident} {params.nonlcs} -o {output}
         # remove output if empty, or touch if not
@@ -219,9 +241,12 @@ rule reas_repeat_assembly:
         end = CONFIG["reas"]["options"]["end"],
         min_depth = CONFIG["reas"]["options"]["min_depth"],
         min_extend = CONFIG["reas"]["options"]["min_extend"],
-        max_extend = CONFIG["reas"]["options"]["max_extend"]
+        max_extend = CONFIG["reas"]["options"]["max_extend"],
+        working_dir = CONFIG['base']['working_dir']
     shell:
         """
+        mkdir -p {params.working_dir}
+        cd {params.working_dir}
         export PATH=$PATH:{input.PATH}
         DoAssembly -r {input.seg_file} -l {input.link_file} {params.sub_multi} -b {input.bound_file} -d {params.d} -o {output} {params.prefix} {params.log} -e {params.end} {params.min_depth} {params.min_extend} {params.max_extend}
         # remove output if empty, or touch if not
