@@ -9,7 +9,7 @@ rule install_perl:
         "wget --no-check-certificate -O - http://install.perlbrew.pl | bash && "
         "" + CONFIG["base"]["perl_brew"] + "/bin/perlbrew " + CONFIG["base"]["perl_brew_options"] + " install " + CONFIG["base"]["perl_version"] + " && "
         "ln -fs " + CONFIG["base"]["perl_brew"] + "perls/perl-" + CONFIG["base"]["perl_version"] + "/bin/perl" + CONFIG["base"]["perl_version"] + " " + CONFIG["base"]["perl_brew"] + "perls/perl-" + CONFIG["base"]["perl_version"] + "/bin/perl && "
-        "sed -i 's|export PERLBREW_BASHRC_VERSION|set +u\\nexport PERLBREW_BASHRC_VERSION|' " + CONFIG["base"]["perl_brew"] + "etc/bashrc && "
+        "sed -i '1s|^|set +u \\\n|' " + CONFIG["base"]["perl_brew"] + "etc/bashrc && "
         "source " + CONFIG["base"]["perl_brew"] + "etc/bashrc && "
         "perlbrew switch " + CONFIG["base"]["perl_version"] + " && "
         "cat " + CONFIG["base"]["perl_brew"] + "etc/bashrc >> {rules.bashrc.output} && "
@@ -71,6 +71,7 @@ rule blast_plus_installation:
     output: CONFIG["executables"]["blastn"]
     params: dir = strip_path_level(CONFIG["executables"]["blastn"],2)
     shell:
+        "mkdir -p " + CONFIG["base"]["download_dir"]+ " && "
         "TEMPDIR=`mktemp -p " + CONFIG["base"]["download_dir"] + " -d` && "
         "cd $TEMPDIR && "
         "wget"+CONFIG['executable_sources']['wget_options']+CONFIG['executable_sources']['blast+_URL']+" && "
@@ -85,6 +86,7 @@ rule rmblast_installation:
     output: CONFIG["executables"]["rmblast"]
     params: dir = strip_path_level(CONFIG["executables"]["rmblast"],2)
     shell:
+        "mkdir -p " + CONFIG["base"]["download_dir"]+ " && "
         "TEMPDIR=`mktemp -p " + CONFIG["base"]["download_dir"] + " -d` && "
         "cd $TEMPDIR;"
         "wget"+CONFIG['executable_sources']['wget_options']+CONFIG['executable_sources']['rmblast_URL']+" && "
@@ -98,6 +100,7 @@ rule rmblast_installation:
 rule recon_installation:
     output: CONFIG["executables"]["recon"]
     shell:
+        "mkdir -p " + CONFIG["base"]["download_dir"]+ " && "
         "TEMPDIR=`mktemp -p " + CONFIG["base"]["download_dir"] + " -d` && "
         "cd $TEMPDIR && "
         "wget"+CONFIG['executable_sources']['wget_options']+CONFIG['executable_sources']['recon_URL']+" && "
@@ -111,6 +114,7 @@ rule recon_installation:
 rule repeatscout_installation:
     output: CONFIG["executables"]["repeatscout"]
     shell:
+        "mkdir -p " + CONFIG["base"]["download_dir"]+ " && "
         "TEMPDIR=`mktemp -p " + CONFIG["base"]["download_dir"] + " -d` && "
         "cd $TEMPDIR && "
         "wget"+CONFIG['executable_sources']['wget_options']+CONFIG['executable_sources']['repeatscout_URL']+" && "
@@ -131,6 +135,7 @@ rule repeatmasker_installation:
     output: CONFIG["executables"]["RepeatMasker"]
     params: dir = strip_path_level(CONFIG["executables"]["RepeatMasker"],1), RMBLAST = strip_path_level(CONFIG["executables"]["rmblast"],1)
     shell:
+        "mkdir -p " + CONFIG["base"]["download_dir"]+ " && "
         "TEMPDIR=`mktemp -p " + CONFIG["base"]["download_dir"] + " -d` && "
         "cd $TEMPDIR && "
         "wget"+CONFIG['executable_sources']['wget_options']+CONFIG['executable_sources']['repeatmasker_URL']+" && "
@@ -163,6 +168,7 @@ rule repeatmodeler_installation:
         RECON = strip_path_level(CONFIG["executables"]["recon"],1),
         SCOUT = strip_path_level(CONFIG["executables"]["repeatscout"],1)
     shell:
+        "mkdir -p " + CONFIG["base"]["download_dir"]+ " && "
         "TEMPDIR=`mktemp -p " + CONFIG["base"]["download_dir"] + " -d` && "
         "cd $TEMPDIR && "
         "wget"+CONFIG['executable_sources']['wget_options']+CONFIG['executable_sources']['repeatmodeler_URL']+" && "
@@ -188,6 +194,7 @@ rule repeatmodeler:
         MODEL = rules.repeatmodeler_installation.output
     output: CONFIG["base"]["rmlib"]
     shell:
+        "mkdir -p " + CONFIG["base"]["download_dir"]+ " && "
         "TEMPDIR=`mktemp -p " + CONFIG["base"]["download_dir"] + " -d` && "
         "cd $TEMPDIR && rm -f {output} && touch {output} && "
         "{input.MODEL}/BuildDatabase -name repeat_db -engine ncbi " + CONFIG["base"]["genome"]  + " && "

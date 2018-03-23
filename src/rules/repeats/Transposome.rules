@@ -13,21 +13,24 @@ rule install_transposome:
         PERL=rules.install_perl.output
     output: ""  + CONFIG["executables"]["transposome"] + "/bin/transposome"
     shell:
+        "mkdir -p " + CONFIG["base"]["download_dir"]+ " && "
         "TEMPDIR=`mktemp -p " + CONFIG["base"]["download_dir"] + " -d` && "
         "cd $TEMPDIR && "
-        "wget https://github.com/sestaton/Transposome/archive/v0.09.7.tar.gz && "
-        "tar xzf v0.09.7.tar.gz && cd Transposome-* && "
+        "wget"+CONFIG['executable_sources']['wget_options']+CONFIG['executable_sources']['transposome_URL']+" && "
+        "tar xzf *.tar.gz && cd Transposome-* && "
         "curl -L cpanmin.us | {input.PERL} - --installdeps . && {input.PERL} Makefile.PL && make && make install && "
-        "mv -f * " + CONFIG["executables"]["transposome"] + " && cd .. && rm -rf Transposome* "
+        "mv -f * " + CONFIG["executables"]["transposome"] + " && cd && rm -rf $TEMPDIR "
 
 rule transposome:
     input: 
-        rules.install_transposome.output
+        rules.install_transposome.output,
+        PERL=rules.install_perl.output
     params : configured = read_yml(CONFIG, "config.yml")
     output: "" + CONFIG["base"]["output"] + "/config.yml"
+    threads: 8
     shell:
         "source {rules.bashrc.output} && "
         "mkdir -p "+ CONFIG["base"]["output"] + " && "
         'echo "{params.configured}" > ' + CONFIG["base"]["output"] + "/config.yml && "
-        "{rules.install_transposome.output} --config "+ CONFIG["base"]["output"] + "/config.yml"
+        "{input.PERL} {rules.install_transposome.output} --config "+ CONFIG["base"]["output"] + "/config.yml"
     
