@@ -27,7 +27,7 @@ rule transposome:
         PERL=rules.install_perl.output
     params : configured = read_yml(CONFIG, "config.yml")
     output: "" + CONFIG["base"]["output"] + "/config.yml"
-    threads: 8
+    threads: 100
     shell:
         "source {rules.bashrc.output} && "
         "mkdir -p "+ CONFIG["base"]["output"] + " && "
