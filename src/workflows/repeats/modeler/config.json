@@ -39,7 +39,6 @@
 	{
 		"perl" : "{home_dir}perl5/perlbrew/perls/perl-5.26.0/bin/perl",
 		"cpanm" : "{home_dir}perl5/perlbrew/bin/cpanm",
-	
 		"rmblast": "{base_dir}{executables}rmblast/bin/rmblastn",
 		"makeblastdb": "{base_dir}{executables}blast_plus/bin/makeblastdb",
 		"blastn": "{base_dir}{executables}blast_plus/bin/blastn",

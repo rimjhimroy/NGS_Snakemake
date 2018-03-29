@@ -129,6 +129,7 @@ rule repeatscout_installation:
 # Download and install Repeatmasker
 rule repeatmasker_installation:
     input:
+        rules.install_perl_libs.output,
         RMBLAST=rules.rmblast_installation.output,
         TRF=rules.trf_installation.output,
         BLAST=rules.blast_plus_installation.output
@@ -156,7 +157,8 @@ rule repeatmasker_installation:
         "touch {output}"
 
 rule repeatmodeler_installation:
-    input: rules.install_perl_libs.output,
+    input: 
+        rules.install_perl_libs.output,
         SCOUT = rules.repeatscout_installation.output,
         TRF = rules.trf_installation.output,
         RECON = rules.recon_installation.output,
@@ -206,8 +208,9 @@ rule repeatmodeler:
 rule repeatmasker:
     input:
         MASKER = rules.repeatmasker_installation.output,
+        PERL=rules.install_perl.output
     output: "" + CONFIG["base"]["output"] + "/snakemake.done"
     shell:
         "rm -f {output} && touch {output} && "
-        "{input.MASKER} -dir " + CONFIG["base"]["output"] + " -lib " + CONFIG["base"]["rmlib"] + " -engine ncbi -pa " +CONFIG["base"]["cpus"]+ " " +CONFIG["base"]["cl_options"] + " " + CONFIG["base"]["genome"]
+        "{input.PERL} {input.MASKER} -dir " + CONFIG["base"]["output"] + " -lib " + CONFIG["base"]["rmlib"] + " -engine ncbi -pa " +CONFIG["base"]["cpus"]+ " " +CONFIG["base"]["cl_options"] + " " + CONFIG["base"]["genome"]
 

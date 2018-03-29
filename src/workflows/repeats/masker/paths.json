@@ -1,6 +1,7 @@
 {
-	"base_dir": "/home/snakemake/data/",
+	"base_dir": "/tmp/VLPB/masker/",
 	"executables": "bin/repeats/",
 	"databases":"databases/",
-	"download_dir":"/home/snakemake/data/tmp/"
+	"home_dir":"/home/haars001/",
+	"download_dir":"/tmp/VLPB/masker/tmp/"
 }
