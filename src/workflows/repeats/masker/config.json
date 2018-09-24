@@ -7,7 +7,7 @@
 		"rmlib" : "{base_dir}{databases}repeat_db.fasta",
 		"cpus": "8",
 		"output": "{base_dir}repeatmasker_out",
-		"cl_options": " -gff -html "
+	    "cl_options": " -gff -html "
 	},
 	"executables":
 	{
@@ -21,7 +21,7 @@
 		"repeatscout": "{base_dir}{executables}repeatscout/",
 		"repeatmodeler": "{base_dir}{executables}repeatmodeler/",
 		"trf": "{base_dir}{executables}trf/trf",
-		"recon" : "{base_dir}{executables}recon/bin"
+	    "recon" : "{base_dir}{executables}recon/bin"
 	},
 
 	"executable_sources":
