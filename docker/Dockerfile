@@ -3,9 +3,7 @@ FROM ubuntu:latest
 MAINTAINER Sven Warris (sven.warris@wur.nl)
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3 python3-dev python3-pip python3-setuptools git wget build-essential
-
-#RUN wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh; bash Miniconda3-latest-Linux-x86_64.sh -b; rm Miniconda3-latest-Linux-x86_64.sh
+    python3 python3-dev python3-pip python3-setuptools git wget build-essential ssh
 
 RUN pip3 install setuptools wheel
 RUN pip3 install snakemake
@@ -23,6 +21,7 @@ RUN apt-get update && apt-get install -y git python python-setuptools sudo wget 
 #
 # CREATE USER
 #
+ARG USER_UID=1001
 
 RUN echo USER_UID $USER_UID; \
     useradd --uid $USER_UID --create-home --shell /bin/bash snakemake && \
@@ -34,8 +33,9 @@ ADD id_rsa     /home/snakemake/.ssh/
 ADD id_rsa.pub /home/snakemake/.ssh/
 
 RUN chmod 750 /home/snakemake/.ssh && \
-    chown -R snakemake:snakemake /home/snakemake/.ssh/ && \
-    echo "    IdentityFile ~/.ssh/id_rsa" >> /etc/ssh/ssh_config
+    chown -R snakemake:snakemake /home/snakemake/.ssh/ 
+#&& \
+#    echo "    IdentityFile ~/.ssh/id_rsa" >> /etc/ssh/ssh_config
 
 
 
@@ -53,12 +53,16 @@ WORKDIR /home/snakemake
 # INSTALL CONDA
 #
 
-RUN wget https://repo.continuum.io/archive/$CONDA_VER -O /tmp/$CONDA_VER && \
-    chmod +x /tmp/$CONDA_VER && \
-    /tmp/$CONDA_VER -b && \
-    rm /tmp/$CONDA_VER
+#RUN wget https://repo.continuum.io/archive/$CONDA_VER -O /tmp/$CONDA_VER && \
+#    chmod +x /tmp/$CONDA_VER && \
+#    /tmp/$CONDA_VER -b && \
+#    rm /tmp/$CONDA_VER
+RUN wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh && \
+	bash Miniconda3-latest-Linux-x86_64.sh -b 
+	#&& \
+	#rm Miniconda3-latest-Linux-x86_64.sh
 
-ENV PATH="/home/snakemake/bin:/home/snakemake/.local/bin:/home/snakemake/anaconda3/bin:$PATH"
+ENV PATH="/home/snakemake/bin:/home/snakemake/.local/bin:/home/snakemake/miniconda3/bin:$PATH"
 
 RUN conda config --add channels conda-forge && \
     conda config --add channels defaults    && \
