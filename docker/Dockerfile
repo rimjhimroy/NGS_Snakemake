@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 FROM ubuntu:latest
 
 MAINTAINER Sven Warris (sven.warris@wur.nl)
@@ -6,22 +5,10 @@ MAINTAINER Sven Warris (sven.warris@wur.nl)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 python3-dev python3-pip python3-setuptools git wget build-essential
 
-RUN wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh; bash Miniconda3-latest-Linux-x86_64.sh -b; rm Miniconda3-latest-Linux-x86_64.sh
+#RUN wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh; bash Miniconda3-latest-Linux-x86_64.sh -b; rm Miniconda3-latest-Linux-x86_64.sh
 
 RUN pip3 install setuptools wheel
 RUN pip3 install snakemake
-
-=======
-FROM ubuntu:16.04
-
-#
-# ARGUMENTS
-#
-
-ARG USER_UID=1001
-
-ARG CONDA_VER=Anaconda3-4.3.0-Linux-x86_64.sh
-
 
 #
 # SYSTEM REQS
@@ -80,17 +67,6 @@ RUN conda config --add channels conda-forge && \
     conda create --name snakemake -y python=3 snakemake biopython
 
 
-
-#
-# INSTALL SNAKEMAKE
-#
-
-RUN mkdir -p  /home/snakemake/.ssh                     && \
-    chmod 750 /home/snakemake/.ssh                     && \
-    touch     /home/snakemake/.ssh/known_hosts         && \
-    chmod 600 /home/snakemake/.ssh/*                   && \
-    chown -R snakemake:snakemake /home/snakemake/.ssh/
-
 RUN echo -e "Host git.wur.nl\n\tStrictHostKeyChecking no\n" >> /home/snakemake/.ssh/config && \
     ssh-keyscan -t rsa -H github.com >> /home/snakemake/.ssh/known_hosts && \
     ssh-keyscan -t rsa -H git.wur.nl >> /home/snakemake/.ssh/known_hosts && \
@@ -103,8 +79,6 @@ ENV PYTHONPATH=$PYTHONPATH:/home/snakemake/SnakemakeVLPB
 
 ADD runSnakemake /home/snakemake/bin/
 
-
-
 #
 # RUN
 #
@@ -114,4 +88,4 @@ WORKDIR /home/snakemake/data
 #CMD source activate snakemake && snakemake --directory /home/snakemake/data --snakefile /home/snakemake/SnakemakeVLPB/src/workflows/variantCalling/freebayes/Snakefile
 
 ENTRYPOINT ["/home/snakemake/bin/runSnakemake"]
->>>>>>> branch 'master' of ssh://git@git.wur.nl:22/warri004/SnakemakeVLPB.git
+
