@@ -1,11 +1,35 @@
 # Workflows in Snakemake for VLPB #
 
-
 In this project, a couple of workflows have been made, the main ones are:
 
 * Genome assembly
 * Variant calling
 * Genome annotation
+
+
+## Docker ##
+The preferable method to run these pipelines is through Docker (https://www.docker.com/).
+
+To run with docker:
+
+- Follow the installation instructions for docker in https://www.docker.com/products/overview.
+
+- create a data folder and a data/tmp folder.
+
+- In this repository, copy the config files from one of our workflows and add it to the 
+  data folder, modifying them accordingly.
+
+    You can find the available workflows in: ```src/workflows```
+
+    The ```paths.json``` should work without change while the other config files might need adaptation.
+
+- inside the data folder, run docker with the name of the workflow choose. e.g.: for annotation/braker
+
+     ```docker run -it --rm -v $PWD:/home/snakemake/data/ sauloal/snakemake annotation/braker```
+
+
+
+## Local installation ##
 
 To run a workflow, you will need:
 
@@ -13,9 +37,10 @@ To run a workflow, you will need:
 * Snakemake
 * Biopython
 
-## Example ##
+### Example ###
 
 The repository was extracted in `/tmp/SnakeMakeVlpb` , with ```git clone https://git.wur.nl/warri004/SnakemakeVLPB.git /tmp/SnakeMakeVlpb```.
+Please note the capitol "M" in the target directory.
 
 To let Snakemake find our code, we need to add that directory to the `PYTHONPATH`:
 

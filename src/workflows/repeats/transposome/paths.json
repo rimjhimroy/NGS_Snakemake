@@ -1,7 +1,7 @@
 {
-	"base_dir": "/tmp/",
-	"working_dir": "/tmp/repeats/",
+	"base_dir": "/tmp/VLPB/transposome/",
+	"working_dir": "/mnt/scratch2/haars001/tmp/VLPB/transposome/",
 	"executables": "bin/repeats/",
-	"home_dir":"/home/vlpb/",
-	"download_dir":"/tmp/"
+	"home_dir":"/home/haars001/",
+	"download_dir":"/tmp/VLPB/transposome/tmp/"
 }

@@ -1,5 +1,5 @@
 """
-Run the maker annotation pipeline
+Run the tophat/stringtie/cufflinks pipeline
 """
 
 import json, os, inspect

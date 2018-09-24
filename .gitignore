@@ -60,3 +60,8 @@ coverage.xml
 # Sphinx documentation
 docs/_build/
 
+# Others
+*.swp
+
+#Visual Studio Code
+.vscode

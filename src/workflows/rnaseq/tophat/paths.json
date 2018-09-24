@@ -1,6 +1,6 @@
 {
-	"base_dir": "/tmp/",
+	"base_dir": "/home/snakemake/data/",
 	"executables": "bin/tophat_helpers/",
-	"home_dir":"/home/haars001/",
-	"download_dir":"/tmp/"
+	"home_dir":"/home/snakemake/",
+	"download_dir":"/home/snakemake/data/tmp/"
 }
