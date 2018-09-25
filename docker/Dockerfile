@@ -3,7 +3,7 @@ FROM ubuntu:latest
 MAINTAINER Sven Warris (sven.warris@wur.nl)
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3 python3-dev python3-pip python3-setuptools git wget build-essential ssh less
+    python3 python3-dev python3-pip python3-setuptools git wget build-essential ssh less emacs
 
 RUN pip3 install setuptools wheel
 RUN pip3 install snakemake
@@ -74,12 +74,13 @@ RUN conda config --add channels conda-forge && \
 RUN echo -e "Host git.wur.nl\n\tStrictHostKeyChecking no\n" >> /home/snakemake/.ssh/config && \
     ssh-keyscan -t rsa -H github.com >> /home/snakemake/.ssh/known_hosts && \
     ssh-keyscan -t rsa -H git.wur.nl >> /home/snakemake/.ssh/known_hosts && \
-    git clone git@git.wur.nl:warri004/SnakemakeVLPB.git
+    git clone git@git.wur.nl:warri004/SnakemakeVLPB.git && \
+    ln -s SnakemakeVLPB SnakeMakeVlpb
     
 RUN mkdir /home/snakemake/data && \
     mkdir /home/snakemake/bin
 
-ENV PYTHONPATH=$PYTHONPATH:/home/snakemake/SnakemakeVLPB
+ENV PYTHONPATH=$PYTHONPATH:/home/snakemake/SnakeMakeVlpb
 
 ADD runSnakemake /home/snakemake/bin/
 
