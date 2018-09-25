@@ -3,7 +3,7 @@ FROM ubuntu:latest
 MAINTAINER Sven Warris (sven.warris@wur.nl)
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3 python3-dev python3-pip python3-setuptools git wget build-essential ssh
+    python3 python3-dev python3-pip python3-setuptools git wget build-essential ssh less
 
 RUN pip3 install setuptools wheel
 RUN pip3 install snakemake
@@ -91,5 +91,5 @@ WORKDIR /home/snakemake/data
 
 #CMD source activate snakemake && snakemake --directory /home/snakemake/data --snakefile /home/snakemake/SnakemakeVLPB/src/workflows/variantCalling/freebayes/Snakefile
 
-ENTRYPOINT ["/home/snakemake/bin/runSnakemake"]
+#ENTRYPOINT ["/home/snakemake/bin/runSnakemake"]
 

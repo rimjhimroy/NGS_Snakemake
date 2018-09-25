@@ -10,4 +10,3 @@ fi
 
 docker build --rm -t ${DOMAIN}/snakemake .
 
-touch ok

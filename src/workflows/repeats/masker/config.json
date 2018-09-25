@@ -7,9 +7,6 @@
 		"rmlib" : "{base_dir}{databases}repeat_db.fasta",
 		"cpus": "8",
 		"output": "{base_dir}repeatmasker_out",
-<<<<<<< HEAD
-	    "cl_options": " -gff -html "
-=======
 		"cl_options": " -gff -html ",
 		"perl_brew" : "{home_dir}perl5/perlbrew/",
 		"perl_install": "{home_dir}perl5/perlbrew/perls/perl-5.26.0/",
@@ -36,7 +33,6 @@
 		"Parallel::ForkManager", 
 		"Text::Soundex"
 		]
->>>>>>> branch 'master' of ssh://git@git.wur.nl:22/warri004/SnakemakeVLPB.git
 	},
 	"executables":
 	{
