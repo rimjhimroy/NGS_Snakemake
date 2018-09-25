@@ -90,7 +90,4 @@ ADD runSnakemake /home/snakemake/bin/
 
 WORKDIR /home/snakemake/data
 
-#CMD source activate snakemake && snakemake --directory /home/snakemake/data --snakefile /home/snakemake/SnakemakeVLPB/src/workflows/variantCalling/freebayes/Snakefile
-
-#ENTRYPOINT ["/home/snakemake/bin/runSnakemake"]
 
