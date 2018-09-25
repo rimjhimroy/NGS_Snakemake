@@ -8,5 +8,4 @@ echo "WORKFLOW PATH       : ${WORKFLOW_PATH}"
 echo "REMAINING PARAMETERS: ${REST}"
 echo
 
-#source activate snakemake && snakemake --directory /home/snakemake/data --snakefile /home/snakemake/SnakemakeVLPB/src/workflows/variantCalling/freebayes/Snakefile
-source activate snakemake && export PYTHONPATH=$PYTHONPATH:/home/snakemake/ && snakemake --directory /home/snakemake/data --snakefile /home/snakemake/SnakemakeVLPB/src/workflows/${WORKFLOW_PATH}/Snakefile ${REST}
+source activate snakemake && export PYTHONPATH=$PYTHONPATH:/home/snakemake/ && snakemake --directory /home/snakemake/SnakeMakeVlpb/src/workflows/${WORKFLOW_PATH}/ --snakefile /home/snakemake/SnakeMakeVlbp/src/workflows/${WORKFLOW_PATH}/Snakefile ${REST}
