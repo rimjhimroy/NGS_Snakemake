@@ -3,8 +3,8 @@
 	{
 		"bashrc": "{base_dir}{executables}bashrc",
 		"download_dir":"{download_dir}",
-		"genome": "{base_dir}e.coli.fna",
-		"rmlib" : "{base_dir}{databases}repeat_db.fasta",
+		"genome": "{base_dir}data/GCF_000001735.4_TAIR10.1_genomic.fna",
+		"rmlib" : "{base_dir}data/databases/mipsREdat_9.3p_ALL.fasta",
 		"cpus": "8",
 		"output": "{base_dir}repeatmasker_out",
 		"cl_options": " -gff -html ",

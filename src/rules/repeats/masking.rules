@@ -211,6 +211,8 @@ rule repeatmasker:
         PERL=rules.install_perl.output
     output: "" + CONFIG["base"]["output"] + "/snakemake.done"
     shell:
-        "rm -f {output} && touch {output} && "
-        "{input.PERL} {input.MASKER} -dir " + CONFIG["base"]["output"] + " -lib " + CONFIG["base"]["rmlib"] + " -engine ncbi -pa " +CONFIG["base"]["cpus"]+ " " +CONFIG["base"]["cl_options"] + " " + CONFIG["base"]["genome"]
+        "rm -f {output} && "
+        "{input.PERL} {input.MASKER} -dir " + CONFIG["base"]["output"] + " -lib " + CONFIG["base"]["rmlib"] + " -engine ncbi -pa " +CONFIG["base"]["cpus"]+ " " +CONFIG["base"]["cl_options"] + " " + CONFIG["base"]["genome"] + " && "
+        "touch {output}" 
+        
 

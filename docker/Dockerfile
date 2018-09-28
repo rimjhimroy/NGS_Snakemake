@@ -3,7 +3,7 @@ FROM ubuntu:latest
 MAINTAINER Sven Warris (sven.warris@wur.nl)
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3 python3-dev python3-pip python3-setuptools git wget build-essential ssh less emacs
+    python3 python3-dev python3-pip python3-setuptools git wget build-essential ssh less emacs libidn2-0
 
 RUN pip3 install setuptools wheel
 RUN pip3 install snakemake
@@ -16,7 +16,13 @@ RUN apt-get update && apt-get install -y git python python-setuptools sudo wget 
     apt-get clean all && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-
+RUN /usr/bin/wget ftp://alpha.gnu.org/pub/gnu/libidn/libidn-1.9.tar.gz && \
+	tar zxvf libidn-1.9.tar.gz && \
+	cd libidn-1.9 && \
+	./configure --prefix=/usr/ && \
+	make install && \
+	cd .. && \
+	rm -rf libidn-1.9* 
 
 #
 # CREATE USER
@@ -90,4 +96,16 @@ ADD runSnakemake /home/snakemake/bin/
 
 WORKDIR /home/snakemake/data
 
+# Download test data
+RUN cd /home/snakemake/data && \
+	/usr/bin/wget ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/735/GCF_000001735.4_TAIR10.1/GCF_000001735.4_TAIR10.1_genomic.fna.gz && \
+	gunzip GCF_000001735.4_TAIR10.1_genomic.fna.gz
+	
+RUN mkdir /home/snakemake/data/databases && \
+	cd /home/snakemake/data/databases && \
+	/usr/bin/wget ftp://ftpmips.helmholtz-muenchen.de/plants/REdat/mipsREdat_9.3p_ALL.fasta.gz && \
+	gunzip mipsREdat_9.3p_ALL.fasta.gz
+
+
+	
 
