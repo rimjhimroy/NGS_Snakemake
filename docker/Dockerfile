@@ -94,8 +94,6 @@ ADD runSnakemake /home/snakemake/bin/
 # RUN
 #
 
-WORKDIR /home/snakemake/data
-
 # Download test data
 RUN cd /home/snakemake/data && \
 	/usr/bin/wget ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/001/735/GCF_000001735.4_TAIR10.1/GCF_000001735.4_TAIR10.1_genomic.fna.gz && \
@@ -106,6 +104,7 @@ RUN mkdir /home/snakemake/data/databases && \
 	/usr/bin/wget ftp://ftpmips.helmholtz-muenchen.de/plants/REdat/mipsREdat_9.3p_ALL.fasta.gz && \
 	gunzip mipsREdat_9.3p_ALL.fasta.gz
 
+WORKDIR /home/snakemake/data
 
 	
 
