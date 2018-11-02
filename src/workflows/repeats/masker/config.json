@@ -15,6 +15,7 @@
 		"perl_brew_options" : "-j 6 --notest --noman --thread --force ",
 		"perl_libs":
 		["Scalar::Util",
+			"Text/Soundex.pm",
 		"Bio::SeqIO",
 		"Pod::Usage",
 		"File::Basename",
