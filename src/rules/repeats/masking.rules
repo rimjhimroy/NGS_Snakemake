@@ -112,7 +112,7 @@ rule recon_installation:
         "cp -R ../bin/* {output} && cd / && rm -rf $TEMPDIR && touch {output}"
     
 rule repeatscout_installation:
-    output: CONFIG["executables"]["repeatscout"]
+    output: directory(CONFIG["executables"]["repeatscout"])
     shell:
         "mkdir -p " + CONFIG["base"]["download_dir"]+ " && "
         "TEMPDIR=`mktemp -p " + CONFIG["base"]["download_dir"] + " -d` && "
