@@ -25,8 +25,8 @@
             "EP57": {
                 "readsets": {
                     "1": [
-                        "/media/sven/extData/sven/VLPB/raw_reads/ST_sample001_1.fastq", 
-                        "/media/sven/extData/sven/VLPB/raw_reads/ST_sample001_2.fastq"
+                        "/home/snakemake/data/Pleurotus_ostreatus/SRR6384728_1.fastq", 
+                        "/home/snakemake/data/Pleurotus_ostreatus/SRR6384728_1.fastq"
                         ]	
                     },
                 "type": "pe",
