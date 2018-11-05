@@ -1,7 +1,7 @@
 {
-	"base_dir": "/tmp/VLPB/modeler",
+	"base_dir": "/home/snakemake/",
 	"executables": "bin/repeats/",
 	"databases":"databases/",
-	"home_dir":"/home/haars001/",
-	"download_dir":"/tmp/VLPB/modeler/tmp/"
+	"home_dir":"/home/snakemake/",
+	"download_dir":"/tmp/"
 }
