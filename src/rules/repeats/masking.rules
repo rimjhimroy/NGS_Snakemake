@@ -164,7 +164,7 @@ rule repeatmodeler_installation:
         RECON = rules.recon_installation.output,
         RM = rules.rmblast_installation.output,
         REPEAT = rules.repeatmasker_installation.output
-    output: CONFIG["executables"]["repeatmodeler"]
+    output: directory(CONFIG["executables"]["repeatmodeler"])
     params: REPEAT = strip_path_level(CONFIG["executables"]["RepeatMasker"],1), 
         RM = strip_path_level(CONFIG["executables"]["rmblast"],1),
         RECON = strip_path_level(CONFIG["executables"]["recon"],1),
