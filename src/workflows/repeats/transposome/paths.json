@@ -4,5 +4,5 @@
 	"databases":"databases/",
 	"home_dir":"/home/snakemake/",
 	"download_dir":"/tmp/",
-	"working_dir":"/home/snakemake/data/transposome"
+	"working_dir":"/home/snakemake/data/transposome/repeats"
 }

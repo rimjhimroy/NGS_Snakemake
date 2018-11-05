@@ -1,8 +1,8 @@
 {
 	"base":
 	{
-		"fasta": "/tmp/fasta.fa",
-		"output": "/tmp/consensus.fa",
+		"fasta": "{base_dir}data/databases/mipsREdat_9.3p_ALL.fasta",
+		"output": "{base_dir}data/databases/usearch",
 		"working_dir": "{base_dir}temp_repeats",
 		"download_dir": "{download_dir}",
         "executables": "{base_dir}{executables}"
