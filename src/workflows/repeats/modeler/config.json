@@ -62,7 +62,7 @@
 		"repeatmasker_URL": "http://www.repeatmasker.org/RepeatMasker-open-4-0-6.tar.gz",
  		"recon_URL": "http://www.repeatmasker.org/RepeatModeler/RECON-1.08.tar.gz",
 		"repeatscout_URL": "http://bix.ucsd.edu/repeatscout/RepeatScout-1.0.5.tar.gz",
-		"repeatmodeler_URL": "http://www.repeatmasker.org/RepeatModeler-open-1-0-10.tar.gz"
+		"repeatmodeler_URL": "http://www.repeatmasker.org/RepeatModeler/RepeatModeler-open-1.0.11.tar.gz"
 	}
 
 }
