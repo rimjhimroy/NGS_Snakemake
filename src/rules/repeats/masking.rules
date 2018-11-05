@@ -98,7 +98,7 @@ rule rmblast_installation:
         "touch {output};"
 
 rule recon_installation:
-    output: CONFIG["executables"]["recon"]
+    output: directory(CONFIG["executables"]["recon"])
     shell:
         "mkdir -p " + CONFIG["base"]["download_dir"]+ " && "
         "TEMPDIR=`mktemp -p " + CONFIG["base"]["download_dir"] + " -d` && "
