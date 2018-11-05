@@ -1,7 +1,7 @@
 {
 	"base":
 	{
-		"seq_file": "/home/warri004/scratch/annotation/repeat/DRR040059_1.fastq",
+		"seq_file": "/home/snakemake/data/Pleurotus_ostreatus/SRR6384728_1.fastq",
 		"format": "fastq",
 		"output": "{working_dir}transposome_output",
 		"cpus":"8",

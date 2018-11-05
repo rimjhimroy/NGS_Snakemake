@@ -1,7 +1,8 @@
 {
-	"base_dir": "/tmp/VLPB/transposome/",
-	"working_dir": "/mnt/scratch2/haars001/tmp/VLPB/transposome/",
+	"base_dir": "/home/snakemake/",
 	"executables": "bin/repeats/",
-	"home_dir":"/home/haars001/",
-	"download_dir":"/tmp/VLPB/transposome/tmp/"
+	"databases":"databases/",
+	"home_dir":"/home/snakemake/",
+	"download_dir":"/tmp/",
+	"working_dir":"/home/snakemake/data/transposome"
 }
