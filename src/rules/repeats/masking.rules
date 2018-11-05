@@ -174,7 +174,7 @@ rule repeatmodeler_installation:
         "TEMPDIR=`mktemp -p " + CONFIG["base"]["download_dir"] + " -d` && "
         "cd $TEMPDIR && "
         "wget"+CONFIG['executable_sources']['wget_options']+CONFIG['executable_sources']['repeatmodeler_URL']+" && "
-        "tar zxf RepeatModeler*.tar.gz && "
+        "tar zxf RepeatModeler*.tar.gz && mv RepeatModeler-open-1.0.11 RepeatModeler && "
         "cd RepeatModeler && "
         "grep -l -r '#!/u1' * | xargs -I '%' sed -i 's|/u1/local/bin/perl|/usr/bin/env perl|' % && "
         "grep -l -r '#!/usr/local/bin/perl' * | xargs -I '%' sed -i 's|/usr/local/bin/perl|/usr/bin/env perl|' % && "
