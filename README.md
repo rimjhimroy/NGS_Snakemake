@@ -5,6 +5,7 @@ In this project, a couple of workflows have been made, the main ones are:
 * Genome assembly
 * Variant calling
 * Genome annotation
+* Repeat detection and masking
 
 
 ## Docker ##
@@ -13,19 +14,13 @@ The preferable method to run these pipelines is through Docker (https://www.dock
 To run with docker:
 
 - Follow the installation instructions for docker in https://www.docker.com/products/overview.
+- run `buildDocker.sh` from the docker folder in the root
+- Start an interactive shell: `docker run -i -t vlpb/snakemake /bin/bash`
 
-- create a data folder and a data/tmp folder.
+This will bring you to the data folder of the snakemake user. You can add your own data here, but the docker already contains test data.
+In the `/home/snakemake/bin` folder there is a `runSnakemake` script, which will start a selected part of the pipeline:
 
-- In this repository, copy the config files from one of our workflows and add it to the 
-  data folder, modifying them accordingly.
-
-    You can find the available workflows in: ```src/workflows```
-
-    The ```paths.json``` should work without change while the other config files might need adaptation.
-
-- inside the data folder, run docker with the name of the workflow choose. e.g.: for annotation/braker
-
-     ```docker run -it --rm -v $PWD:/home/snakemake/data/ sauloal/snakemake annotation/braker```
+`./runSnakemake repeats/modeler`
 
 
 
