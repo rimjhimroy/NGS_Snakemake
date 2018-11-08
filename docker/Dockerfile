@@ -16,7 +16,7 @@ RUN apt-get update && apt-get install -y git python python-setuptools sudo wget 
     apt-get clean all && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-RUN /usr/bin/wget ftp://alpha.gnu.org/pub/gnu/libidn/libidn-1.9.tar.gz && \
+RUN /usr/bin/wget https://ftp.gnu.org/gnu/libidn/libidn-1.9.tar.gz && \
 	tar zxvf libidn-1.9.tar.gz && \
 	cd libidn-1.9 && \
 	./configure --prefix=/usr/ && \
@@ -35,6 +35,7 @@ RUN echo USER_UID $USER_UID; \
     adduser snakemake sudo && \
     ln -snf /bin/bash /bin/sh
 
+RUN mkdir -p /home/snakemake/.ssh/
 ADD id_rsa     /home/snakemake/.ssh/
 ADD id_rsa.pub /home/snakemake/.ssh/
 
@@ -77,11 +78,15 @@ RUN conda config --add channels conda-forge && \
     conda create --name snakemake -y python=3 snakemake biopython
 
 
-RUN echo -e "Host git.wur.nl\n\tStrictHostKeyChecking no\n" >> /home/snakemake/.ssh/config && \
-    ssh-keyscan -t rsa -H github.com >> /home/snakemake/.ssh/known_hosts && \
-    ssh-keyscan -t rsa -H git.wur.nl >> /home/snakemake/.ssh/known_hosts && \
-    git clone git@git.wur.nl:warri004/SnakemakeVLPB.git && \
+#RUN echo -e "Host git.wur.nl\n\tStrictHostKeyChecking no\n" >> /home/snakemake/.ssh/config && \
+#    ssh-keyscan -t rsa -H github.com >> /home/snakemake/.ssh/known_hosts && \
+#    ssh-keyscan -t rsa -H git.wur.nl >> /home/snakemake/.ssh/known_hosts && \
+#    git clone git@git.wur.nl:warri004/SnakemakeVLPB.git && \
+#    ln -s SnakemakeVLPB SnakeMakeVlpb
+ 
+RUN git clone https://git.wur.nl/warri004/SnakemakeVLPB.git  && \
     ln -s SnakemakeVLPB SnakeMakeVlpb
+
     
 RUN mkdir /home/snakemake/data && \
     mkdir /home/snakemake/bin
