@@ -209,8 +209,7 @@ rule repeatmodeler:
 """ Run repeatmasker """
 rule repeatmasker:
     input:
-        MASKER = rules.repeatmasker_installation.output,
-        PERL=rules.install_perl.output
+        MASKER = rules.repeatmasker_installation.output
     output: "" + CONFIG["base"]["output"] + "/snakemake.done"
     shell:
         "rm -f {output} && "
