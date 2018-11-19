@@ -33,7 +33,7 @@
             "output": "consensus.fa",
             "prefix": "-p ''",
             "log": "",
-            "size": "100",
+            "size": "80",
             "seqsize": "80",
             "ident": "0.6",
             "nonlcs": "50",

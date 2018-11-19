@@ -56,6 +56,6 @@ os.makedirs(strip_path_level(CONFIG['executables']['reas'],1), exist_ok=True)
 
 rule all:
     input:
-        # CONFIG['base']['bashrc'],                       # Needs to be separate defined always !
+        #CONFIG['base']['bashrc'],                       # Needs to be separate defined always !
         "consensus.fa"
 
