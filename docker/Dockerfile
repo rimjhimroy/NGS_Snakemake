@@ -35,14 +35,6 @@ RUN echo USER_UID $USER_UID; \
     adduser snakemake sudo && \
     ln -snf /bin/bash /bin/sh
 
-RUN mkdir -p /home/snakemake/.ssh/
-ADD id_rsa     /home/snakemake/.ssh/
-ADD id_rsa.pub /home/snakemake/.ssh/
-
-RUN chmod 750 /home/snakemake/.ssh && \
-    chown -R snakemake:snakemake /home/snakemake/.ssh/ 
-#&& \
-#    echo "    IdentityFile ~/.ssh/id_rsa" >> /etc/ssh/ssh_config
 
 
 
