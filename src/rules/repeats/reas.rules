@@ -78,7 +78,7 @@ rule reas_clean_reads:
         rules.reas_installation.output,
         reads = CONFIG["reads"],
         PATH = strip_path_level(CONFIG['executables']['reas'],1)
-    output: CONFIG["reas"]["options"]["clean_read_file"]
+    output: CONFIG['base']['working_dir'] + CONFIG["reas"]["options"]["clean_read_file"]
     params:
         seqsize = CONFIG["reas"]["options"]["seqsize"],
         working_dir = CONFIG['base']['working_dir']
