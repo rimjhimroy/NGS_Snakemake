@@ -1,7 +1,7 @@
 {
 	"base":
 	{
-		"working_dir": "{base_dir}data/Pleurotus_ostreatus/repeats/",
+		"working_dir": "{base_dir}data/Pleurotus_ostreatus/repeats",
 		"download_dir": "{download_dir}",
         "dnaPipeTE_bashrc": "{base_dir}{executables}dnaPipeTE.bashrc",
         "executables": "{base_dir}{executables}"
@@ -25,7 +25,7 @@
 
 	"samples": {
         "Pleurotus_ostreatus": {
-            "EP57": {
+            "PO": {
                 "readsets": {
                         "1": [
                                "/home/snakemake/data/Pleurotus_ostreatus/SRR6384728_1.fastq", 
