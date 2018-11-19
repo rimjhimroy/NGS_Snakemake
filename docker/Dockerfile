@@ -71,6 +71,8 @@ RUN conda config --add channels conda-forge && \
     conda create --name snakemake -y python=3 snakemake biopython
 
 RUN conda install --yes seqtk
+
+RUN cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
  
 RUN git clone https://git.wur.nl/warri004/SnakemakeVLPB.git  && \
     ln -s SnakemakeVLPB SnakeMakeVlpb

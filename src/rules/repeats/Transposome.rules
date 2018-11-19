@@ -9,8 +9,7 @@ from Transposome import *
        
 rule install_transposome:
     input:
-        rules.install_perl_libs.output,
-        PERL=rules.install_perl.output
+        rules.install_perl_libs.output
     output: ""  + CONFIG["executables"]["transposome"] + "/bin/transposome"
     shell:
         "mkdir -p " + CONFIG["base"]["download_dir"]+ " && "
@@ -18,13 +17,12 @@ rule install_transposome:
         "cd $TEMPDIR && "
         "wget"+CONFIG['executable_sources']['wget_options']+CONFIG['executable_sources']['transposome_URL']+" && "
         "tar xzf *.tar.gz && cd Transposome-* && "
-        "curl -L cpanmin.us | {input.PERL} - --installdeps . && {input.PERL} Makefile.PL && make && make install && "
+        "curl -L cpanmin.us | perl - --installdeps . && perl Makefile.PL && make && make install && "
         "mv -f * " + CONFIG["executables"]["transposome"] + " && cd && rm -rf $TEMPDIR "
 
 rule transposome:
     input: 
-        rules.install_transposome.output,
-        PERL=rules.install_perl.output
+        rules.install_transposome.output
     params : configured = read_yml(CONFIG, "config.yml")
     output: "" + CONFIG["base"]["output"] + "/config.yml"
     threads: 100
@@ -32,5 +30,5 @@ rule transposome:
         "source {rules.bashrc.output} && "
         "mkdir -p "+ CONFIG["base"]["output"] + " && "
         'echo "{params.configured}" > ' + CONFIG["base"]["output"] + "/config.yml && "
-        "{input.PERL} {rules.install_transposome.output} --config "+ CONFIG["base"]["output"] + "/config.yml"
+        "perl {rules.install_transposome.output} --config "+ CONFIG["base"]["output"] + "/config.yml"
     
