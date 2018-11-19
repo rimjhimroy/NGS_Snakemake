@@ -54,7 +54,7 @@ def createSymlinks(CONFIG):
                     print(readset)
                     for path in CONFIG["samples"][sample][lib]["readsets"][readset]:
                         splitpath=path.split("/")
-                        dir="./reads/" + sample + "/" + lib + "/" + readset
+                        dir=CONFIG["base"]["working_dir"] + "/reads/" + sample + "/" + lib + "/" + readset
                         try:
                             os.stat(dir)
                         except:
@@ -72,7 +72,7 @@ def createSymlinks(CONFIG):
                 for readset in CONFIG["samples"][sample][lib]["replicates"]:
                     for path in CONFIG["samples"][sample][lib]["replicates"][readset]:
                         splitpath=path.split("/")
-                        dir="./reads/" + sample + "/" + lib + "/" + readset
+                        dir=CONFIG["base"]["working_dir"] + "/reads/" + sample + "/" + lib + "/" + readset
                         try:
                             os.stat(dir)
                         except:
