@@ -17,6 +17,7 @@ rule install_perl:
         "touch {output};"
 
 # Create local Perl library
+
 rule install_perl_cpanm:
     input:
         PERL=rules.install_perl.output
@@ -26,16 +27,17 @@ rule install_perl_cpanm:
         "perlbrew install-cpanm && "
         "touch {output}"
 
+
 # Install necessary Perl libraries
 rule install_perl_libs:
-    input:
-        rules.install_perl_cpanm.output,
-        rules.install_perl.output
+#    input:
+#        rules.install_perl_cpanm.output,
+#        rules.install_perl.output
     output: CONFIG["base"]["perl_install"] + "lib/done"
     run:
         for lib in CONFIG["base"]["perl_libs"]:
-            shell("source  {rules.bashrc.output} ; cpanm "+ CONFIG["base"]["perl_cpanm_options"] + " " + lib)
-        shell("touch " + CONFIG["base"]["perl_install"] + "lib/done")
+            shell("cpanm "+ CONFIG["base"]["perl_cpanm_options"] + " " + lib)
+        shell("mkdir -p " + CONFIG["base"]["perl_install"] + "/lib && " + "touch " + CONFIG["base"]["perl_install"] + "lib/done")
 
 
 def strip_path_level(path, level = 0):

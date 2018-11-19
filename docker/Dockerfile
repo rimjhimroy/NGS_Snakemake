@@ -15,6 +15,7 @@ RUN pip3 install snakemake
 RUN apt-get update && apt-get install -y git python python-setuptools sudo wget curl bzip2 && \
     apt-get clean all && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+RUN cpan App::cpanminus
 
 RUN /usr/bin/wget https://ftp.gnu.org/gnu/libidn/libidn-1.9.tar.gz && \
 	tar zxvf libidn-1.9.tar.gz && \
