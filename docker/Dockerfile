@@ -69,12 +69,6 @@ RUN conda config --add channels conda-forge && \
     conda config --add channels bioconda    && \
     conda create --name snakemake -y python=3 snakemake biopython
 
-
-#RUN echo -e "Host git.wur.nl\n\tStrictHostKeyChecking no\n" >> /home/snakemake/.ssh/config && \
-#    ssh-keyscan -t rsa -H github.com >> /home/snakemake/.ssh/known_hosts && \
-#    ssh-keyscan -t rsa -H git.wur.nl >> /home/snakemake/.ssh/known_hosts && \
-#    git clone git@git.wur.nl:warri004/SnakemakeVLPB.git && \
-#    ln -s SnakemakeVLPB SnakeMakeVlpb
  
 RUN git clone https://git.wur.nl/warri004/SnakemakeVLPB.git  && \
     ln -s SnakemakeVLPB SnakeMakeVlpb
