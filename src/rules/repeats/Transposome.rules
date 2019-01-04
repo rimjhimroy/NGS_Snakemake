@@ -17,7 +17,7 @@ rule install_transposome:
         "cd $TEMPDIR && "
         "wget"+CONFIG['executable_sources']['wget_options']+CONFIG['executable_sources']['transposome_URL']+" && "
         "tar xzf *.tar.gz && cd Transposome-* && "
-        "curl -L cpanmin.us | perl - --installdeps . && perl Makefile.PL && make && make install && "
+        "curl -L cpanmin.us | perl - --installdeps . && perl Makefile.PL && make && "
         "mv -f * " + CONFIG["executables"]["transposome"] + " && cd && rm -rf $TEMPDIR "
 
 rule transposome:
