@@ -27,7 +27,7 @@ rule tedna_installation:
 	shell:
 		"mkdir -p " + CONFIG["base"]["executables"] + " && "
 		"cd " + CONFIG["base"]["executables"] + " && "
-		"wget" + CONFIG["executable_sources"]["wget_options"] + CONFIG["executable_sources"]["Tedna_URL"] + " && "
+		"curl " + CONFIG["executable_sources"]["wget_options"] + CONFIG["executable_sources"]["Tedna_URL"] + " --output " + CONFIG["executable_sources"]["Tedna_file"] + " && "
 		"tar -zxvf " + CONFIG["executable_sources"]["Tedna_file"] + " && "
 		"cd tedna_1.2.2/ && "
 		"sed -i 's;CFLAGS = -Wall -pedantic -std=c++11 -pthread;CFLAGS = -Wall -pedantic -std=c++11 -pthread -I/tmp/bin/repeats/sparsehash/include;g' makefile && "
