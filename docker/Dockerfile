@@ -85,6 +85,10 @@ ENV PYTHONPATH=$PYTHONPATH:/home/snakemake/SnakeMakeVlpb
 
 ADD runSnakemake /home/snakemake/bin/
 
+RUN echo 'export PERL_MB_OPT="--install_base \"/home/snakemake/perl5\""' >> /home/snakemake/.bashrc
+RUN echo 'export PERL_MM_OPT=INSTALL_BASE=/home/snakemake/perl5' >> /home/snakemake/.bashrc
+RUN echo 'export PERL_LOCAL_LIB_ROOT=/home/snakemake/perl5' >> /home/snakemake/.bashrc
+RUN echo 'export PERL5LIB=/home/snakemake/perl5/lib/perl5' >> /home/snakemake/.bashrc
 #
 # RUN
 #
@@ -106,9 +110,12 @@ RUN mkdir /home/snakemake/data/Pleurotus_ostreatus && \
 	gunzip SRR6384728_1.fastq.gz && \
 	gunzip SRR6384728_2.fastq.gz
 	
-	
 
 WORKDIR /home/snakemake/data
+
+RUN bash /home/snakemake/bin/runSnakemake repeats/masker repeatmasker_installation	
+RUN bash /home/snakemake/bin/runSnakemake repeats/modeler repeatmodeler_installation	
+
 
 	
 

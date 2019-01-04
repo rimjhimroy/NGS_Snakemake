@@ -8,7 +8,7 @@ from SnakeMakeVlpb.src.utils.StripPathLevel import strip_path_level
 
 # Download and install Sparsehash
 rule sparsehash_installation:
-	output: CONFIG["executables"]["sparsehash"]
+	output: directory(CONFIG["executables"]["sparsehash"])
 	shell:
 		"mkdir -p " + CONFIG["base"]["executables"] + " && "
 		"cd " + CONFIG["base"]["executables"] + " && "
