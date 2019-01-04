@@ -13,7 +13,7 @@ rule usearch_installation:
 	shell:
 		"mkdir -p " + CONFIG["base"]["executables"] + " && "
 		"cd " + CONFIG["base"]["executables"] + " && "
-		"wget" + CONFIG["executable_sources"]["wget_options"] + CONFIG["executable_sources"]["usearch_URL"] + " && "
+		"wget" + CONFIG["executable_sources"]["wget_options"] + CONFIG["executable_sources"]["usearch_URL"] + "$USEARCH && "
 		"mv upload* usearch && "
 		"chmod a+rx usearch && "
 		"touch {output}"

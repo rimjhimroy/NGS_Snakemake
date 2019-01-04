@@ -3,7 +3,7 @@ FROM ubuntu:18.04
 MAINTAINER Sven Warris (sven.warris@wur.nl)
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3 python3-dev python3-pip python3-setuptools git wget build-essential ssh less emacs libidn2-0 sra-toolkit
+    python3 python3-dev python3-pip python3-setuptools git wget build-essential ssh less emacs libidn2-0 sra-toolkit bc
 
 RUN pip3 install setuptools wheel
 RUN pip3 install snakemake
@@ -112,9 +112,13 @@ RUN mkdir /home/snakemake/data/Pleurotus_ostreatus && \
 	
 
 WORKDIR /home/snakemake/data
-
+ENV USEARCH=2019010405583625040 
 RUN bash /home/snakemake/bin/runSnakemake repeats/masker repeatmasker_installation	
 RUN bash /home/snakemake/bin/runSnakemake repeats/modeler repeatmodeler_installation	
+RUN bash /home/snakemake/bin/runSnakemake repeats/reas reas_installation	
+RUN bash /home/snakemake/bin/runSnakemake repeats/tedna tedna_installation	
+RUN bash /home/snakemake/bin/runSnakemake repeats/transposome install_transposome	
+RUN bash /home/snakemake/bin/runSnakemake repeats/usearch usearch_installation	
 
 
 	

@@ -14,8 +14,7 @@
 
 	"executable_sources":
 	{
-		"Tedna_URL": "https://urgi.versailles.inra.fr/content/download/3481/29402/file/tedna_1.2.2.tar.gz",
-		"Tedna_file": "{base_dir}{executables}tedna_1.2.2.tar.gz",
+		"Tedna_file": "/home/snakemake/miniconda3/bin/tedna",
 		"wget_options": " -c --proxy=off ",
         "sparsehash_URL": "https://github.com/sparsehash/sparsehash.git"
 	},

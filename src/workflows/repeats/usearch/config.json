@@ -15,7 +15,7 @@
 
 	"executable_sources":
 	{
-		"usearch_URL": "http://drive5.com/cgi-bin/upload3.py?license=2017012008363614880",
+		"usearch_URL": "http://drive5.com/cgi-bin/upload3.py?license=",
 		"wget_options": " -c --proxy=off "
 	},
     "usearch_opts": {
